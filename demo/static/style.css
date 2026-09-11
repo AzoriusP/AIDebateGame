@@ -398,12 +398,14 @@ html[data-fx-shake="off"] #app.shake { animation: none !important; }
 #identity-token { color: var(--gold-bright); }
 #identity-summary { display: flex; justify-content: center; gap: 6px; font-size: 11px; color: var(--text-mute); }
 #identity-switch { height: 30px; border-radius: 4px; border: 1px solid var(--border); background: transparent; color: var(--text-dim); padding: 0 12px; font-size: 12px; }
+.identity-token-actions,
 #identity-token-actions {
   display: flex;
   align-items: center;
   gap: 6px;
   flex-wrap: wrap;
 }
+.identity-token-actions .identity-action-btn,
 #identity-token-actions .identity-action-btn {
   height: 30px;
   border-radius: 4px;
@@ -412,6 +414,20 @@ html[data-fx-shake="off"] #app.shake { animation: none !important; }
   color: var(--text-dim);
   padding: 0 12px;
   font-size: 12px;
+  position: relative;
+}
+.identity-token {
+  margin-bottom: 6px;
+  color: var(--gold-bright);
+  display: flex;
+  justify-content: center;
+  gap: 4px;
+  font-size: 12px;
+}
+.identity-token b {
+  color: var(--text-strong);
+  font-size: 13px;
+  font-weight: 700;
 }
 #identity-feature-hints {
   width: 100%;
@@ -438,6 +454,28 @@ html[data-fx-shake="off"] #app.shake { animation: none !important; }
   font-size: 11px;
   border-radius: 8px;
   padding: 1px 7px;
+}
+.identity-token-actions .identity-action-btn.identity-token-loading,
+#identity-token-actions .identity-action-btn.identity-token-loading {
+  opacity: 0.75;
+  color: var(--text-mute);
+  cursor: wait;
+}
+.identity-token-actions .identity-action-btn.identity-token-loading::after,
+#identity-token-actions .identity-action-btn.identity-token-loading::after {
+  content: "";
+  display: inline-block;
+  width: 10px;
+  height: 10px;
+  margin-left: 8px;
+  border: 2px solid rgba(84, 116, 128, 0.35);
+  border-top-color: var(--text-mute);
+  border-radius: 50%;
+  vertical-align: middle;
+  animation: spin 0.8s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
 }
 #identity-feature-hints .permission-status.permission-ok {
   color: var(--player);

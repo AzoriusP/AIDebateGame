@@ -285,7 +285,7 @@
       const dimLabels = (typeof DIM_LABELS !== "undefined") ? DIM_LABELS : {};
       state.npcWeakness = (init.weakness || []).map((k) => dimLabels[k] || k);
       state.confidence = init.confidence != null ? init.confidence : 100;
-      state.quota = init.token_quota != null ? init.token_quota : 420;
+      state.quota = init.token_quota != null ? init.token_quota : 840;
       state.token = state.quota;
       state.topic = (script.topic && script.topic.text) || "";
 

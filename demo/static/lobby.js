@@ -75,6 +75,19 @@
     for (const panel of [identityPanel, fxPanel, reset, summary]) parking.append(panel);
     content.replaceChildren();
   });
+  const runTokenAction = async (button, taskFactory) => {
+    const originalText = button.textContent;
+    button.disabled = true;
+    button.classList.add("identity-token-loading");
+    button.textContent = "处理中…";
+    try {
+      await taskFactory();
+    } finally {
+      button.disabled = false;
+      button.classList.remove("identity-token-loading");
+      button.textContent = originalText;
+    }
+  };
   function open(titleText) {
     title.textContent = titleText;
     content.replaceChildren();
@@ -87,7 +100,17 @@
   };
   help.onclick = () => {
     open("游戏帮助");
-    content.textContent = "选择天梯赛挑战对手，用论点说服对方，将自信度降至零即可获胜。游客使用默认角色，仅能挑战第一档天梯；账号玩家可保存对局记录，自由切磋仍需满足账号代币条件。";
+    content.innerHTML = `
+      <p>玩法规则（核心）：你在每轮输入辩论内容，系统会给出判定。每条发言会消耗自身的 token，先将 TA 的「自信度」打到 0 即可获胜。</p>
+      <p>AI Native 特色：</p>
+      <ul>
+        <li>每一位 NPC 都是可对话的 AI 角色，具备独立人格参数（六维雷达）、可学习的记忆与成长。</li>
+        <li>对局判定与 NPC 回合由 LLM 推理生成，不是静态脚本，攻守转换更有动态性。</li>
+        <li>每局会记录你在不同维度上的触发结果，后续可通过长期对局建立“对 TA 的观察与反应节奏”。</li>
+        <li>提示系统按次数受限，鼓励你用策略打出关键一击，而非无脑刷字。</li>
+      </ul>
+      <p>游客模式用于体验，账号模式可保留历史与积分，解锁自由切磋与重置进度功能。</p>
+    `;
   };
   topup.onclick = () => {
     open("账号代币");
@@ -95,8 +118,32 @@
       content.textContent = "游客暂不能购买代币或领取广告奖励，请先使用账号登录。";
       return;
     }
-    identityPanel.classList.remove("hidden");
-    content.append(identityPanel);
+    content.replaceChildren();
+    const tokenRow = document.createElement("div");
+    tokenRow.className = "identity-token";
+    const tokenLabel = document.createElement("span");
+    tokenLabel.textContent = "账号代币：";
+    const tokenValue = document.createElement("b");
+    tokenValue.textContent = String(identity?.accountToken ?? 0);
+    tokenRow.append(tokenLabel, tokenValue);
+    const actionPanel = document.createElement("div");
+    actionPanel.className = "identity-token-actions";
+    const sourceActions = document.getElementById("identity-token-actions");
+    if (sourceActions) {
+      const watchBtn = sourceActions.querySelector("#identity-ad-reward");
+      const buyBtn = sourceActions.querySelector("#identity-buy");
+      if (watchBtn) {
+        const copy = watchBtn.cloneNode(true);
+        copy.onclick = () => runTokenAction(copy, () => simulateWatchAdReward().catch(reportUiError));
+        actionPanel.append(copy);
+      }
+      if (buyBtn) {
+        const copy = buyBtn.cloneNode(true);
+        copy.onclick = () => runTokenAction(copy, () => simulatePurchaseTokenPack().catch(reportUiError));
+        actionPanel.append(copy);
+      }
+    }
+    content.append(tokenRow, actionPanel);
   };
   history.onclick = () => {
     open("对局记录");

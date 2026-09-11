@@ -41,7 +41,7 @@ function setNpcSpeakDurationMs(ms) {
 
 let state = {
   sid: null, topic: null, dimensions: {}, confidence: 100,
-  token: 0, quota: 400, busy: false, npcName: "对手", tier: 1,
+  token: 0, quota: 840, busy: false, npcName: "对手", tier: 1,
   hintsLeft: HINTS_PER_MATCH,
   hintAdLeft: HINT_AD_BONUS_PER_MATCH,
   npcId: "", stance: "反对",
@@ -1202,7 +1202,7 @@ function showEntry() {
   $("#entry-account-panel").classList.add("hidden");
   setAuthStatus("");
   const acctBtn = $("#identity-switch");
-  if (acctBtn) acctBtn.textContent = "切换身份";
+  if (acctBtn) acctBtn.textContent = "退出登录";
 }
 
 function confirmGuestEntry() {
@@ -2133,6 +2133,9 @@ $("#auth-submit").addEventListener("click", submitAuth);
 $("#auth-forgot").addEventListener("click", () => setAuthStatus("忘记密码功能将在下一阶段开放。"));
 $("#entry-account-panel").addEventListener("keydown", (event) => { if (event.key === "Enter" && !event.isComposing) submitAuth(); });
 $("#identity-switch").addEventListener("click", () => {
+  const entryDialog = $("#lobby-dialog");
+  if (entryDialog?.open) entryDialog.close();
+  switchIdentity(makeDefaultProfile("guest"));
   showEntry();
 });
 $("#stance-start").addEventListener("click", () => { if (run) newGame(run.tier, null, pendingStance.topicId); });

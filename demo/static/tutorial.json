@@ -12,7 +12,7 @@
   },
   "initial": {
     "confidence": 100,
-    "token_quota": 420,
+    "token_quota": 840,
     "dimensions": {
       "LOGIC": 2,
       "EVIDENCE": 2,
