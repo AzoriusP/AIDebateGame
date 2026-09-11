@@ -1028,6 +1028,10 @@ def _chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temper
         if started < len(candidates):
             launch(started)
             started += 1
+        elif active <= 0:
+            # 所有候选都跑过一遍且全部失败（典型：密钥无效/URL 写错 → 秒返 401/404）。
+            # 此时不必再空耗到总时限，立刻抛错让玩家看到"连接超时，请F5"提示。
+            break
     stop.set()
     raise LLMUnavailableError("; ".join(errors[-3:]) or "all candidates timed out")
 
