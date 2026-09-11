@@ -1,0 +1,71 @@
+{
+  "format": "ordinary-raster-psd-v1",
+  "source_manifest": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\layers.json",
+  "source_manifest_sha256": "7feeaacf1555ab61e36611c35841352238efbe916616837c7c0178e29ef00811",
+  "canvas": {
+    "width": 2048,
+    "height": 1536,
+    "color_mode": "RGBA",
+    "depth": 8
+  },
+  "layer_order": "bottom-to-top",
+  "alpha_bounds_cropped": true,
+  "merged_includes": "visible layers only",
+  "merged_rgb_storage": "white-matted RGB with original alpha; individual layers retain straight RGBA",
+  "psd": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\male-acting-poses.psd",
+  "psd_sha256": "43edfe76745dcf1769b59b179e4ff62ad31f2e20c1fc476c66b43d0d610e393e",
+  "psd_bytes": 27764276,
+  "preview": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\male-acting-poses.preview.png",
+  "layers": [
+    {
+      "name": "Neutral_PoseReference",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\layers\\Neutral.png",
+      "source_sha256": "e13097baf038effba3e276eb0c0c15b62655d84f5256e6391ad3b570c721444b",
+      "visible": true,
+      "bbox": [
+        531,
+        65,
+        1180,
+        1536
+      ],
+      "source_canvas": [
+        2048,
+        1536
+      ]
+    },
+    {
+      "name": "Lean_PoseReference",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\layers\\Lean.png",
+      "source_sha256": "c3e9d597d721549ff7a9613b2f1278ee157257a5a4dda9705c8137a5ecd3be01",
+      "visible": false,
+      "bbox": [
+        503,
+        89,
+        1253,
+        1536
+      ],
+      "source_canvas": [
+        2048,
+        1536
+      ]
+    },
+    {
+      "name": "Point_PoseReference",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\acting-v2\\pose-sources\\layers\\Point.png",
+      "source_sha256": "e34d5a69d969fed53fe045363c7a1ec1a96ea2a8f8b9f90b6b5e035d1fa570e6",
+      "visible": false,
+      "bbox": [
+        601,
+        56,
+        1787,
+        1536
+      ],
+      "source_canvas": [
+        2048,
+        1536
+      ]
+    }
+  ],
+  "cubism_import": "must be verified in Editor for each production package",
+  "preview_sha256": "82bb73e12babf9d8fdf38dd43e25d88c9a5850e9fbb68960eac8cd63d7e900e1"
+}

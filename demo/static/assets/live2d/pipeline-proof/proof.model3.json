@@ -1,0 +1,29 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "proof.moc3",
+    "Textures": [
+      "proof.1024/texture_00.png"
+    ],
+    "DisplayInfo": "proof.cdi3.json",
+    "Motions": {
+      "Objection": [
+        {
+          "File": "motions/objection.motion3.json",
+          "FadeInTime": 0.08,
+          "FadeOutTime": 0.15
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    }
+  ]
+}

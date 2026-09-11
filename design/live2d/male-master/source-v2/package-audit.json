@@ -1,0 +1,876 @@
+{
+  "checked_at_utc": "2026-09-09T08:11:17.387811+00:00",
+  "pass": true,
+  "checks": {
+    "thirteen_layers": true,
+    "nine_visible_four_hidden_in_saved_psd": true,
+    "all_layer_pixel_checks_pass": true,
+    "all_source_rgb_alpha_provenance_pass": true,
+    "rgba_dimensions_and_depth": true,
+    "resolution_info_present": true,
+    "all_four_pose_compositions_pass": true,
+    "merged_raw_bytes_white_matted_exact": true,
+    "merged_display_error_at_most_one": true,
+    "merged_alpha_exact": true,
+    "standalone_psd_preview_matches_neutral": true,
+    "original_11_layer_source_preserved": true,
+    "new_package_unchanged_during_audit": true,
+    "package_receipt_hashes_match": true
+  },
+  "decoder": {
+    "name": "psd-tools",
+    "version": "1.19.0"
+  },
+  "psd": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.psd",
+  "sha256": {
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.psd": "f5c47b037666d7a4ce27ddc9cfd6f8cccfbb24df9a7da442268230ebe957a1de",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers.json": "489e856c6f3475992995165ed8ed8d85e9bf19759932e903d6a2cca164e972fe",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.preview.png": "7d5dee3c69de7f6252b2d97ba3ed1d0563992a150be5daef4e09cd22b6dcd5a6",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.layers.json": "40552789b78b4018c7763444819f990692284534e5f326eb15470ebd3cf4eb6b",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_Body.png": "0cb040566d8687a70b3d473d3e72d75f10c61c063e357d33b20e6661529b6309",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_ArmLIdle.png": "aed0f2a1ac192b250886c582391070eea07898ce63365b79c4a112a929a24f86",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_ArmLPoint.png": "20a971f5fa0aede29f20e5e6f6ca6ac97c759cb4d2b99d0068b8afa92876b57d",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_Base.png": "32e6cbee5edde5a3021cb07a38dcfc003b6649d1ab27bd8a75ab27532be86bac",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeROpen.png": "371ef3051f83e333454b1c05c3b2534037c35869caf12264c9e42e3344febb3c",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeLOpen.png": "68cfcb3c6c1c6206a6fbba9fea3e5c3991588167970d56a4e75f853965aa0e90",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_BrowR.png": "13cef511a877dd9f6f15c7b4befbdcd5b39c6042b934c6333df0822b9e51cb6b",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_BrowL.png": "00bc028395dea793f88808881feee48bb297b9fbc6e7f21de108b172dfbc5b72",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_MouthClosed.png": "413f9d2dd5abe1b0cc763111b70fb2908d858e2487e772679c7f5ff4e1c3a603",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeRClosed.png": "62c1f7a1878acd9059430b5f1cab92090ebfe8efa5cbf1fc9ba5b0b3c23edd86",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeLClosed.png": "bfd072b06ceec06f18a0b871a38586343b8a700963748a606bcda02a1b0ad53c",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_MouthOpen.png": "d01fd84ac1bcf1c4ed300ea90088adbf761425b787742afdfa3a7bf2a85b6b21",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\HairA_Front.png": "7e0b7d842918098adfc8612b6f7a05697456ffba641150f2991e02036f99f688",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\neutral.preview.png": "7d5dee3c69de7f6252b2d97ba3ed1d0563992a150be5daef4e09cd22b6dcd5a6",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\closed.preview.png": "929230c3a2bae9cfeaa67ab683109d1ab88187d52c05ea571226c93c132bd992",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\talking.preview.png": "64602c89c605198ba35dc9a6db4d947ce49950b5e90982ca372b250e248c065a",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\objection.preview.png": "e43b5bbc634d7a3d8f807abeb5f59e2a80676c4dbb2c40600d55fad4d4135f3c"
+  },
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        166,
+        392,
+        743,
+        1536
+      ],
+      "expected_alpha_bbox": [
+        166,
+        392,
+        743,
+        1536
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        675,
+        466,
+        853,
+        1294
+      ],
+      "expected_alpha_bbox": [
+        675,
+        466,
+        853,
+        1294
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1406942,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "visible": false,
+      "expected_visible": false,
+      "bbox": [
+        645,
+        451,
+        907,
+        777
+      ],
+      "expected_alpha_bbox": [
+        645,
+        451,
+        907,
+        777
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 686307,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_Base",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        405,
+        219,
+        631,
+        470
+      ],
+      "expected_alpha_bbox": [
+        405,
+        219,
+        631,
+        470
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1497129,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_EyeROpen",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "expected_alpha_bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1547440,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_EyeLOpen",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "expected_alpha_bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1547326,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_BrowR",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        431,
+        267,
+        503,
+        300
+      ],
+      "expected_alpha_bbox": [
+        431,
+        267,
+        503,
+        300
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1548086,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_BrowL",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        525,
+        268,
+        601,
+        301
+      ],
+      "expected_alpha_bbox": [
+        525,
+        268,
+        601,
+        301
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1548021,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_MouthClosed",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        477,
+        368,
+        555,
+        405
+      ],
+      "expected_alpha_bbox": [
+        477,
+        368,
+        555,
+        405
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1547240,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_EyeRClosed",
+      "visible": false,
+      "expected_visible": false,
+      "bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "expected_alpha_bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1548221,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_EyeLClosed",
+      "visible": false,
+      "expected_visible": false,
+      "bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "expected_alpha_bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1548061,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "FaceA_MouthOpen",
+      "visible": false,
+      "expected_visible": false,
+      "bbox": [
+        481,
+        360,
+        547,
+        404
+      ],
+      "expected_alpha_bbox": [
+        481,
+        360,
+        547,
+        404
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1547175,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    },
+    {
+      "name": "HairA_Front",
+      "visible": true,
+      "expected_visible": true,
+      "bbox": [
+        339,
+        83,
+        694,
+        412
+      ],
+      "expected_alpha_bbox": [
+        339,
+        83,
+        694,
+        412
+      ],
+      "cropped_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "restored_canvas_pixels": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 1437414,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "pass": true
+    }
+  ],
+  "provenance_checks": [
+    {
+      "name": "OutfitA_Body",
+      "rgb_equals_original_source": true,
+      "alpha_equals_mask": true,
+      "source_hash_matches": true,
+      "mask_hash_matches": true
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "rgb_equals_original_source": true,
+      "alpha_equals_mask": true,
+      "source_hash_matches": true,
+      "mask_hash_matches": true
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "rgb_equals_original_source": true,
+      "alpha_equals_mask": true,
+      "source_hash_matches": true,
+      "mask_hash_matches": true
+    },
+    {
+      "name": "FaceA_Base",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeROpen",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeLOpen",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_BrowR",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_BrowL",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_MouthClosed",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeRClosed",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeLClosed",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "FaceA_MouthOpen",
+      "exact_original_file_copy": true
+    },
+    {
+      "name": "HairA_Front",
+      "exact_original_file_copy": true
+    }
+  ],
+  "poses": [
+    {
+      "pose": "neutral",
+      "visible_layers": [
+        "OutfitA_Body",
+        "OutfitA_ArmLIdle",
+        "FaceA_Base",
+        "FaceA_EyeROpen",
+        "FaceA_EyeLOpen",
+        "FaceA_BrowR",
+        "FaceA_BrowL",
+        "FaceA_MouthClosed",
+        "HairA_Front"
+      ],
+      "png_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "forced_psd_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 935758,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": false,
+        "visible_changed_pixels": 6956,
+        "visible_max_channel_difference": 1,
+        "alpha_equal": false
+      },
+      "display_error": {
+        "black": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 4214,
+          "raw_max_channel_difference": 2,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 4214,
+          "visible_max_channel_difference": 2,
+          "alpha_equal": true
+        },
+        "white": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 4273,
+          "raw_max_channel_difference": 1,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 4273,
+          "visible_max_channel_difference": 1,
+          "alpha_equal": true
+        }
+      },
+      "pass": true
+    },
+    {
+      "pose": "closed",
+      "visible_layers": [
+        "OutfitA_Body",
+        "OutfitA_ArmLIdle",
+        "FaceA_Base",
+        "FaceA_BrowR",
+        "FaceA_BrowL",
+        "FaceA_MouthClosed",
+        "FaceA_EyeRClosed",
+        "FaceA_EyeLClosed",
+        "HairA_Front"
+      ],
+      "png_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "forced_psd_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 935239,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": false,
+        "visible_changed_pixels": 6437,
+        "visible_max_channel_difference": 1,
+        "alpha_equal": false
+      },
+      "display_error": {
+        "black": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 3709,
+          "raw_max_channel_difference": 2,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 3709,
+          "visible_max_channel_difference": 2,
+          "alpha_equal": true
+        },
+        "white": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 3667,
+          "raw_max_channel_difference": 1,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 3667,
+          "visible_max_channel_difference": 1,
+          "alpha_equal": true
+        }
+      },
+      "pass": true
+    },
+    {
+      "pose": "talking",
+      "visible_layers": [
+        "OutfitA_Body",
+        "OutfitA_ArmLIdle",
+        "FaceA_Base",
+        "FaceA_EyeROpen",
+        "FaceA_EyeLOpen",
+        "FaceA_BrowR",
+        "FaceA_BrowL",
+        "FaceA_MouthOpen",
+        "HairA_Front"
+      ],
+      "png_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "forced_psd_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 936077,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": false,
+        "visible_changed_pixels": 7275,
+        "visible_max_channel_difference": 1,
+        "alpha_equal": false
+      },
+      "display_error": {
+        "black": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 4545,
+          "raw_max_channel_difference": 2,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 4545,
+          "visible_max_channel_difference": 2,
+          "alpha_equal": true
+        },
+        "white": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 4692,
+          "raw_max_channel_difference": 1,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 4692,
+          "visible_max_channel_difference": 1,
+          "alpha_equal": true
+        }
+      },
+      "pass": true
+    },
+    {
+      "pose": "objection",
+      "visible_layers": [
+        "OutfitA_Body",
+        "OutfitA_ArmLPoint",
+        "FaceA_Base",
+        "FaceA_EyeROpen",
+        "FaceA_EyeLOpen",
+        "FaceA_BrowR",
+        "FaceA_BrowL",
+        "FaceA_MouthOpen",
+        "HairA_Front"
+      ],
+      "png_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": true,
+        "raw_changed_pixels": 0,
+        "raw_max_channel_difference": 0,
+        "visible_rgba_equal": true,
+        "visible_changed_pixels": 0,
+        "visible_max_channel_difference": 0,
+        "alpha_equal": true
+      },
+      "forced_psd_composition_vs_saved_qa": {
+        "size_matches": true,
+        "raw_rgba_equal": false,
+        "raw_changed_pixels": 986283,
+        "raw_max_channel_difference": 255,
+        "visible_rgba_equal": false,
+        "visible_changed_pixels": 19759,
+        "visible_max_channel_difference": 1,
+        "alpha_equal": false
+      },
+      "display_error": {
+        "black": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 17475,
+          "raw_max_channel_difference": 2,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 17475,
+          "visible_max_channel_difference": 2,
+          "alpha_equal": true
+        },
+        "white": {
+          "size_matches": true,
+          "raw_rgba_equal": false,
+          "raw_changed_pixels": 17525,
+          "raw_max_channel_difference": 1,
+          "visible_rgba_equal": false,
+          "visible_changed_pixels": 17525,
+          "visible_max_channel_difference": 1,
+          "alpha_equal": true
+        }
+      },
+      "pass": true
+    }
+  ],
+  "raw_merge_vs_white_matte": {
+    "size_matches": true,
+    "raw_rgba_equal": true,
+    "raw_changed_pixels": 0,
+    "raw_max_channel_difference": 0,
+    "visible_rgba_equal": true,
+    "visible_changed_pixels": 0,
+    "visible_max_channel_difference": 0,
+    "alpha_equal": true
+  },
+  "decoded_merged_display_error": {
+    "black": {
+      "size_matches": true,
+      "raw_rgba_equal": false,
+      "raw_changed_pixels": 5455,
+      "raw_max_channel_difference": 1,
+      "visible_rgba_equal": false,
+      "visible_changed_pixels": 5455,
+      "visible_max_channel_difference": 1,
+      "alpha_equal": true
+    },
+    "white": {
+      "size_matches": true,
+      "raw_rgba_equal": false,
+      "raw_changed_pixels": 5455,
+      "raw_max_channel_difference": 1,
+      "visible_rgba_equal": false,
+      "visible_changed_pixels": 5455,
+      "visible_max_channel_difference": 1,
+      "alpha_equal": true
+    }
+  },
+  "visual_review": {
+    "neutral": "Full-frame review: left idle arm rejoins the shoulder without an obvious transparent split. Existing cream silhouette outlines remain.",
+    "objection": "Pointing arm overlaps the shoulder and chest without an obvious open gap at full-frame size. A thin pale/pink fringe remains along parts of the pointing hand outline; this comes from the supplied artwork/mask and was not repainted.",
+    "motion_limitation": "Static pose inspection only. Intermediate arm transforms, opacity crossfades, deformation, ID-preserving PSD reimport, and official MOC playback still require Cubism validation."
+  },
+  "pixel_semantics": "Every cropped layer preserves raw RGBA exactly. Canvas restoration ignores only RGB under alpha=0 outside crop bounds. PNG QA composition is exact. The 8-bit white-matted merged PSD preview is checked over black and white with at most 1/255 display error; forced per-layer composition may differ by 1/255 in visible RGBA because of decoder rounding.",
+  "source_changes": "Only new source-v2 production package files created; original source layer PNGs and PSD were read and hash checked, not overwritten. Cubism source was not read or written. Independent Comfy extraction used only LoadImage, ImageToMask, InvertMask, JoinImageWithAlpha and SaveImage."
+}

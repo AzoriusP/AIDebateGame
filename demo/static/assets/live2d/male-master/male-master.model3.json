@@ -1,0 +1,36 @@
+{
+  "Version": 3,
+  "FileReferences": {
+    "Moc": "male-master.moc3",
+    "Textures": [
+      "male-master.2048/texture_00.png"
+    ],
+    "DisplayInfo": "male-master.cdi3.json",
+    "Motions": {
+      "Objection": [
+        {
+          "File": "motions/objection.motion3.json",
+          "FadeInTime": 0.03,
+          "FadeOutTime": 0.05
+        }
+      ]
+    }
+  },
+  "Groups": [
+    {
+      "Target": "Parameter",
+      "Name": "EyeBlink",
+      "Ids": [
+        "ParamEyeLOpen",
+        "ParamEyeROpen"
+      ]
+    },
+    {
+      "Target": "Parameter",
+      "Name": "LipSync",
+      "Ids": [
+        "ParamMouthOpenY"
+      ]
+    }
+  ]
+}

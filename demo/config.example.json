@@ -1,0 +1,29 @@
+{
+  "llm_mode": "openai",
+  "llm_opening": false,
+  "keep_alive": "30m",
+  "ollama_base": "http://localhost:11434",
+  "model": "qwen3.5:latest",
+  "judge_model": "qwen3.5:latest",
+  "npc_model": "qwen3.5:latest",
+  "openai_base": "https://tokenhub.tencentmaas.com",
+  "openai_api_key": "YOUR_TOKENHUB_KEY_HERE",
+  "openai_model": "hy4-preview",
+  "port": 8787,
+  "judge_timeout_s": 180,
+  "npc_timeout_s": 180,
+  "tts": {
+    "enabled": false,
+    "mode": "edge",
+    "timeout_s": 20,
+    "max_text": 300,
+    "voices": {
+      "default": "zh-CN-XiaoxiaoNeural",
+      "L1_A": "zh-CN-XiaoxiaoNeural",
+      "L2_A": "zh-CN-YunxiNeural",
+      "L3_A": "zh-CN-XiaoyiNeural",
+      "L4_A": "zh-CN-YunjianNeural",
+      "L5_A": "zh-CN-YunyangNeural"
+    }
+  }
+}

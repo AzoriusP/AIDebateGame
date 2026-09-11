@@ -1,0 +1,899 @@
+<!DOCTYPE html>
+<html lang="zh-CN" data-page-node-id="8eSBbsgKJPUdaQmRk3mt6G">
+<head data-page-node-id="1lDhJKehznbbDXNDz10wrK">
+<meta charset="UTF-8" data-page-node-id="ToYtr8jdZ46yL30cztoT4b">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="DTrhzeQi0gW5dpGdepT2mk">
+<title>抬杠模拟器 · UI v3 原型</title>
+<style>
+/* ============================================================
+   DESIGN TOKENS — 言刃法庭 v3
+   ============================================================ */
+:root{
+  /* 色彩 */
+  --bg-deep:#0E1226; --bg-mid:#171C3A; --bg-raise:#1F2549;
+  --red:#FF3B4E; --red-deep:#C81E33;
+  --gold:#F5C04E; --gold-bright:#FFE08A;
+  --player:#45D6C8; --npc:#F08A5D;
+  --text:#F5F6FA; --text-dim:#C8CCE0; --text-mute:#8A8F9F;
+  --border:rgba(255,255,255,.08); --border-strong:rgba(255,255,255,.16);
+
+  /* 字体 */
+  --serif:"Noto Serif SC","Songti SC","STSong",SimSun,serif;
+  --sans:"Noto Sans SC","PingFang SC","Microsoft YaHei",sans-serif;
+  --mono:"JetBrains Mono",ui-monospace,Consolas,monospace;
+
+  /* 字号 */
+  --fs-11:11px; --fs-12:12px; --fs-13:13px; --fs-14:14px; --fs-16:16px;
+  --fs-18:18px; --fs-22:22px; --fs-28:28px; --fs-36:36px; --fs-48:48px;
+
+  /* 间距 */
+  --sp-1:4px; --sp-2:8px; --sp-3:12px; --sp-4:16px; --sp-5:20px;
+  --sp-6:24px; --sp-8:32px; --sp-10:40px; --sp-12:48px; --sp-16:64px;
+
+  /* 圆角 / 阴影 */
+  --r-sm:4px; --r-md:6px; --r-lg:8px; --r-pill:999px;
+  --sh-sm:0 1px 2px rgb(0 0 0/.24);
+  --sh-md:0 6px 16px -4px rgb(0 0 0/.40);
+  --sh-lg:0 18px 48px -12px rgb(0 0 0/.56);
+  --glow-gold:0 0 0 1px rgba(245,192,78,.5),0 0 24px -6px rgba(245,192,78,.45);
+  --glow-red:0 0 0 1px rgba(255,59,78,.5),0 0 24px -6px rgba(255,59,78,.45);
+
+  /* 动效 */
+  --ease:cubic-bezier(.2,.7,.3,1);
+  --t-fast:150ms; --t-mid:300ms; --t-slow:520ms;
+}
+
+*{box-sizing:border-box;}
+html,body{margin:0;padding:0;height:100%;}
+body{
+  font-family:var(--sans); color:var(--text); background:#05070F;
+  display:flex; flex-direction:column; overflow:auto;
+}
+button{font-family:inherit;cursor:pointer;border:none;background:none;color:inherit;}
+input{font-family:inherit;}
+:focus-visible{outline:2px solid var(--gold);outline-offset:2px;border-radius:var(--r-sm);}
+.icon{width:20px;height:20px;flex:0 0 auto;stroke:currentColor;fill:none;stroke-width:1.6;
+  stroke-linecap:round;stroke-linejoin:round;}
+.icon--sm{width:16px;height:16px;}
+.icon--lg{width:24px;height:24px;}
+.num{font-family:var(--mono);font-variant-numeric:tabular-nums;}
+
+/* ============================================================
+   原型外壳（非设计内容）
+   ============================================================ */
+#shell-bar{
+  flex:0 0 auto;display:flex;align-items:center;gap:var(--sp-2);
+  padding:var(--sp-2) var(--sp-4);background:#080B18;
+  border-bottom:1px solid var(--border);flex-wrap:wrap;
+}
+#shell-bar .tag{
+  font-size:var(--fs-11);letter-spacing:1px;color:#5E6480;
+  border:1px solid #262C4A;padding:2px var(--sp-2);border-radius:var(--r-sm);
+}
+.snav{
+  font-size:var(--fs-12);padding:5px var(--sp-3);border-radius:var(--r-sm);
+  border:1px solid #262C4A;color:#8A8F9F;transition:all var(--t-fast);
+}
+.snav:hover{color:var(--text);border-color:#3A4270;}
+.snav.on{background:var(--gold);color:#0E1226;border-color:var(--gold);font-weight:700;}
+.snav-dev{margin-left:auto;}
+
+#proto-wrap{
+  flex:1 1 auto;display:flex;align-items:stretch;justify-content:center;
+  padding:var(--sp-4);min-height:0;
+}
+#proto{
+  position:relative;width:100%;max-width:1280px;height:calc(100vh - 108px);min-height:600px;
+  background:var(--bg-deep);border:1px solid var(--border-strong);border-radius:var(--r-lg);
+  overflow:hidden;box-shadow:var(--sh-lg);transition:all var(--t-slow) var(--ease);
+  background-image:
+    radial-gradient(ellipse at center,rgba(245,192,78,.04) 0%,transparent 60%),
+    radial-gradient(ellipse at top,rgba(69,214,200,.03) 0%,transparent 70%);
+}
+body.dev-mobile #proto{
+  width:390px;max-width:390px;height:780px;border-radius:20px;
+  border:8px solid #1B2035;
+}
+body.dev-mobile #proto-wrap{align-items:center;}
+
+.screen{position:absolute;inset:0;display:none;flex-direction:column;}
+.screen.on{display:flex;animation:fadeUp var(--t-mid) var(--ease);}
+@keyframes fadeUp{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+/* ============================================================
+   组件
+   ============================================================ */
+/* Button */
+.btn{
+  display:inline-flex;align-items:center;justify-content:center;gap:var(--sp-2);
+  height:44px;padding:0 var(--sp-5);border-radius:var(--r-sm);
+  font-size:var(--fs-14);font-weight:600;letter-spacing:1px;
+  transition:all var(--t-fast) var(--ease);white-space:nowrap;
+}
+.btn:active{transform:translateY(1px);}
+.btn:disabled{opacity:.45;pointer-events:none;}
+.btn--primary{background:var(--gold);color:#0E1226;}
+.btn--primary:hover{background:var(--gold-bright);box-shadow:var(--glow-gold);}
+.btn--danger{background:var(--red);color:#fff;}
+.btn--danger:hover{background:#FF5566;box-shadow:var(--glow-red);}
+.btn--outline{border:1px solid rgba(69,214,200,.5);color:var(--player);background:rgba(69,214,200,.06);}
+.btn--outline:hover{background:rgba(69,214,200,.14);border-color:var(--player);}
+.btn--ghost{border:1px solid var(--border-strong);color:var(--text-dim);}
+.btn--ghost:hover{border-color:var(--gold);color:var(--gold);}
+.btn--lg{height:52px;font-size:var(--fs-16);padding:0 var(--sp-8);}
+.btn--sm{height:32px;font-size:var(--fs-12);padding:0 var(--sp-3);}
+.btn--icon{width:44px;padding:0;}
+.btn--icon.btn--sm{width:32px;}
+
+/* TicketCard */
+.ticket{
+  position:relative;background:var(--bg-mid);border:2px solid var(--border-strong);
+  border-radius:var(--r-md);padding:var(--sp-4);
+  clip-path:polygon(0 12px,12px 0,calc(100% - 12px) 0,100% 12px,100% calc(100% - 12px),calc(100% - 12px) 100%,12px 100%,0 calc(100% - 12px));
+  transition:transform var(--t-fast) var(--ease),box-shadow var(--t-fast) var(--ease),border-color var(--t-fast);
+}
+.ticket--gold{border-color:rgba(245,192,78,.45);}
+.ticket--gold:hover{border-color:var(--gold);transform:translateY(-2px);box-shadow:var(--sh-md);}
+.ticket--red{border-color:rgba(255,59,78,.45);}
+.ticket--locked{opacity:.42;filter:saturate(.3);}
+
+/* Chip */
+.chip{
+  display:inline-flex;align-items:center;gap:var(--sp-1);
+  height:22px;padding:0 var(--sp-3);border-radius:var(--r-pill);
+  font-size:var(--fs-11);letter-spacing:.5px;border:1px solid transparent;
+}
+.chip--gold{color:var(--gold);background:rgba(245,192,78,.12);border-color:rgba(245,192,78,.3);}
+.chip--red{color:var(--red);background:rgba(255,59,78,.12);border-color:rgba(255,59,78,.3);}
+.chip--cyan{color:var(--player);background:rgba(69,214,200,.12);border-color:rgba(69,214,200,.3);}
+.chip--mute{color:var(--text-mute);background:rgba(255,255,255,.05);border-color:var(--border);}
+
+/* Switch */
+.switch{width:44px;height:24px;border-radius:var(--r-pill);background:rgba(255,255,255,.12);
+  border:1px solid var(--border-strong);position:relative;transition:all var(--t-fast);flex:0 0 auto;}
+.switch::after{content:"";position:absolute;top:2px;left:2px;width:18px;height:18px;border-radius:50%;
+  background:var(--text-mute);transition:all var(--t-fast) var(--ease);}
+.switch.on{background:rgba(245,192,78,.28);border-color:var(--gold);}
+.switch.on::after{left:22px;background:var(--gold);}
+
+/* ConfidenceMeter */
+.meter{height:10px;border-radius:var(--r-pill);background:rgba(255,255,255,.08);
+  border:1px solid var(--border-strong);overflow:hidden;}
+.meter__fill{height:100%;width:100%;transform-origin:left center;
+  transition:transform 400ms var(--ease),background 300ms;}
+.meter[data-level="high"] .meter__fill{background:linear-gradient(90deg,#FF6B7A,var(--red));}
+.meter[data-level="mid"] .meter__fill{background:linear-gradient(90deg,#FFB15D,var(--npc));}
+.meter[data-level="low"] .meter__fill{background:linear-gradient(90deg,var(--gold-bright),var(--gold));}
+
+/* ============================================================
+   S1 入场券
+   ============================================================ */
+.entry{display:flex;flex-direction:column;align-items:center;justify-content:center;
+  padding:var(--sp-8);gap:var(--sp-6);text-align:center;}
+.brand{font-family:var(--serif);font-size:var(--fs-48);font-weight:900;letter-spacing:8px;
+  color:var(--gold);margin:0;text-shadow:0 4px 32px rgba(245,192,78,.28);}
+.brand-sub{font-size:var(--fs-14);color:var(--text-dim);letter-spacing:2px;margin:0;}
+.entry-idbar{
+  display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-2) var(--sp-3);
+  border:1px dashed rgba(69,214,200,.4);border-radius:var(--r-md);background:rgba(69,214,200,.05);
+}
+.entry-idbar .nm{font-family:var(--serif);font-size:var(--fs-14);color:var(--player);}
+.entry-foot{display:flex;gap:var(--sp-3);margin-top:var(--sp-4);}
+
+/* ============================================================
+   S2 选对手
+   ============================================================ */
+.roster-hd{padding:var(--sp-5) var(--sp-6) var(--sp-3);border-bottom:1px solid var(--border);}
+.roster-tabs{display:flex;gap:var(--sp-2);margin-top:var(--sp-4);}
+.tab{padding:var(--sp-2) var(--sp-5);border:1px solid var(--border-strong);border-radius:var(--r-sm);
+  font-size:var(--fs-14);color:var(--text-dim);transition:all var(--t-fast);}
+.tab:hover{border-color:var(--gold);color:var(--gold);}
+.tab.on{background:var(--gold);color:#0E1226;border-color:var(--gold);font-weight:700;}
+.roster-body{flex:1 1 auto;overflow:auto;padding:var(--sp-5) var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-3);}
+.memrow{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3) var(--sp-4);
+  background:rgba(245,192,78,.06);border:1px solid rgba(245,192,78,.25);border-radius:var(--r-md);
+  font-size:var(--fs-13);color:var(--gold);}
+.memrow .switch{margin-left:auto;}
+.foe{display:flex;align-items:center;gap:var(--sp-4);cursor:pointer;}
+.foe__badge{
+  width:52px;height:52px;flex:0 0 auto;display:flex;align-items:center;justify-content:center;
+  font-family:var(--serif);font-size:var(--fs-22);font-weight:900;color:var(--red);
+  background:rgba(255,59,78,.1);border:1px solid rgba(255,59,78,.35);border-radius:var(--r-sm);
+  clip-path:polygon(0 8px,8px 0,calc(100% - 8px) 0,100% 8px,100% calc(100% - 8px),calc(100% - 8px) 100%,8px 100%,0 calc(100% - 8px));
+}
+.foe__main{flex:1 1 auto;min-width:0;}
+.foe__name{font-family:var(--serif);font-size:var(--fs-18);font-weight:700;}
+.foe__desc{font-size:var(--fs-12);color:var(--text-mute);margin-top:2px;}
+.foe__meta{display:flex;gap:var(--sp-2);margin-top:var(--sp-2);flex-wrap:wrap;}
+.foe__go{flex:0 0 auto;color:var(--gold);}
+
+/* ============================================================
+   S3 辩题确认
+   ============================================================ */
+.brief{flex:1 1 auto;overflow:auto;padding:var(--sp-6);display:flex;flex-direction:column;
+  align-items:center;justify-content:center;gap:var(--sp-5);}
+.verdict-card{
+  width:100%;max-width:640px;background:var(--bg-mid);border:2px solid rgba(245,192,78,.4);
+  border-radius:var(--r-md);padding:var(--sp-8) var(--sp-6);
+  clip-path:polygon(0 16px,16px 0,calc(100% - 16px) 0,100% 16px,100% calc(100% - 16px),calc(100% - 16px) 100%,16px 100%,0 calc(100% - 16px));
+  text-align:center;
+}
+.vc-label{font-size:var(--fs-12);letter-spacing:4px;color:var(--text-mute);}
+.vc-topic{font-family:var(--serif);font-size:var(--fs-28);font-weight:900;line-height:1.35;
+  margin:var(--sp-4) 0 var(--sp-5);}
+.side-row{display:flex;align-items:center;justify-content:space-between;
+  padding:var(--sp-3) var(--sp-4);border-radius:var(--r-sm);margin-bottom:var(--sp-2);font-size:var(--fs-14);}
+.side-row.npc{background:rgba(240,138,93,.08);border:1px solid rgba(240,138,93,.3);color:var(--npc);}
+.side-row.you{background:rgba(69,214,200,.08);border:1px solid rgba(69,214,200,.3);color:var(--player);}
+.side-row b{font-family:var(--serif);letter-spacing:2px;}
+.tags-line{display:flex;flex-wrap:wrap;gap:var(--sp-2);align-items:center;
+  margin-top:var(--sp-4);justify-content:center;}
+.tags-line .lb{font-size:var(--fs-12);color:var(--text-mute);}
+.brief-cta{display:flex;gap:var(--sp-3);align-items:center;}
+
+/* ============================================================
+   S4 对战
+   ============================================================ */
+.hud{
+  flex:0 0 auto;height:52px;display:grid;grid-template-columns:1fr auto 1fr;align-items:center;
+  gap:var(--sp-4);padding:0 var(--sp-4);border-bottom:1px solid var(--border);
+  background:linear-gradient(180deg,rgba(255,255,255,.04),transparent);
+}
+.hud__topic{display:flex;align-items:center;gap:var(--sp-2);min-width:0;}
+.hud__topic span{font-family:var(--serif);font-size:var(--fs-14);white-space:nowrap;
+  overflow:hidden;text-overflow:ellipsis;}
+.hud__mid{display:flex;align-items:center;gap:var(--sp-2);font-family:var(--serif);
+  font-size:var(--fs-13);color:var(--gold-bright);letter-spacing:1px;white-space:nowrap;}
+.hud__res{display:flex;align-items:center;justify-content:flex-end;gap:var(--sp-4);
+  font-size:var(--fs-13);color:var(--text-dim);}
+.hud__res .it{display:flex;align-items:center;gap:var(--sp-1);}
+.hud__res .it.warn{color:var(--red);}
+
+.arena{flex:1 1 auto;display:flex;gap:var(--sp-4);padding:var(--sp-4);min-height:0;}
+.stream{flex:1 1 auto;min-width:0;max-width:720px;margin:0 auto;overflow:auto;
+  display:flex;flex-direction:column;gap:var(--sp-3);padding-right:var(--sp-2);}
+.msg{max-width:78%;padding:var(--sp-3) var(--sp-4);border-radius:var(--r-md);
+  font-size:var(--fs-18);line-height:1.6;animation:fadeUp var(--t-mid) var(--ease) backwards;}
+.msg__who{font-size:var(--fs-11);letter-spacing:1px;margin-bottom:var(--sp-1);opacity:.8;}
+.msg--npc{align-self:flex-start;background:var(--bg-mid);border-left:3px solid var(--npc);}
+.msg--npc .msg__who{color:var(--npc);}
+.msg--me{align-self:flex-end;background:rgba(69,214,200,.08);border-right:3px solid var(--player);
+  text-align:right;}
+.msg--me .msg__who{color:var(--player);}
+.msg--judge{align-self:center;max-width:90%;width:100%;background:transparent;
+  border:1px solid rgba(245,192,78,.3);border-radius:var(--r-sm);padding:var(--sp-2) var(--sp-3);
+  font-size:var(--fs-13);color:var(--gold);
+  background-image:repeating-linear-gradient(135deg,rgba(245,192,78,.07) 0 8px,transparent 8px 16px);}
+.msg--sys{align-self:center;font-size:var(--fs-12);color:var(--text-mute);
+  background:none;border:none;padding:0;}
+
+.foecard{flex:0 0 240px;display:flex;flex-direction:column;gap:var(--sp-3);
+  background:var(--bg-mid);border:1px solid rgba(240,138,93,.3);border-radius:var(--r-md);
+  padding:var(--sp-3);align-self:flex-start;}
+.foecard__pic{height:180px;background:var(--bg-raise);border:2px solid var(--npc);
+  border-radius:var(--r-sm);display:flex;align-items:center;justify-content:center;overflow:hidden;
+  clip-path:polygon(0 10px,10px 0,calc(100% - 10px) 0,100% 10px,100% calc(100% - 10px),calc(100% - 10px) 100%,10px 100%,0 calc(100% - 10px));
+  background-image:linear-gradient(180deg,rgba(240,138,93,.10),transparent);}
+.foecard__pic svg{width:120px;height:120px;opacity:.9;}
+.foecard__nm{font-family:var(--serif);font-size:var(--fs-16);font-weight:700;color:var(--npc);
+  display:flex;align-items:center;justify-content:space-between;}
+.foecard__lb{font-size:var(--fs-11);color:var(--text-mute);display:flex;justify-content:space-between;}
+
+.composer{flex:0 0 auto;display:flex;align-items:center;gap:var(--sp-3);
+  padding:var(--sp-3) var(--sp-4);border-top:1px solid var(--border);
+  background:linear-gradient(0deg,rgba(255,255,255,.03),transparent);}
+.me-chip{flex:0 0 auto;display:flex;align-items:center;gap:var(--sp-2);padding:var(--sp-1) var(--sp-3) var(--sp-1) var(--sp-1);
+  border:1px solid rgba(69,214,200,.35);border-radius:var(--r-pill);background:rgba(69,214,200,.06);}
+.me-chip__av{width:30px;height:30px;border-radius:50%;background:rgba(69,214,200,.2);
+  display:flex;align-items:center;justify-content:center;color:var(--player);
+  font-family:var(--serif);font-weight:700;font-size:var(--fs-13);}
+.me-chip__tx{font-size:var(--fs-12);color:var(--player);}
+.inp-wrap{flex:1 1 auto;display:flex;align-items:center;gap:var(--sp-2);
+  background:var(--bg-raise);border:1px solid var(--border-strong);border-radius:var(--r-md);
+  padding:0 var(--sp-3);height:44px;transition:border-color var(--t-fast);}
+.inp-wrap:focus-within{border-color:var(--gold);box-shadow:0 0 0 3px rgba(245,192,78,.12);}
+.inp-wrap input{flex:1 1 auto;background:none;border:none;outline:none;color:var(--text);font-size:var(--fs-14);}
+.inp-wrap input::placeholder{color:var(--text-mute);}
+
+/* ============================================================
+   S5 底细抽屉
+   ============================================================ */
+.scrim{position:absolute;inset:0;background:rgba(0,0,0,.5);opacity:0;pointer-events:none;
+  transition:opacity var(--t-mid);z-index:20;}
+.scrim.on{opacity:1;pointer-events:auto;}
+.drawer{position:absolute;top:0;right:0;bottom:0;width:360px;z-index:21;
+  background:var(--bg-mid);border-left:2px solid rgba(240,138,93,.4);
+  transform:translateX(100%);transition:transform var(--t-mid) var(--ease);
+  display:flex;flex-direction:column;padding:var(--sp-4);gap:var(--sp-3);overflow:auto;}
+.drawer.on{transform:none;}
+.drawer__hd{display:flex;align-items:center;justify-content:space-between;}
+.drawer__hd h3{margin:0;font-family:var(--serif);font-size:var(--fs-18);color:var(--npc);letter-spacing:2px;}
+.emo-card{display:flex;align-items:center;gap:var(--sp-3);padding:var(--sp-3);
+  background:var(--bg-raise);border:1px solid var(--border);border-radius:var(--r-md);}
+.emo-card__face{width:44px;height:44px;border-radius:50%;background:rgba(240,138,93,.18);
+  display:flex;align-items:center;justify-content:center;font-size:22px;}
+.emo-card__st{font-size:var(--fs-14);color:var(--npc);font-family:var(--serif);}
+.emo-card__note{font-size:var(--fs-11);color:var(--text-mute);}
+.sect-lb{font-size:var(--fs-12);color:var(--text-mute);letter-spacing:2px;}
+.weak-line{font-size:var(--fs-14);color:var(--text-dim);}
+.weak-line b{color:var(--red);}
+#radar{width:100%;height:auto;}
+
+/* ============================================================
+   S6 结算
+   ============================================================ */
+.verdict{flex:1 1 auto;display:flex;align-items:center;justify-content:center;padding:var(--sp-6);}
+.vbox{width:100%;max-width:520px;text-align:center;display:flex;flex-direction:column;
+  align-items:center;gap:var(--sp-4);
+  background:var(--bg-mid);border:2px solid rgba(245,192,78,.45);border-radius:var(--r-md);
+  padding:var(--sp-10) var(--sp-6);
+  clip-path:polygon(0 16px,16px 0,calc(100% - 16px) 0,100% 16px,100% calc(100% - 16px),calc(100% - 16px) 100%,16px 100%,0 calc(100% - 16px));}
+.stamp{width:120px;height:120px;color:var(--gold);animation:stamp var(--t-slow) var(--ease) backwards;}
+@keyframes stamp{0%{opacity:0;transform:scale(2.4) rotate(-14deg);}70%{opacity:1;transform:scale(.94) rotate(-4deg);}100%{transform:scale(1) rotate(-6deg);}}
+.vtitle{font-family:var(--serif);font-size:var(--fs-36);font-weight:900;letter-spacing:6px;color:var(--gold);margin:0;}
+.vsub{font-size:var(--fs-14);color:var(--text-dim);margin:0;}
+.retro{width:100%;text-align:left;background:var(--bg-raise);border:1px solid var(--border);
+  border-radius:var(--r-md);padding:var(--sp-4);font-size:var(--fs-13);line-height:1.9;color:var(--text-dim);}
+.retro h4{margin:0 0 var(--sp-2);font-size:var(--fs-12);letter-spacing:2px;color:var(--gold);}
+.vcta{display:flex;gap:var(--sp-3);}
+
+/* ============================================================
+   S7 Tokens
+   ============================================================ */
+.tok{flex:1 1 auto;overflow:auto;padding:var(--sp-6);display:flex;flex-direction:column;gap:var(--sp-6);}
+.tok h2{font-family:var(--serif);font-size:var(--fs-22);letter-spacing:2px;margin:0 0 var(--sp-3);}
+.swatches{display:flex;flex-wrap:wrap;gap:var(--sp-3);}
+.sw{width:132px;border:1px solid var(--border);border-radius:var(--r-md);overflow:hidden;}
+.sw__c{height:56px;}
+.sw__t{padding:var(--sp-2);font-size:var(--fs-11);color:var(--text-dim);line-height:1.6;}
+.sw__t b{display:block;color:var(--text);font-family:var(--mono);}
+.row{display:flex;flex-wrap:wrap;gap:var(--sp-3);align-items:center;}
+.type-row{display:flex;flex-direction:column;gap:var(--sp-1);}
+
+/* ============================================================
+   响应式
+   ============================================================ */
+@media (max-width:1023px){
+  .arena{padding:var(--sp-3);}
+  .foecard{flex:0 0 200px;}
+}
+@media (max-width:767px){
+  .hud{height:44px;grid-template-columns:1fr auto;padding:0 var(--sp-3);}
+  .hud__topic span{font-size:var(--fs-12);max-width:140px;}
+  .arena{flex-direction:column;padding:var(--sp-2);gap:var(--sp-2);}
+  .foecard{flex:0 0 auto;width:100%;flex-direction:row;align-items:center;gap:var(--sp-3);
+    padding:var(--sp-2) var(--sp-3);}
+  .foecard__pic{width:56px;height:56px;flex:0 0 auto;}
+  .foecard__pic svg{width:40px;height:40px;}
+  .foecard__side{flex:1 1 auto;min-width:0;display:flex;flex-direction:column;gap:var(--sp-1);}
+  .stream{max-width:none;}
+  .msg{font-size:var(--fs-16);max-width:88%;}
+  .composer{flex-wrap:wrap;padding:var(--sp-2) var(--sp-3);gap:var(--sp-2);
+    padding-bottom:calc(var(--sp-2) + env(safe-area-inset-bottom));}
+  .me-chip{order:-1;}
+  .inp-wrap{order:1;flex:1 1 100%;}
+  .btn--lg{height:48px;font-size:var(--fs-14);padding:0 var(--sp-6);}
+  .brief{padding:var(--sp-4);}
+  .vc-topic{font-size:var(--fs-22);}
+  .drawer{width:100%;}
+  .brand{font-size:32px;letter-spacing:5px;}
+}
+@media (prefers-reduced-motion:reduce){
+  *{animation-duration:.01ms !important;transition-duration:.01ms !important;}
+}
+</style>
+</head>
+<body data-page-node-id="7CJCJpeeZr26Gbn7aYboZb">
+
+<!-- ========== SVG 图标 sprite ========== -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true" data-page-node-id="zW0JYayhLDWi6wcChxv8J5">
+  <symbol id="i-objection" viewBox="0 0 24 24" data-page-node-id="Sg5tQtDf4fzc0xGsAexsuY"><path d="M12 3l9.5 16.5H2.5z" data-page-node-id="OzjBACZDJNv67jHCeyvQ0A"/><path d="M12 9.5v4.2M12 17.2v.6" data-page-node-id="bpfmZl3ZooSY8Hwwpe2M9p"/></symbol>
+  <symbol id="i-mic" viewBox="0 0 24 24" data-page-node-id="2MrDDKLjb19TGTmHZE2Z2d"><path d="M12 3a3 3 0 0 1 3 3v5a3 3 0 0 1-6 0V6a3 3 0 0 1 3-3z" data-page-node-id="RuKdi1qwJHQJ25gfVKQyy8"/><path d="M5.5 11.5a6.5 6.5 0 0 0 13 0M12 18v3" data-page-node-id="71JA10U8jYspkCu4jCmWO0"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24" data-page-node-id="wJF78NgeINCZNzaA8RZYcA"><circle cx="12" cy="12" r="9" data-page-node-id="vfGadoYzmKX5SNYJS6eiDb"/><path d="M12 7v5.2l3.2 2" data-page-node-id="GWvROlfhy4oDHvWlrfD7kF"/></symbol>
+  <symbol id="i-coin" viewBox="0 0 24 24" data-page-node-id="1eKHRSALfzIDmfnQdMK9Sp"><circle cx="12" cy="12" r="9" data-page-node-id="iRnQfPRcGZxgN9p1tecX58"/><path d="M9 9.5h6M9 12h6M9 14.5h6" data-page-node-id="fsFe00bRvPhM6VgSilPpDF"/></symbol>
+  <symbol id="i-info" viewBox="0 0 24 24" data-page-node-id="0WfTAnTQ6Gg1a0FU9lniRS"><circle cx="12" cy="12" r="9" data-page-node-id="lxYkKPODC4wVeePtdhSesD"/><path d="M12 11v6M12 7.6v.8" data-page-node-id="i9Ai9SaRHfexXmKlgnADNR"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24" data-page-node-id="fm5Swvp6b4dHrPADXjnrmD"><circle cx="12" cy="12" r="3.2" data-page-node-id="9JxrwKXaOUy5psS24rggBx"/><path d="M12 2.5v3M12 18.5v3M2.5 12h3M18.5 12h3M5.2 5.2l2.1 2.1M16.7 16.7l2.1 2.1M18.8 5.2l-2.1 2.1M7.3 16.7l-2.1 2.1" data-page-node-id="YzwKjZG6KOTPWLRGYiO6cV"/></symbol>
+  <symbol id="i-back" viewBox="0 0 24 24" data-page-node-id="rMmQJahBbJ5Q7sJLY4Sg04"><path d="M15 5l-7 7 7 7" data-page-node-id="Im4hAhwTE3fAziqjgjqOwK"/></symbol>
+  <symbol id="i-reroll" viewBox="0 0 24 24" data-page-node-id="7iQlfAsX3uz4IwZhROCzw0"><path d="M20 12a8 8 0 1 1-2.4-5.7" data-page-node-id="yeEmOPftXFcD4tEtuUw8ZL"/><path d="M20.5 3.5v4h-4" data-page-node-id="6aEEEBOUDBOFD0Q6AdCEfU"/></symbol>
+  <symbol id="i-flag" viewBox="0 0 24 24" data-page-node-id="ggnu7FOoKhcbWVUboyEyrU"><path d="M6 21V4h12l-3 4 3 4H6" data-page-node-id="OisAzNSwZiq5DHYoBAzXK3"/></symbol>
+  <symbol id="i-bulb" viewBox="0 0 24 24" data-page-node-id="6LqQeIdVPsIrNkQ0xiV85T"><path d="M9.5 18.5h5M10.5 21h3" data-page-node-id="09x290H1Tk839rYkTrCKUv"/><path d="M12 3a6 6 0 0 0-3.6 10.8c.6.4.9 1 .9 1.7v1h5.4v-1c0-.7.3-1.3.9-1.7A6 6 0 0 0 12 3z" data-page-node-id="kgpFYe0IEHxKuz44phmWV9"/></symbol>
+  <symbol id="i-vol" viewBox="0 0 24 24" data-page-node-id="8iA8VEqhaU8tUhFw73yTBV"><path d="M4 9.5h3L11 6v12L7 14.5H4z" data-page-node-id="MRLlmF1vqeamx8wnIoUiQ7"/><path d="M15 9.5a3.5 3.5 0 0 1 0 5M17.5 7a7 7 0 0 1 0 10" data-page-node-id="Ez0OTWjrZ6iCiYTHnAgtPG"/></symbol>
+  <symbol id="i-mute" viewBox="0 0 24 24" data-page-node-id="5lmRI6wgghdgkEM38orB9J"><path d="M4 9.5h3L11 6v12L7 14.5H4z" data-page-node-id="SCGvHjvboBjJ9XpK6C1YHH"/><path d="M15.5 10l4 4M19.5 10l-4 4" data-page-node-id="Qog5GwE3R7VKOwfYlzxEp8"/></symbol>
+  <symbol id="i-lock" viewBox="0 0 24 24" data-page-node-id="Vm7FnTpTgDgXu2Ur9fLhYx"><path d="M6.5 10.5V8a5.5 5.5 0 0 1 11 0v2.5" data-page-node-id="sIE5PAVsbhQgkQBy0KlRVi"/><rect x="4.5" y="10.5" width="15" height="10" rx="2" data-page-node-id="O3r86rfukpdJC2KnNlDQlM"/></symbol>
+  <symbol id="i-close" viewBox="0 0 24 24" data-page-node-id="34aRKIO7wLUPOWNEOBKMmX"><path d="M6 6l12 12M18 6L6 18" data-page-node-id="Bov7aAmklMWaRnjZ80uCiP"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24" data-page-node-id="q2aESKGQ0O4LhA5fBNGAdR"><path d="M21 3L3 10.6l7 2.9 2.9 7z" data-page-node-id="BYkdxnlDLEB1LrrV6E7U1C"/><path d="M21 3l-7.4 17.5" data-page-node-id="uhG50azTsAJNylspDYbel3"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24" data-page-node-id="2xxWcbjZQ6ZVjE3ABNFLUs"><path d="M9 5l7 7-7 7" data-page-node-id="pCEtKpL3lHyX4uEmVhpYZs"/></symbol>
+  <symbol id="i-memory" viewBox="0 0 24 24" data-page-node-id="6YihNZRLMd6Swmk1HxvaR4"><rect x="5" y="5" width="14" height="14" rx="2" data-page-node-id="uhsWxCtZGetuYy8xoyYJfO"/><path d="M9 2v3M15 2v3M9 19v3M15 19v3M2 9h3M2 15h3M19 9h3M19 15h3" data-page-node-id="CsD33lgMquutS6xGZQKlWE"/></symbol>
+  <symbol id="i-user" viewBox="0 0 24 24" data-page-node-id="gumRi4h4t17asRCBpxrCtK"><circle cx="12" cy="8" r="4" data-page-node-id="Tn4DfAnYtfAQuuIFhzyqfs"/><path d="M4.5 20a7.5 7.5 0 0 1 15 0" data-page-node-id="45EfCs0UmZ7GwoxoLyvRxg"/></symbol>
+  <symbol id="i-reset" viewBox="0 0 24 24" data-page-node-id="M2bET8CWwobnHIOSv54EcC"><path d="M4 12a8 8 0 1 0 2.4-5.7" data-page-node-id="QZBzMh2o53vhPoj0nyRnVT"/><path d="M3.5 3.5v4h4" data-page-node-id="IzE0i71RpDeEllm22EoG36"/></symbol>
+</svg>
+
+<!-- ========== 原型外壳 ========== -->
+<div id="shell-bar" data-page-node-id="Y46S4RIpvhwwoBQtdpNl0N">
+  <span class="tag" data-page-node-id="uLaNLPTrBDbd7G8QM7LGnV">原型外壳 · 非设计内容</span>
+  <button class="snav on" data-go="entry" data-page-node-id="QJ8znsgUG3DpIoBtoJaV6o">入场券</button>
+  <button class="snav" data-go="roster" data-page-node-id="RNRQ5Wzhvz2xpACriYXjjM">选对手</button>
+  <button class="snav" data-go="briefing" data-page-node-id="OgJD8cSS4bIGsb17iwRBCB">辩题确认</button>
+  <button class="snav" data-go="arena" data-page-node-id="5NsYwBd4g9SHysSgs22p7I">对战</button>
+  <button class="snav" data-go="verdict" data-page-node-id="fSeXNs2fx19aQlqO9lXzzJ">结算</button>
+  <button class="snav" data-go="tokens" data-page-node-id="QwVSfL2Ke5JoZjLvFVOQcI">设计系统</button>
+  <button class="snav snav-dev" id="dev-btn" data-page-node-id="USdLxwHtGgVnkNEentyO2A">切到手机 390px</button>
+</div>
+
+<div id="proto-wrap" data-page-node-id="yN2wnFVqYR9mqNvq5jF0pP">
+<div id="proto" data-page-node-id="045tYXFSBF9421ISGlL8i1">
+
+  <!-- ========== S1 入场券 ========== -->
+  <section class="screen on" data-screen="entry" data-page-node-id="gOe6gnZjZJTuYVCb35IVh5">
+    <div class="entry" data-page-node-id="ZbdTmu0kugptDCGNzfDQ0M">
+      <h1 class="brand" data-page-node-id="MOynygHrFCTAqKuGyDpaHP">抬杠模拟器</h1>
+      <p class="brand-sub" data-page-node-id="BFSZmjmkPorCGbu511YojI">用嘴皮子说服 AI —— 把 TA 的「自信度」说到归零，你就赢了</p>
+      <div class="entry-idbar" data-page-node-id="Lw3hsX9lJXBH0uGFsfcV6c">
+        <svg class="icon" style="color:var(--player)" data-page-node-id="eCrCcMAxId6idREwexLqyx"><use href="#i-user" data-page-node-id="MCGESaFOGH81EDNy7Ih8bk"/></svg>
+        <span class="nm" data-page-node-id="VNeeqbXgKWPwSWvSZPLwx2">当前身份：游客</span>
+        <span class="chip chip--mute" data-page-node-id="Jxn1ReZwsc82xgrNkIcmYI">历史对局 0</span>
+        <button class="btn btn--ghost btn--sm" data-go="entry" data-page-node-id="CAZQPY2IJO5KSCHBbLgGXO">切换身份</button>
+      </div>
+      <button class="btn btn--primary btn--lg" data-go="roster" data-page-node-id="snKVbuzNxew5HZUFCM3Ogu">开 始 抬 杠</button>
+      <div class="entry-foot" data-page-node-id="wNKMcRtAo1SNE3ZqcYptCz">
+        <button class="btn btn--ghost btn--sm" data-page-node-id="yO29j4Owlp6u7Wr8CVw8GY"><svg class="icon icon--sm" data-page-node-id="S7bwu9kR5RFoEhtkQZEsQK"><use href="#i-gear" data-page-node-id="8Mn7s7XAGyEk7M0l5TsTkA"/></svg>演出设置</button>
+        <button class="btn btn--ghost btn--sm" data-page-node-id="2IT62Q2abSG136rPxReK9k"><svg class="icon icon--sm" data-page-node-id="m5msQ7x8Cu7BjFeF87paGH"><use href="#i-reset" data-page-node-id="mBxf9fkkuEA3DO21UpYPD9"/></svg>重置进度</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== S2 选对手 ========== -->
+  <section class="screen" data-screen="roster" data-page-node-id="VQN2YEvP79hFghirazAwfc">
+    <div class="roster-hd" data-page-node-id="LH5J9oY61Uf6wCQBEiCFZZ">
+      <div style="display:flex;align-items:center;gap:var(--sp-3)" data-page-node-id="vVuc4GgEByxZPUzauW3lrc">
+        <button class="btn btn--ghost btn--sm" data-go="entry" data-page-node-id="1RueSbxhuQV65upF9I2yeP"><svg class="icon icon--sm" data-page-node-id="EUQNW7fZCqJ8CQQN5Albte"><use href="#i-back" data-page-node-id="VUOhYZvqGm5g6JU85QTOjI"/></svg></button>
+        <h1 style="margin:0;font-family:var(--serif);font-size:var(--fs-28);letter-spacing:4px" data-page-node-id="BM2EUMqzY2HWGO3rdur02i">选择对手</h1>
+      </div>
+      <div class="roster-tabs" data-page-node-id="fBOBEd8MD3aermuc6okJcp">
+        <button class="tab on" data-tab="ladder" data-page-node-id="5QfIDY0KBNZiQPb1PJJN37">天梯赛 · 三局两胜</button>
+        <button class="tab" data-tab="free" data-page-node-id="N2krtSgUfBT1Swj8EGjq0S">自由切磋</button>
+      </div>
+    </div>
+    <div class="roster-body" data-page-node-id="ITV1URg4BM95qMakimm0t6">
+      <div class="memrow" id="memrow" style="display:none" data-page-node-id="CCJxmF7lDhnhjmb2xqfYjr">
+        <svg class="icon icon--sm" data-page-node-id="E1A8joKF8eLg6uowMHx6wR"><use href="#i-memory" data-page-node-id="1rpaH3cqX1EmDmXipm7PDB"/></svg>
+        <span data-page-node-id="4apc3NxPNXNvEGPUdYd9Zf">NPC 记忆与成长：同一对手会记住你的打法</span>
+        <span class="switch on" id="memsw" data-page-node-id="C11xQzRCtDlrwDRIrVWHK9"></span>
+      </div>
+
+      <div class="ticket ticket--gold foe" data-go="briefing" data-page-node-id="rwzSRep9YMxJQY7yhO9baB">
+        <div class="foe__badge" data-page-node-id="uBCHIOCIQVcDo6SRdfaglp">L1</div>
+        <div class="foe__main" data-page-node-id="CGQG7UTwFkOpSITyhYnYD0">
+          <div class="foe__name" data-page-node-id="Nz4Dt0zjKT0NTELKvNksgx">王阿姨 <span class="chip chip--mute" style="margin-left:6px" data-page-node-id="MsHgN5ZGCDwUCXisvzZ17D">小区意见领袖</span></div>
+          <div class="foe__desc" data-page-node-id="ycSd6wx49LgqCqSdziQscG">不讲道理讲人情，最听不得「你不懂」</div>
+          <div class="foe__meta" data-page-node-id="phvNF4YK7Izs8dvFeshTCf">
+            <span class="chip chip--red" data-page-node-id="ASyTKu1zBOcHgtQd0Ma6BO">交手 3 次</span>
+            <span class="chip chip--gold" data-page-node-id="Cll7tiBsIGHwnC5bqdERU8">软肋 · 情感</span>
+            <span class="chip chip--mute" data-page-node-id="hkFOyQkC3QhpQb3gMfmzdG">token 420</span>
+          </div>
+        </div>
+        <svg class="icon icon--lg foe__go" data-page-node-id="JR3aCHVri3p8gpxLQBqh16"><use href="#i-chev" data-page-node-id="AUZSKhX4UkyTty1CFNPbmh"/></svg>
+      </div>
+
+      <div class="ticket ticket--gold foe" data-go="briefing" data-page-node-id="2EGiC0H2mugP7ufOMCt1lK">
+        <div class="foe__badge" data-page-node-id="wg9G7rnOLDolPQ1zRFUVXm">L2</div>
+        <div class="foe__main" data-page-node-id="bL7BsQfGoySotW1uPXI9XY">
+          <div class="foe__name" data-page-node-id="2D8TWWhd2GR7YWZ0It5u73">键盘侠小张 <span class="chip chip--mute" style="margin-left:6px" data-page-node-id="YODCpELN0OuA7EjHNaLIqS">常年对线</span></div>
+          <div class="foe__desc" data-page-node-id="ZXeSKGr8SxYSY7YB89zGRr">数据张口就来，被追问来源就转移话题</div>
+          <div class="foe__meta" data-page-node-id="XKlfaKEVWmV6gHT4hmuz8Y">
+            <span class="chip chip--red" data-page-node-id="UgyHyNBG03fqREbOntxCr1">交手 1 次</span>
+            <span class="chip chip--gold" data-page-node-id="U0HT7ccUr49GfxQNxm5xxk">软肋 · 证据</span>
+            <span class="chip chip--mute" data-page-node-id="Kuutr7yGhZhl7QI0IUmuIS">token 380</span>
+          </div>
+        </div>
+        <svg class="icon icon--lg foe__go" data-page-node-id="BpwgAAwdQbsrC6uADanrnP"><use href="#i-chev" data-page-node-id="kjtaXQKibbMFEkVAfzfrFR"/></svg>
+      </div>
+
+      <div class="ticket ticket--locked foe" data-page-node-id="wsplHTmQDOqi5kuynSS4yh">
+        <div class="foe__badge" style="color:var(--text-mute);background:rgba(255,255,255,.05);border-color:var(--border)" data-page-node-id="f777PSZKKHgm2SSGrMEaaw">
+          <svg class="icon" data-page-node-id="7hGcPbqDY8jspSRk68F7RN"><use href="#i-lock" data-page-node-id="77iGAodtiOgYJMhpB3HCxP"/></svg>
+        </div>
+        <div class="foe__main" data-page-node-id="P87SoLObvSHV7EJAe4COvn">
+          <div class="foe__name" style="color:var(--text-dim)" data-page-node-id="njL9QD7a2mA3nJUgMsvc0N">阿凯教练 · 健身房的道理</div>
+          <div class="foe__desc" data-page-node-id="5TFIIvcYffPr3agnFS1oH1">击败 L2 后解锁</div>
+          <div class="foe__meta" data-page-node-id="6dndK9KISHl1u9U3KNHExN"><span class="chip chip--mute" data-page-node-id="aXD5wHK4RaTXbCMbwShMPT">token 340</span></div>
+        </div>
+      </div>
+
+      <div class="ticket ticket--locked foe" data-page-node-id="7JFWUtYc6YLwOhGNirZ1tw">
+        <div class="foe__badge" style="color:var(--text-mute);background:rgba(255,255,255,.05);border-color:var(--border)" data-page-node-id="UFQ0fyAQ5hjCFT00NQEZcf">
+          <svg class="icon" data-page-node-id="y8SWyGHPgJKk9oGpJwczpa"><use href="#i-lock" data-page-node-id="wXHtQPWUMyc1vzKdkJuRvN"/></svg>
+        </div>
+        <div class="foe__main" data-page-node-id="SiSYpiuk7G0jickk9UitfQ">
+          <div class="foe__name" style="color:var(--text-dim)" data-page-node-id="rRG1Y1HMsSsJpNQFZSMfBv">林薇学姐 · 辩论队退役</div>
+          <div class="foe__desc" data-page-node-id="YT1Dz6dDfnrw6zGOsBLE5f">击败 L3 后解锁</div>
+        </div>
+      </div>
+
+      <div class="ticket ticket--locked foe" data-page-node-id="RREEM2ncfHLIojErv6aiaQ">
+        <div class="foe__badge" style="color:var(--text-mute);background:rgba(255,255,255,.05);border-color:var(--border)" data-page-node-id="6EiBxW3xXb6uQCvLc3QMuD">
+          <svg class="icon" data-page-node-id="eClbgvnZas5UN9hEDUtWi0"><use href="#i-lock" data-page-node-id="bLDALf8E1CHQRiXwMj8D2r"/></svg>
+        </div>
+        <div class="foe__main" data-page-node-id="8Q5RmMkHFIBw6vpjdLBdou">
+          <div class="foe__name" style="color:var(--text-dim)" data-page-node-id="1wub9LidZKMkn9CJ3EIixG">陈墨律师 · 靠嘴吃饭</div>
+          <div class="foe__desc" data-page-node-id="xCIg6AhXn6zmSg1AdmaLnw">击败 L4 后解锁</div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== S3 辩题确认 ========== -->
+  <section class="screen" data-screen="briefing" data-page-node-id="jElCHxFGsIUWBVVHLfkF07">
+    <div class="brief" data-page-node-id="UvuRpLo2sZy5wkf0AfNoTY">
+      <div style="display:flex;align-items:center;gap:var(--sp-3);width:100%;max-width:640px" data-page-node-id="9vNiQWlC57aaaBINbnBFvn">
+        <button class="btn btn--ghost btn--sm" data-go="roster" data-page-node-id="1CjQMvYdB3wMFd8mwk5Eou"><svg class="icon icon--sm" data-page-node-id="VzKjrBonqxVwrGc64OxQm8"><use href="#i-back" data-page-node-id="90dLTLgJEYnoD964v7DvDe"/></svg> 返回</button>
+        <div style="display:flex;align-items:center;gap:var(--sp-2);margin-left:auto" data-page-node-id="HgzJU9sLpippvyE0YzfhBX">
+          <span class="chip chip--mute" data-page-node-id="X8aPmJTUCHEBcyIGqUS2VB">对手：王阿姨</span>
+          <span class="chip chip--gold" data-page-node-id="eIlE7YOSvno4HbLFpp63KP"><svg class="icon icon--sm" data-page-node-id="Jl2jvBKYoXQp1SWku3fBx2"><use href="#i-memory" data-page-node-id="he8DUNFFVqModOqBXD3JrY"/></svg> 记忆开启</span>
+        </div>
+      </div>
+
+      <div class="verdict-card" data-page-node-id="1RBFR4DHCEyZTzUWe2OSgN">
+        <div class="vc-label" data-page-node-id="3P0UObJ9yZDxltry5xy29X">本 局 辩 题</div>
+        <div class="vc-topic" data-page-node-id="sDrK5BcpgLeiVXoFgtWmly">小区里应该全面禁止养狗</div>
+        <div class="side-row npc" data-page-node-id="D44FUlAJ3BCPlCWyzJnfku"><span data-page-node-id="AsD0ag2GOR9DRx86QfWjwb">TA · 正方（支持禁止）</span><b data-page-node-id="pb5JzQkX9jjZMjCVBcoTvn">王阿姨</b></div>
+        <div class="side-row you" data-page-node-id="vSHeHdvXdO1QmZ33IrICJd"><span data-page-node-id="LzPuLvFLIU9OrwFqTKpTfH">你 · 反方（反对禁止）</span><b data-page-node-id="QLVTmutDZBp64dMu2wWxdG">你</b></div>
+        <div class="tags-line" data-page-node-id="ipsgk894mNpgDE3ci6QzSl">
+          <span class="lb" data-page-node-id="BN5vZ2yrFrIAZioh359FJM">TA 的底细 · 可当话柄：</span>
+          <span class="chip chip--red" data-page-node-id="EiHVPwNJj7AbAxilJrafOy">独居</span>
+          <span class="chip chip--red" data-page-node-id="TdpJAFRHPvKiH8DWnduNdl">怕狗</span>
+          <span class="chip chip--red" data-page-node-id="eZjn3R5gX4nnwVyPkJz5Iy">爱拿「大家」压人</span>
+        </div>
+        <p style="font-size:var(--fs-12);color:var(--text-mute);margin:var(--sp-5) 0 0" data-page-node-id="oEAlzyAoOap4RvOeVGatGT">
+          说服 TA 改口：把 TA 的自信度说到归零即赢。准备好了吗？
+        </p>
+      </div>
+
+      <div class="brief-cta" data-page-node-id="hOH0W8vzpIcM019papOdDB">
+        <button class="btn btn--primary btn--lg" data-go="arena" data-page-node-id="UiBYKZeKakJUZ0dzIl12E0">开 辩</button>
+        <button class="btn btn--ghost" data-page-node-id="AGzhwHml0HCRAnvQQO9rU1"><svg class="icon icon--sm" data-page-node-id="zmTYI8BFWTZDRGDrWRjaOS"><use href="#i-reroll" data-page-node-id="386bCqgUEIhdCPEpur55Dl"/></svg>换一题</button>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== S4 对战 ========== -->
+  <section class="screen" data-screen="arena" data-page-node-id="dyqk9jA9DDJComEabfD4En">
+    <div class="hud" data-page-node-id="BY8gdebzesQYtxpRID0RMq">
+      <div class="hud__topic" data-page-node-id="mt6X5mZHzSj4R5tr2u2itS">
+        <span class="chip chip--gold" data-page-node-id="osGxwPac2qNGQkzDsBkY3A">生活</span>
+        <span data-page-node-id="3UK7dYdoP5AzzBuq04Rtg5">小区里应该全面禁止养狗</span>
+      </div>
+      <div class="hud__mid" data-page-node-id="KbPUPblg94ivfRoQOAFHPv">
+        <svg class="icon icon--sm" data-page-node-id="UyFQFjU6ZE9UOQPAjev1X4"><use href="#i-flag" data-page-node-id="FZmV1eq1PpMn1du45pbjkm"/></svg>第 2/3 局 · 你 1:1 王阿姨
+      </div>
+      <div class="hud__res" data-page-node-id="VB6iHYRPunw1ovhBgZFWQn">
+        <span class="it" data-page-node-id="a6VSrI9sDjBAnGRjJAru2k"><svg class="icon icon--sm" data-page-node-id="nmkProuQmExLznvBRdDZYM"><use href="#i-coin" data-page-node-id="CnsR2FVIIpHUlB6IEIre7l"/></svg><b class="num" data-page-node-id="2ZmcUG1ErMLMF0wGkJIAz2">286</b></span>
+        <span class="it warn" data-page-node-id="u55GRqovcZseZ1ePWjpYGf"><svg class="icon icon--sm" data-page-node-id="Tr4ymPgg21Lv4zq8CQG0Ta"><use href="#i-clock" data-page-node-id="XdUf2Ne1TR4EXdPf2B46Gk"/></svg><b class="num" data-page-node-id="yKTnat4raYY0r679aAqpi2">6:12</b></span>
+        <button class="btn btn--ghost btn--sm btn--icon" title="演出设置" data-page-node-id="l5eSDLP4mfvomHIALhZFGH"><svg class="icon icon--sm" data-page-node-id="gWdR3gGcdrgE9XXrJ8B3N2"><use href="#i-gear" data-page-node-id="4Fya4hfjNpjAhQTdkc1ZxJ"/></svg></button>
+      </div>
+    </div>
+
+    <div class="arena" data-page-node-id="W5M9vBP2FW6NR2H1omU68L">
+      <div class="stream" id="stream" role="log" aria-live="polite" data-page-node-id="bXAIt22syhaa9qvu6eJgrC">
+        <div class="msg msg--sys" style="--d:0ms" data-page-node-id="rQ5FI7RBspg4U22TAfFMDS">—— 第 2 局开始 ——</div>
+        <div class="msg msg--judge" style="--d:120ms" data-page-node-id="lNmCF3XlAjgpEy4a2aaNF5">
+          <svg class="icon icon--sm" style="vertical-align:-3px" data-page-node-id="ZpYOoi9G10AfeePF0QvBhl"><use href="#i-objection" data-page-node-id="98IKZOyNORdWXz2Js6fF1P"/></svg>
+          判定 · 你从「利益」切入，TA 早有准备，被挡回来了
+        </div>
+        <div class="msg msg--npc" style="--d:240ms" data-page-node-id="xCHDWgyWSav8ul9ziZPpEg">
+          <div class="msg__who" data-page-node-id="l0aTT7UI8S7wLFQxQ2229E">王阿姨</div>
+          哎哟，你这年轻人看着挺体面，怎么说话这么自私呢？狗在楼道里拉屎，你家门口你乐意啊？
+        </div>
+        <div class="msg msg--me" style="--d:360ms" data-page-node-id="6eGWTGAUZECWsaj4hyPysZ">
+          <div class="msg__who" data-page-node-id="ewb1GQKbSAA7ulYhFbdTQy">你</div>
+          阿姨，我不反对管狗，我反对的是「一刀切」。您被狗吓过，不代表所有养狗的邻居都该被连坐。
+        </div>
+        <div class="msg msg--judge" style="--d:480ms" data-page-node-id="NUnW4rdE7Jslm1t2fPmnEd">
+          <svg class="icon icon--sm" style="vertical-align:-3px" data-page-node-id="qIMBV0CgEGJCc40mtnvHXX"><use href="#i-objection" data-page-node-id="bsj3rvGa32ggQ6DctJhKmV"/></svg>
+          判定 · 命中软肋【情感】 自信度 −12
+        </div>
+        <div class="msg msg--npc" style="--d:600ms" data-page-node-id="uHrZv4n6CjvqXbomFR54Lq">
+          <div class="msg__who" data-page-node-id="CXV1gFTNsKjHfW3izJmFEt">王阿姨</div>
+          ……我、我不是那个意思。我就是觉得，大家总得讲个先来后到吧？
+        </div>
+      </div>
+
+      <aside class="foecard" data-page-node-id="BImXXxW6cbEZWowSh3U7dX">
+        <div class="foecard__pic" data-page-node-id="YsTOJeqouLq5yBo5TZht3l">
+          <svg viewBox="0 0 100 100" fill="none" aria-hidden="true" data-page-node-id="X3JltcOna16anP2iSfMJrq">
+            <circle cx="50" cy="38" r="20" fill="rgba(240,138,93,.35)" stroke="#F08A5D" stroke-width="2" data-page-node-id="M7iXEHeu8560eohLDZpwp7"/>
+            <path d="M22 92c0-16 12.5-26 28-26s28 10 28 26" fill="rgba(240,138,93,.2)" stroke="#F08A5D" stroke-width="2" data-page-node-id="2Ugo6IWFFpkdixzFWCktXm"/>
+            <path d="M40 34c2-3 6-3 8 0" stroke="#F08A5D" stroke-width="2" stroke-linecap="round" data-page-node-id="e77X95aTXMaQqHgn8Zjr9z"/>
+            <path d="M54 34c2-3 6-3 8 0" stroke="#F08A5D" stroke-width="2" stroke-linecap="round" data-page-node-id="JaMAcCOtdBE2Oh8FzNwGHn"/>
+            <path d="M42 48c5 3 11 3 16 0" stroke="#F08A5D" stroke-width="2" stroke-linecap="round" data-page-node-id="GGf5a4G4K7cZlWZHGEzDAN"/>
+            <path d="M68 24l2 5 5 2-5 2-2 5-2-5-5-2 5-2z" fill="#F5C04E" opacity=".8" data-page-node-id="BrcbacuV4VGtoKzn7Z1QAm"/>
+          </svg>
+        </div>
+        <div class="foecard__side" data-page-node-id="k9v85IQITG2FaOJNitt4XU">
+          <div class="foecard__nm" data-page-node-id="B4tRROjIA1BTsrYuj4iiRN">王阿姨 <span class="chip chip--red" data-page-node-id="sRaVIwgKkVXGJJwn8fwgnF">动摇</span></div>
+          <div class="foecard__lb" data-page-node-id="w9SQ4fd0woPOPpkBUFKFSe"><span data-page-node-id="h6BvgB3C6w0ch2V58MxZbI">自信度</span><span class="num" style="color:var(--gold);font-weight:700" data-page-node-id="bopF7WEF8fpf7hG3UO2Vsc">68</span></div>
+          <div class="meter" data-level="high" role="progressbar" aria-valuenow="68" aria-valuemin="0" aria-valuemax="100" data-page-node-id="sL5as1Xg0laChD3gAj1D23">
+            <div class="meter__fill" style="transform:scaleX(.68)" data-page-node-id="pGnJXhiQCn9SyPW8rBr5PG"></div>
+          </div>
+          <div class="foecard__lb" data-page-node-id="OB5XD0U1TL6zqefKhqlPqI"><span data-page-node-id="xWpAandSod61iheBUPgd6G">剩余 token</span><span class="num" data-page-node-id="XYxavIFNM1pvgvwosTZ7Z4">286</span></div>
+        </div>
+        <button class="btn btn--ghost btn--sm" id="open-drawer" data-page-node-id="aP4UEvCXabWScMA5NMpLQ8"><svg class="icon icon--sm" data-page-node-id="RpcwgbPe4wFBffWAlRbaP2"><use href="#i-info" data-page-node-id="4aEpeiVf8j9sP6lHMjlfgd"/></svg>查看底细</button>
+      </aside>
+    </div>
+
+    <div class="composer" data-page-node-id="ATew5ZZTYITqfD152GyQPi">
+      <div class="me-chip" data-page-node-id="e5fW3EuXmDTMCuPN6FDv1X">
+        <span class="me-chip__av" data-page-node-id="F0kRJEJH19qsHYfgL4v3yj">你</span>
+        <span class="me-chip__tx" data-page-node-id="hUsegOrZIkYNlOrrPWcuqN">从容</span>
+      </div>
+      <button class="btn btn--ghost btn--icon btn--sm" title="提示" data-page-node-id="nRIr1NFFeUilvpUjyofZMf"><svg class="icon icon--sm" data-page-node-id="6cfWfDvnDU1DuJCe6F9HBm"><use href="#i-bulb" data-page-node-id="htHQTGk4OrvY3cZXQhDVGY"/></svg></button>
+      <div class="inp-wrap" data-page-node-id="HBEzAsLNkAdkxBaGPLNvnO">
+        <input type="text" placeholder="输入你的论点，命中 TA 的薄弱点…" maxlength="300" aria-label="论点输入" data-page-node-id="GOxUylOS9B7zNvgDbkTHr3">
+        <button class="btn btn--ghost btn--icon btn--sm" title="语音输入" data-page-node-id="ebE1v85eBhxynh1YPpAxEp"><svg class="icon icon--sm" data-page-node-id="jO0qPFt0i3C3WNxeCqIT8g"><use href="#i-mic" data-page-node-id="DbAC6brpc8p7wIdyomA0Hi"/></svg></button>
+      </div>
+      <button class="btn btn--primary" data-page-node-id="rJfvDVXPomuCTPR4u9i89s">发送 <svg class="icon icon--sm" data-page-node-id="nV56FvBkHJlTGKkIbjCAiv"><use href="#i-send" data-page-node-id="SDeI9RDxCjqykf08r6TUu3"/></svg></button>
+      <button class="btn btn--ghost btn--icon" title="投降" data-page-node-id="pVWuHOAEYxqMiQxPAylpmq"><svg class="icon" data-page-node-id="3v494V19jR6mF53X1R2Lua"><use href="#i-flag" data-page-node-id="St2ENLzmkJuoeKn8hr47QU"/></svg></button>
+    </div>
+
+    <!-- 底细抽屉 -->
+    <div class="scrim" id="scrim" data-page-node-id="F5BMJNAUTlZeQ26MxYoHCO"></div>
+    <aside class="drawer" id="drawer" role="dialog" aria-label="对手底细" data-page-node-id="fFcLZV7oH4HAYtSHAZXA3o">
+      <div class="drawer__hd" data-page-node-id="ElLKA3dKplAG68qv1Dq1Nn">
+        <h3 data-page-node-id="zVo2GLgb21yzBPocHIhM7f">对手底细</h3>
+        <button class="btn btn--ghost btn--sm btn--icon" id="close-drawer" data-page-node-id="dXz8tdK2KFF1wg4m55USWA"><svg class="icon icon--sm" data-page-node-id="VEklQATLVMknFzm2iKecjt"><use href="#i-close" data-page-node-id="VjGF4oipy9viTR2SzLe3Ci"/></svg></button>
+      </div>
+      <div class="emo-card" data-page-node-id="fGjE6wyslz8ASCZiHf5JrF">
+        <span class="emo-card__face" data-page-node-id="4yp4p4y1stsu4CvmmV7FDr">😰</span>
+        <div data-page-node-id="FiIhkuA3UGBG7lJGFWhNvV">
+          <div class="emo-card__st" data-page-node-id="kPPPpb3P2RlxZrsE7a4CHU">动摇</div>
+          <div class="emo-card__note" data-page-node-id="9jFhigk3cI9fIEBl5ZJzWD">此刻的心理状态</div>
+        </div>
+      </div>
+      <div class="sect-lb" data-page-node-id="KKnNKPe6FhqEc6FidtqWUb">六 维</div>
+      <svg id="radar" viewBox="0 0 320 300" role="img" aria-label="NPC 六维雷达图：逻辑5 证据4 情感3 利益7 认同8 权威6" data-page-node-id="rAYNYsJRJx8DZbE75GXhZe"></svg>
+      <div class="sect-lb" data-page-node-id="X2N1608NOwDePAPGYHwjvA">软 肋</div>
+      <div class="weak-line" data-page-node-id="Z4AZAd91IQhDCWuSbACsq8">软肋：<b data-page-node-id="miql0eFG3Scia7NZEQURYh">情感</b> · 打中能让 TA 明显动摇，但会漂移，别一直用同一招</div>
+      <div class="sect-lb" data-page-node-id="QtOqYTWjie0i78TEzDPx0d">可 当 话 柄</div>
+      <div class="row" data-page-node-id="Z0fvqhRAm8rhg4m57G3CEJ">
+        <span class="chip chip--red" data-page-node-id="8xPTAg1dBbnfrypSGmNHQX">独居</span>
+        <span class="chip chip--red" data-page-node-id="QYVBhdNUDRwN1QBYHkk3ql">怕狗</span>
+        <span class="chip chip--red" data-page-node-id="pJI78CRHiqiWSHDnFMWvKy">爱拿「大家」压人</span>
+      </div>
+    </aside>
+  </section>
+
+  <!-- ========== S6 结算 ========== -->
+  <section class="screen" data-screen="verdict" data-page-node-id="O3DeQxtBGimA1qb6zFyFEf">
+    <div class="verdict" data-page-node-id="0a8cHGDhPhQ3d1vNFiH5wF">
+      <div class="vbox" data-page-node-id="1kBFQFGBfGJ41k2g2dlPMb">
+        <svg class="stamp" viewBox="0 0 120 120" role="img" aria-label="晋级印章" data-page-node-id="ztNryLmHwteZdqmgMOb1za">
+          <rect x="7" y="7" width="106" height="106" rx="10" fill="none" stroke="currentColor" stroke-width="8" data-page-node-id="XkjbV2J6iWHgwoq5ZxKUD5"/>
+          <rect x="21" y="21" width="78" height="78" rx="5" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="kowfXQZtaSLHuHJvwKKJsz"/>
+          <text x="60" y="74" text-anchor="middle" font-size="46" font-weight="900" fill="currentColor" font-family="var(--serif)" data-page-node-id="637IA3TXPqCShBHEWEhfHX">晋级</text>
+        </svg>
+        <h2 class="vtitle" data-page-node-id="bUzgERCfGF9rIFCmfvem0l">说 服 成 功</h2>
+        <p class="vsub" data-page-node-id="RBWnGq9En3rZawbDaLqNfY">你 2:1 击败 王阿姨 · 解锁 L3 阿凯教练</p>
+        <div class="retro" data-page-node-id="qYeEjnez1TtVUqqG8vlwmF">
+          <h4 data-page-node-id="evdpGNlu1uoGCfjBuyHFkE">复 盘</h4>
+          · 你从「一刀切不公平」破局，TA 的挡箭牌失效了<br data-page-node-id="9id0MDaFKK9EX4tjFCL1QT">
+          · 中段连打三次情感，TA 开始漂移、不再吃这一招<br data-page-node-id="v2Uqw4WFB1GuQzolrlpiv8">
+          · 最后一击换到「利益」，TA 没接住，自信度归零
+        </div>
+        <div class="vcta" data-page-node-id="i25iSyWp3v3a5D12MKu4JU">
+          <button class="btn btn--primary" data-go="arena" data-page-node-id="GQds7AetTV8eLuDWipa3Lg">再来一局</button>
+          <button class="btn btn--ghost" data-go="roster" data-page-node-id="6KFx0Vlz8MPBCbEXY9ARwq">回到主界面</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ========== S7 设计系统 ========== -->
+  <section class="screen" data-screen="tokens" data-page-node-id="SV76I9gHhilC7e3vfALQSC">
+    <div class="tok" data-page-node-id="EElSwg87aaAJrVXLrUDns7">
+      <div data-page-node-id="zwHCW6wWLlKD3eqEwCyb8z">
+        <h2 data-page-node-id="pV7ZhTmwNnxSk9MKqpAHnj">色彩 · 三色铁三角</h2>
+        <div class="swatches" data-page-node-id="ndRJdqWhRqPDGav0gQFFLV">
+          <div class="sw" data-page-node-id="47lziyY87bBYuHxq0Rd0nD"><div class="sw__c" style="background:#0E1226" data-page-node-id="Aab0ZUjnwF0BCheDlOPMPo"></div><div class="sw__t" data-page-node-id="jgkJF2GeXN3WBYBTQwB1Ja"><b data-page-node-id="fMjM7oSyyh19gtai7xKF1J">bg-deep</b>页面底 #0E1226</div></div>
+          <div class="sw" data-page-node-id="aub2klqptmblmXejGlKqQ1"><div class="sw__c" style="background:#171C3A" data-page-node-id="tmf9ICFcRrYlWswZzKQNy1"></div><div class="sw__t" data-page-node-id="vU664siHEwiFTrKvsP0XCI"><b data-page-node-id="laFa1WC5lTQ054OcAgigVE">bg-mid</b>卡片底 #171C3A</div></div>
+          <div class="sw" data-page-node-id="coGux7CcO6vmnCUtXioW0B"><div class="sw__c" style="background:#1F2549" data-page-node-id="yOzu6AbySF0xPCrAcT8z1B"></div><div class="sw__t" data-page-node-id="87odefyXqZBxCewMBmD0td"><b data-page-node-id="QjBhvUwxzo1bAxW33yTL4z">bg-raise</b>悬浮层 #1F2549</div></div>
+          <div class="sw" data-page-node-id="r4UrlrTkQTiUGidwhkUyic"><div class="sw__c" style="background:#FF3B4E" data-page-node-id="mEZGvLyzvnpCH3bAkhSgNp"></div><div class="sw__t" data-page-node-id="NzdE5rnKWVg0cBNWvrS5qC"><b data-page-node-id="cXmTGwHboMvxThH1JZgEJ1">red</b>异议 / 危机 5.4:1</div></div>
+          <div class="sw" data-page-node-id="RbVIEi4rV6WDT27Vk19Rt0"><div class="sw__c" style="background:#F5C04E" data-page-node-id="voZClgigpCNDyXCVeY3m5S"></div><div class="sw__t" data-page-node-id="WHexaDGevbEiOvuEBge94b"><b data-page-node-id="Gu0EDnQEqmswI5fJCh6M3i">gold</b>命中 / CTA 10.2:1</div></div>
+          <div class="sw" data-page-node-id="gTgqSMTPSb1XuZG6N2WZok"><div class="sw__c" style="background:#45D6C8" data-page-node-id="MSqdaUiX69DOfZi9rwajDV"></div><div class="sw__t" data-page-node-id="1nTPENPiqNzVcKc6RSr0wc"><b data-page-node-id="55OGjvv8luYMYRvB7vOc4n">player</b>玩家侧 9.1:1</div></div>
+          <div class="sw" data-page-node-id="P42Xq69xix9ZBYqTE4ADza"><div class="sw__c" style="background:#F08A5D" data-page-node-id="tCceSBQm5H2k5dAW8LjiQR"></div><div class="sw__t" data-page-node-id="2S4SGQQFkKHSxc4F3B5eTv"><b data-page-node-id="2o3nzyJ9mq515U5D2ZvkGr">npc</b>对手侧 7.0:1</div></div>
+          <div class="sw" data-page-node-id="FjICwEzVBLfAgCTAW4FQCS"><div class="sw__c" style="background:#8A8F9F" data-page-node-id="Ks0cLe3UjnkpfBtCBUgCcx"></div><div class="sw__t" data-page-node-id="Me5uoFx8LAA01xYB4CdY29"><b data-page-node-id="87ry3n2LrCxp0fNhSKjzit">text-mute</b>辅助 5.2:1</div></div>
+        </div>
+        <p style="font-size:var(--fs-12);color:var(--text-mute);margin:var(--sp-3) 0 0" data-page-node-id="ThtIkGHuV2POwtPBXKZUPv">
+          全部文字色对 bg-deep 达 WCAG AA（≥4.5:1），标题级达 AAA。红色只承载情绪语义，不单独做 CTA。
+        </p>
+      </div>
+
+      <div data-page-node-id="bKfXN8NJseV14tzAA2OKDX">
+        <h2 data-page-node-id="KjmF1EX7xUtAGnAkThuoXU">排版</h2>
+        <div class="type-row" data-page-node-id="r0pxLHbZXmhBb3lc8KqQg5">
+          <div style="font-family:var(--serif);font-size:var(--fs-36);font-weight:900;letter-spacing:4px" data-page-node-id="YGOCMhpHkoDuG5KyuRGjd8">辩题 · 思源宋 Heavy</div>
+          <div style="font-family:var(--serif);font-size:var(--fs-22);letter-spacing:2px" data-page-node-id="0OBXmNcmfbKZZsYDOLllE2">界面标题 22px</div>
+          <div style="font-size:var(--fs-18)" data-page-node-id="BpvNbiSBZZfdDltFUni5HT">对话流正文 18px / 行高 1.6 / 限宽 720px</div>
+          <div style="font-size:var(--fs-14);color:var(--text-dim)" data-page-node-id="YmclDOGQlQs3aWK92szr1s">按钮与表单 14px</div>
+          <div style="font-size:var(--fs-12);color:var(--text-mute)" data-page-node-id="dCygfYHvQnf5PTVTseK2Oc">辅助说明 12px</div>
+          <div class="num" style="font-size:var(--fs-16);color:var(--gold)" data-page-node-id="tel1MTFK65OwTm6zTDnjgO">数字 0123456789 · tabular-nums 防跳动</div>
+        </div>
+      </div>
+
+      <div data-page-node-id="9PVEyviSjculmB9V4qhXh0">
+        <h2 data-page-node-id="cYV8sSSdfBCBgXAJGvzCu7">按钮</h2>
+        <div class="row" data-page-node-id="7r91qOr8v2AoZSiWfoJldX">
+          <button class="btn btn--primary" data-page-node-id="bT1L9rFAbhksGusLJEsYfZ">主要 · 开辩</button>
+          <button class="btn btn--danger" data-page-node-id="objz8Fa0pVQvCqIsmTT03d">危险 · 投降</button>
+          <button class="btn btn--outline" data-page-node-id="0ZiEyh53XmEm2DMhjGcCVQ">次要 · 换一题</button>
+          <button class="btn btn--ghost" data-page-node-id="maC4xfwNxP09HBcJGTMxse">幽灵 · 返回</button>
+          <button class="btn btn--primary" disabled data-page-node-id="100oesMHqgDBwJyJjafPds">禁用态</button>
+          <button class="btn btn--primary btn--lg" data-page-node-id="f5tHHn7UJPsB9aAAYmILEY">大号 CTA</button>
+        </div>
+      </div>
+
+      <div data-page-node-id="RJ1egUqxcKyFvt8bWjdhOB">
+        <h2 data-page-node-id="GHMOFjCBNUoag1IEGoFETa">票据卡 · 通缉令</h2>
+        <div class="row" style="align-items:stretch" data-page-node-id="0m1QRF57U6PoTAankIN0y6">
+          <div class="ticket ticket--gold" style="width:280px" data-page-node-id="wjpaIKv4ypXG0ZL5ag5AEH">
+            <div class="foe__name" data-page-node-id="q4NzG5h1alIZaFXez6auLh">王阿姨</div>
+            <div class="foe__desc" data-page-node-id="11StbTjWfvpJkStmaPVnsN">切角 12px · 2px 金描边 · hover 上移 2px</div>
+          </div>
+          <div class="ticket ticket--red" style="width:280px" data-page-node-id="Ag5BmegDNqkxMehtxGskes">
+            <div class="foe__name" style="color:var(--red)" data-page-node-id="P860MTwX99KfUT5wu5rBND">异议状态</div>
+            <div class="foe__desc" data-page-node-id="4ypaedIsynFHbv7cEmp3IE">红色承载危机与反驳语义</div>
+          </div>
+          <div class="ticket ticket--locked" style="width:280px" data-page-node-id="QNrMZn7tWm4JeGkdukyUvS">
+            <div class="foe__name" style="color:var(--text-dim)" data-page-node-id="ywPn7vGsEHsOVKkqIVHPmC">锁定态</div>
+            <div class="foe__desc" data-page-node-id="u10u7SpuLiYzlhfwz0P5uG">灰化 + 去饱和，不做纯黑遮罩</div>
+          </div>
+        </div>
+      </div>
+
+      <div data-page-node-id="guYSqoPEd8dfAW8pHTEMeh">
+        <h2 data-page-node-id="CRgrkjwMXxDspCWGjFBp6Z">自信度条 · 越低越金</h2>
+        <div class="row" style="flex-direction:column;align-items:stretch;gap:var(--sp-3)" data-page-node-id="i5yIMTlNGzGKCjzdcpYv7O">
+          <div data-page-node-id="wZb8JYm4mGqczl26kcQ5Pg"><div style="font-size:var(--fs-12);color:var(--text-mute);margin-bottom:4px" data-page-node-id="cRSOIxBMhPMbLLWyvWl7Ec">≥60 红 · 强势</div><div class="meter" data-level="high" data-page-node-id="gzFBGxN4MQdWIDu6B6OX6N"><div class="meter__fill" style="transform:scaleX(.85)" data-page-node-id="WrHIEPVGna6HLLx6oAHGDN"></div></div></div>
+          <div data-page-node-id="hkDMVNOGWGvJh2z4fQABGJ"><div style="font-size:var(--fs-12);color:var(--text-mute);margin-bottom:4px" data-page-node-id="rxGj8XNnubL8PKT41E5WGe">30–60 橙 · 松动</div><div class="meter" data-level="mid" data-page-node-id="WAQZCNSSKzSRq1swiiCLBK"><div class="meter__fill" style="transform:scaleX(.45)" data-page-node-id="2hDxUBCdqmA4zrr9qC1YcO"></div></div></div>
+          <div data-page-node-id="Tar7DxjrlJdLvr3IElPwQK"><div style="font-size:var(--fs-12);color:var(--text-mute);margin-bottom:4px" data-page-node-id="ERVLrmAe9tk0aqFHgtu7sh">&lt;30 金 · 快说服了</div><div class="meter" data-level="low" data-page-node-id="tBgHNsNzofq7rK7iW1bLUH"><div class="meter__fill" style="transform:scaleX(.18)" data-page-node-id="eIQJUO8TVgWjCti2A1Cenp"></div></div></div>
+        </div>
+      </div>
+
+      <div data-page-node-id="PiH0zN4j7tm4vanxi2Nm7v">
+        <h2 data-page-node-id="oKpo2JX84k49GXxEc8rG4p">图标 · 19 枚 SVG（无 emoji）</h2>
+        <div class="row" style="gap:var(--sp-4);color:var(--gold)" data-page-node-id="vciyOA7njFZhm7DTGkT77T">
+          <svg class="icon icon--lg" data-page-node-id="CslCIGrGfn6ahZOSRgQDSX"><use href="#i-objection" data-page-node-id="aPMDfDtJI2hXVTVSIhbBNL"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="F2bJfXG3DU3CjEhvHjXCvL"><use href="#i-mic" data-page-node-id="gWOJ1ywMLP7bvpCGJdnLkb"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="xi2sltmJyUTHTtRsPHIsAj"><use href="#i-clock" data-page-node-id="l5nxulFnGTbFR1aHltX14B"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="LVhRVbjLrk0NVNA9ljs5YH"><use href="#i-coin" data-page-node-id="zGodhsUt3D979HImtfTPqA"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="YzbDF4POJmLO9cN4HUKDF4"><use href="#i-info" data-page-node-id="fF6svBX0i1aabHupljWfMP"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="GW1oGFaxWJFDhb1aKj690K"><use href="#i-gear" data-page-node-id="XcIGLFx4BAyFYq2bHGlwBe"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="5KvuYbaeHDDeZbTdOd00j0"><use href="#i-back" data-page-node-id="Uk82exa4OTkj0gH2Vz8yTM"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="PMoB4mRwdjkssgyQVqe5i3"><use href="#i-reroll" data-page-node-id="APTAYFHr6KMLRfFDZ8MqHJ"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="DrsNL4iuewlzwOwdYZ2l9G"><use href="#i-flag" data-page-node-id="dk1mAn2PPzYsMcThT1Thpi"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="EGMWSmcEBIUSbD3Dc1alLK"><use href="#i-bulb" data-page-node-id="sCrrdTxzjmnZ6xHOnd9ZuO"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="Qc5KOtBjAfaCt1pAGFcNP6"><use href="#i-vol" data-page-node-id="Ts66ApIGqxipDMZ7T2xdZP"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="g3UqnLabCWQMNAdhYtwVbC"><use href="#i-mute" data-page-node-id="tECF385Hb85ElFPJefT9SX"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="44Mv3Z1RkFYYC4Kp9JNjtv"><use href="#i-lock" data-page-node-id="DzZIsSUM8FF22r3XdR5o1C"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="5lMyANSp9GpnGeW94AOAB0"><use href="#i-close" data-page-node-id="kyhAwvZFPaUBRCeitttalE"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="MYPW1yUOgKjMz9ALljUiwS"><use href="#i-send" data-page-node-id="NoHch1NNngSjYOOIpmhhsr"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="bT8vlowjD9j0L6HzSVwxXT"><use href="#i-chev" data-page-node-id="qD3V54RkA3hN3szSeWqhll"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="JzFE4TYmW65DTs3EFXMTeS"><use href="#i-memory" data-page-node-id="x6xJZLYb7s17pFHJjbm9z3"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="XBDvePykPD57SPA1JACEPm"><use href="#i-user" data-page-node-id="0aTtIwBWLZO7tnKtMoYSFe"/></svg>
+          <svg class="icon icon--lg" data-page-node-id="K3cELb8PI4wFlYvLVuG2kl"><use href="#i-reset" data-page-node-id="RLmzusC6O97VdLNiECaqLX"/></svg>
+        </div>
+      </div>
+
+      <div data-page-node-id="DEiHd1s5fbXdY3DHE50kIZ">
+        <h2 data-page-node-id="XcMVzw9CP7XNSpfE6GYpXy">间距 / 圆角</h2>
+        <div class="row" style="align-items:flex-end" data-page-node-id="5AykG6YfZzDgsjKwPrxe5P">
+          <div style="text-align:center" data-page-node-id="nXxKUqAwzWi13AxGTUkSdL"><div style="width:4px;height:32px;background:var(--gold)" data-page-node-id="GLDGo2QYO9xCV7unGKjbaU"></div><span style="font-size:10px" data-page-node-id="BAHrrnRm9Joe06g7sD4R38">4</span></div>
+          <div style="text-align:center" data-page-node-id="OAzKX0FFiWoNoFbKvIASyn"><div style="width:8px;height:32px;background:var(--gold)" data-page-node-id="RHSVTJ92GhhcI9amghCCLf"></div><span style="font-size:10px" data-page-node-id="iWnpbijQqmIdz5oZ80VyUA">8</span></div>
+          <div style="text-align:center" data-page-node-id="Xpcu5uYvD6rG7RLqdJH4ko"><div style="width:12px;height:32px;background:var(--gold)" data-page-node-id="Vw7DsAHH1JsHVEfJYd5a6V"></div><span style="font-size:10px" data-page-node-id="vz4Zex7bJdWQzb0pVvmaBA">12</span></div>
+          <div style="text-align:center" data-page-node-id="5Q1Yl2sV7Adj1ksr7hm56X"><div style="width:16px;height:32px;background:var(--gold)" data-page-node-id="U4S1xh4ulAnTdAtrEomkhf"></div><span style="font-size:10px" data-page-node-id="qCDPrueW5BqE824XTCzFSN">16</span></div>
+          <div style="text-align:center" data-page-node-id="hFsw5NYo2btfV7LUMLX1kt"><div style="width:24px;height:32px;background:var(--gold)" data-page-node-id="NhYZrOz2g8GGOvUI1Q9dcI"></div><span style="font-size:10px" data-page-node-id="qIFpHoaA5kSWn10B2xBeSD">24</span></div>
+          <div style="text-align:center" data-page-node-id="Ec6shpGVb4H3riti2KC0ef"><div style="width:32px;height:32px;background:var(--gold)" data-page-node-id="dLyM7DruL6rld5hdoAUd9B"></div><span style="font-size:10px" data-page-node-id="9FOjBKICqAiDHB0A74Dkfn">32</span></div>
+          <div style="text-align:center" data-page-node-id="KAukRJMecksPhFUDxkud4c"><div style="width:48px;height:32px;background:var(--gold)" data-page-node-id="ufedEpZRRG4NfwTii51wFf"></div><span style="font-size:10px" data-page-node-id="yBNlQJOtxBmC9Ue8w0n38G">48</span></div>
+          <div style="margin-left:var(--sp-6);display:flex;gap:var(--sp-3);align-items:center" data-page-node-id="GQ7QhghpxnnveQgw7Ls0EB">
+            <div style="width:48px;height:32px;background:var(--bg-raise);border:1px solid var(--border-strong);border-radius:4px" data-page-node-id="WfzIo9kXRGtWxLHXHT1XUO"></div><span style="font-size:10px" data-page-node-id="dXuU0VTXJhrtCQ3T1Tdc13">r-sm 4</span>
+            <div style="width:48px;height:32px;background:var(--bg-raise);border:1px solid var(--border-strong);border-radius:8px" data-page-node-id="dI9JdsehtLwba0pD3Wgq62"></div><span style="font-size:10px" data-page-node-id="zHHhAkK8hgkUA0jywyoh1m">r-lg 8</span>
+            <div style="width:48px;height:32px;background:var(--bg-raise);border:1px solid var(--border-strong);border-radius:999px" data-page-node-id="kElFU5rXk3cxgTQMvNQr7s"></div><span style="font-size:10px" data-page-node-id="pXmKUAUq3EA9ZiZWvV7QVj">pill</span>
+          </div>
+        </div>
+        <p style="font-size:var(--fs-12);color:var(--text-mute);margin:var(--sp-3) 0 0" data-page-node-id="BrdZdtdvzGBYAA0Xn1xzZi">
+          禁止 16px 以上大圆角与毛玻璃：与「纸质法庭文书」隐喻冲突。层次靠边框不靠阴影。
+        </p>
+      </div>
+    </div>
+  </section>
+
+</div>
+</div>
+
+<script>
+// ---------- 界面切换 ----------
+function go(name){
+  document.querySelectorAll('.screen').forEach(s=>s.classList.toggle('on', s.dataset.screen===name));
+  document.querySelectorAll('.snav').forEach(b=>b.classList.toggle('on', b.dataset.go===name));
+  if(name!=='arena') closeDrawer();
+}
+document.addEventListener('click', e=>{
+  const t = e.target.closest('[data-go]');
+  if(t) go(t.dataset.go);
+});
+
+// ---------- 模式 Tab ----------
+document.querySelectorAll('.tab').forEach(tab=>{
+  tab.addEventListener('click', ()=>{
+    document.querySelectorAll('.tab').forEach(x=>x.classList.remove('on'));
+    tab.classList.add('on');
+    const free = tab.dataset.tab==='free';
+    document.getElementById('memrow').style.display = free ? 'flex' : 'none';
+  });
+});
+document.getElementById('memsw').addEventListener('click', function(){
+  this.classList.toggle('on');
+});
+
+// ---------- 抽屉 ----------
+const drawer = document.getElementById('drawer');
+const scrim = document.getElementById('scrim');
+function openDrawer(){ drawer.classList.add('on'); scrim.classList.add('on'); }
+function closeDrawer(){ drawer.classList.remove('on'); scrim.classList.remove('on'); }
+document.getElementById('open-drawer').addEventListener('click', openDrawer);
+document.getElementById('close-drawer').addEventListener('click', closeDrawer);
+scrim.addEventListener('click', closeDrawer);
+document.addEventListener('keydown', e=>{ if(e.key==='Escape') closeDrawer(); });
+
+// ---------- 设备宽度切换 ----------
+const devBtn = document.getElementById('dev-btn');
+devBtn.addEventListener('click', ()=>{
+  const mob = document.body.classList.toggle('dev-mobile');
+  devBtn.textContent = mob ? '切回桌面' : '切到手机 390px';
+  devBtn.classList.toggle('on', mob);
+});
+
+// ---------- 六维雷达 ----------
+(function radar(){
+  const svg = document.getElementById('radar');
+  if(!svg) return;
+  const labels = ['逻辑','证据','情感','利益','认同','权威'];
+  const values = [5,4,3,7,8,6];          // 情感=3 为软肋
+  const weakIdx = 2;
+  const cx=160, cy=150, R=100;
+  const pt = (i, r)=>{
+    const a = -Math.PI/2 + i*Math.PI/3;
+    return [cx + Math.cos(a)*r, cy + Math.sin(a)*r];
+  };
+  let html = '';
+  // 网格 4 环
+  for(let g=1; g<=4; g++){
+    const r = R*g/4;
+    const d = labels.map((_,i)=>pt(i,r).join(',')).join(' ');
+    html += `<polygon points="${d}" fill="none" stroke="rgba(255,255,255,.10)" stroke-width="1"/>`;
+  }
+  // 轴线 + 标签
+  labels.forEach((lb,i)=>{
+    const [x,y] = pt(i,R);
+    html += `<line x1="${cx}" y1="${cy}" x2="${x}" y2="${y}" stroke="rgba(255,255,255,.10)"/>`;
+    const [lx,ly] = pt(i,R+22);
+    html += `<text x="${lx}" y="${ly+4}" text-anchor="middle" font-size="13" fill="#C8CCE0">${lb}</text>`;
+  });
+  // 数据面
+  const d = values.map((v,i)=>pt(i, R*v/10).join(',')).join(' ');
+  html += `<polygon points="${d}" fill="rgba(240,138,93,.22)" stroke="#F08A5D" stroke-width="2"/>`;
+  // 顶点 + 软肋高亮
+  values.forEach((v,i)=>{
+    const [x,y] = pt(i, R*v/10);
+    const isWeak = i===weakIdx;
+    html += `<circle cx="${x}" cy="${y}" r="${isWeak?5:3.5}" fill="${isWeak?'#FF3B4E':'#F08A5D'}"/>`;
+    if(isWeak){
+      html += `<circle cx="${x}" cy="${y}" r="5" fill="none" stroke="#FF3B4E" stroke-width="1.5">
+        <animate attributeName="r" values="5;11;5" dur="1.8s" repeatCount="indefinite"/>
+        <animate attributeName="opacity" values=".9;0;.9" dur="1.8s" repeatCount="indefinite"/></circle>`;
+    }
+  });
+  svg.innerHTML = html;
+})();
+</script>
+</body>
+</html>

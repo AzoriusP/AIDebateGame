@@ -1,0 +1,66 @@
+{
+  "canvas": {
+    "width": 1024,
+    "height": 1536
+  },
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "file": "layers/OutfitA_Body.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_Base",
+      "file": "layers/FaceA_Base.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_EyeROpen",
+      "file": "layers/FaceA_EyeROpen.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_EyeLOpen",
+      "file": "layers/FaceA_EyeLOpen.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_BrowR",
+      "file": "layers/FaceA_BrowR.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_BrowL",
+      "file": "layers/FaceA_BrowL.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_MouthClosed",
+      "file": "layers/FaceA_MouthClosed.png",
+      "visible": true
+    },
+    {
+      "name": "FaceA_EyeRClosed",
+      "file": "layers/FaceA_EyeRClosed.png",
+      "visible": false
+    },
+    {
+      "name": "FaceA_EyeLClosed",
+      "file": "layers/FaceA_EyeLClosed.png",
+      "visible": false
+    },
+    {
+      "name": "FaceA_MouthOpen",
+      "file": "layers/FaceA_MouthOpen.png",
+      "visible": false
+    },
+    {
+      "name": "HairA_Front",
+      "file": "layers/HairA_Front.png",
+      "visible": true
+    }
+  ],
+  "stage": "facial rig artwork; pointing arm and swap variants still pending",
+  "sides": "L/R use character side; character L appears on image right",
+  "provenance": "G:\\WBSpace\\AIDebate\\work\\live2d\\male-master\\facial-rig-v2.extraction.json"
+}

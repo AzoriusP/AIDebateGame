@@ -1,0 +1,50 @@
+# 含密钥或本地用户数据的真实配置，禁止入库
+demo/config.json
+demo/data/accounts.json
+demo/data/npc_state.json
+demo/data/progress.json
+demo/tools/token_probe_out.json
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Python
+__pycache__/
+*.pyc
+
+# TTS 缓存
+demo/data/tts_cache/
+
+# 工作台/本地缓存
+.workbuddy/
+work/
+outputs/
+**/.cache/
+**/node_modules/
+*.log
+_deploy.tgz
+
+# Web 未引用的图片和旧版备份
+demo/static/assets/player.png
+demo/static/assets/parts/
+demo/static/assets/acting-v2/Point.png
+demo/static/characters.json.bak
+demo/static/__probe*.html
+demo/static/__perf-smoke.html
+_t.webp
+design/art-output/
+design/**/*.png
+design/**/*.jpg
+design/**/*.jpeg
+design/**/*.webp
+design/**/*.gif
+design/**/*.psd
+design/**/*.cmo3
+tools/live2d/extractor/
+抬杠模拟器-参赛介绍/
+
+# 系统
+.DS_Store
+Thumbs.db

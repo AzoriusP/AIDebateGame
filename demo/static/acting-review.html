@@ -1,0 +1,21 @@
+<!doctype html>
+<html lang="zh-CN">
+<head><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self'; style-src 'self' 'unsafe-inline'; object-src 'none'; base-uri 'none'">
+<title>角色姿态新稿 · 辩弈</title>
+<style>
+:root{color-scheme:dark;font:16px/1.65 system-ui,sans-serif;color:#e9ecf3;background:#111827}*{box-sizing:border-box}body{margin:0}main{max-width:1240px;margin:auto;padding:28px}a{color:#e9bd70}h1{font-size:30px;margin:10px 0}p{color:#b9c3d4;margin:10px 0}.eyebrow{font-size:13px;color:#e9bd70;letter-spacing:.12em}.layout{display:grid;grid-template-columns:minmax(0,1fr) 260px;gap:24px;margin-top:24px}.stage{background:#293548;border:1px solid #42516b;border-radius:12px;overflow:hidden;position:relative;aspect-ratio:4/3}.stage img{display:block;width:100%;height:100%;object-fit:contain}.stage.light{background:#ede9e0}.stage.grid{background-color:#e5e5e5;background-image:conic-gradient(#c7c7c7 25%,transparent 0 50%,#c7c7c7 0 75%,transparent 0);background-size:24px 24px}.stage small{position:absolute;left:16px;top:12px;color:#fff;background:#182134d9;padding:3px 9px;border-radius:4px;font-size:12px}button{font:inherit;color:inherit;background:#1c293e;border:1px solid #51617b;border-radius:8px;cursor:pointer;padding:12px 16px}button:hover{border-color:#e9bd70}button:focus-visible,a:focus-visible{outline:3px solid #e9bd70;outline-offset:3px}button[aria-pressed=true]{background:#554329;border-color:#e9bd70}.poses{display:grid;gap:10px}.poses button{text-align:left}.poses span{display:block;font-size:12px;color:#c0c8d4}.backgrounds{display:flex;gap:8px;flex-wrap:wrap;margin:16px 0}.backgrounds button{font-size:13px;padding:6px 12px}.note{border-left:3px solid #e9bd70;padding:0 14px;margin-top:22px;font-size:14px}.status{font-size:13px;color:#bfcadc}footer{margin-top:24px;border-top:1px solid #36425a;padding-top:14px;font-size:13px}#load-error{color:#ff9c9c}@media(max-width:850px){main{padding:18px}.layout{grid-template-columns:1fr}.poses{grid-template-columns:repeat(3,1fr)}.poses button{padding:9px;font-size:14px}.poses span{font-size:11px}h1{font-size:25px}}
+.stage{height:clamp(320px,58vh,620px);aspect-ratio:auto}
+</style></head>
+<body><main>
+<a href="/static/live2d-preview.html?source=male-acting">查看已绑定的三姿势 Live2D 动画 →</a>
+<p class="eyebrow">辩弈 · 角色制作</p><h1>站立、质询与异议</h1>
+<p>依据动作参考重画的三种关键姿态。人物朝向右侧的对手，伸指使用完整肩臂轮廓。</p>
+<div class="layout"><section aria-label="姿态画面"><div class="stage" id="stage"><small>静态原画对照 · 动画见上方链接</small><img id="pose-image" src="/static/assets/acting-v2/Neutral.png" alt="站立倾听：角色侧身面向右方，双臂自然放低" width="2048" height="1536"></div>
+<div class="backgrounds" aria-label="检查透明背景"><button data-bg="dark" aria-pressed="true">深色底</button><button data-bg="light" aria-pressed="false">浅色底</button><button data-bg="grid" aria-pressed="false">透明棋盘</button></div><p id="load-error" hidden role="alert">图片未能载入，请重新打开本页。</p></section>
+<aside><div class="poses" aria-label="选择姿态"><button data-pose="Neutral" aria-pressed="true">01 · 站立倾听<span>双臂放低，注视对手</span></button><button data-pose="Lean" aria-pressed="false">02 · 前倾质询<span>肩胸前压，眉眼收紧</span></button><button data-pose="Point" aria-pressed="false">03 · 左手异议<span>左臂伸出，右手放低</span></button></div>
+<p class="status" id="pose-note" aria-live="polite">站姿用于确认人物身份、服装与基础比例。</p>
+<div class="note"><strong>当前完成</strong><p>三姿势已导入 Cubism 并绑定共同呼吸、近侧眼眨眼和口型；异议能保持到发言结束。</p><strong>后续制作</strong><p>统一衣色与细节，拆分头发和衣服以支持换装，再制作连续肩肘运动和完整情绪表情。</p></div>
+</aside></div>
+<footer>本页展示静态原画。新模型的基础动画已在独立预览页运行；换装、连续关节动作和美术精修仍未完成。</footer>
+</main><script src="/static/acting-review.js?v=left-hand-1"></script></body></html>

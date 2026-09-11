@@ -1,0 +1,48 @@
+<!doctype html>
+<html lang="zh-CN">
+<head>
+<meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+<title>角色验收台 · 辩弈</title>
+<link rel="stylesheet" href="/static/characters.css">
+<style>
+:root{color-scheme:dark;font:16px/1.6 system-ui,sans-serif;background:#111527;color:#ecedf3}
+*{box-sizing:border-box}body{margin:0}main{max-width:1140px;margin:auto;padding:36px 24px}a{color:#f2c76e}
+h1{margin:12px 0 4px;font-size:30px}h2{font-size:19px;margin:0 0 16px}p{color:#b8bdd2;margin:8px 0 22px}
+.status{display:inline-block;font-size:12px;padding:4px 12px;border:1px solid #8b7137;color:#f2c76e;border-radius:20px}
+.layout{display:grid;grid-template-columns:1fr 1fr;gap:24px;margin-top:24px}.panel{padding:24px;background:#1a2035;border:1px solid #313950;border-radius:12px}
+#preview{height:430px;background:radial-gradient(ellipse at bottom,#394058,#1a2035 70%);border-radius:8px}
+label{display:block;font-size:14px;color:#c3c9de;margin:12px 0 6px}select,button{font:inherit;color:inherit;background:#242d46;border:1px solid #53607b;border-radius:6px;padding:8px 14px}
+select{width:100%}button{cursor:pointer}button:hover,button[aria-pressed=true]{border-color:#f2c76e;background:#3b3540;color:#f2c76e}.buttons{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 18px}
+.small{font-size:13px;color:#aeb6cf}output{color:#f2c76e;font-variant-numeric:tabular-nums}.meter{display:grid;grid-template-columns:78px 1fr 48px;gap:10px;align-items:center;margin:12px 0;font-size:13px}meter{width:100%;height:17px}
+#events{min-height:72px;border-left:3px solid #f2c76e;padding-left:12px;color:#cbd0e0;font-size:13px}
+.check{display:flex;align-items:center;gap:8px}hr{border:0;border-top:1px solid #394059;margin:24px 0}
+@media(max-width:720px){main{padding:20px 14px}.layout{grid-template-columns:1fr}.panel{padding:18px}#preview{height:340px}h1{font-size:25px}}
+</style>
+</head>
+<body><main>
+<a href="/">← 返回游戏</a>
+<h1>角色验收台</h1>
+<p>把素材、角色状态和最终动画分开核对，先完成一个母模，再扩展换装与 NPC。</p>
+<span class="status">当前游戏角色：静态立绘</span>
+<p class="small"><a href="/static/live2d-preview.html">打开 Live2D 流程样模验收 →</a> 已有可运行的几何样模，可检查真实网格形变与异议动作。</p>
+<div class="layout">
+<section class="panel"><h2>已接入的角色素材</h2><label for="character">角色</label><select id="character"></select>
+<div id="preview" aria-label="角色预览"></div>
+<p id="asset-status" class="small" role="status">正在读取素材…</p>
+</section>
+<section class="panel"><h2>共用表现协议</h2>
+<p class="small">下方读数是动画驱动参数预览。当前立绘不会随读数变形，也不会眨眼或伸手；需要绑定经过验收的模型。</p>
+<div id="emotions" class="buttons"></div>
+<label class="check"><input type="checkbox" id="motion" checked> 启用动画参数</label>
+<label class="check"><input type="checkbox" id="speaking"> 说话提示（尚未接入音频口型）</label>
+<div class="buttons"><button id="objection">我有异议！</button><button id="pause" aria-pressed="false">暂停</button><button id="reset">重置</button></div>
+<div id="meters"></div>
+<div id="events" role="status">等待事件。连续点击异议将从当前指令重新计时。</div>
+<hr><h2>模型启用条件</h2>
+<p class="small">完整分层原画 → Cubism 网格和变形器 → 四种状态与指向动作 → 模型导出 → 浏览器加载与换装验证。</p>
+<p class="small">资源清单只有已存在的文件。缺少的头发、面部、衣服和模型不作为可选项展示。所有角色共用参数名称和动作约定，各模型仍须完成自己的网格绑定。</p>
+</section></div>
+</main>
+<script src="/static/character-performance.js"></script><script src="/static/characters.js"></script>
+<script src="/static/character-lab.js"></script>
+</body></html>

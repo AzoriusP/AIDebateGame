@@ -1,0 +1,55 @@
+{
+  "canvas": {
+    "width": 2048,
+    "height": 1536
+  },
+  "layers": [
+    {
+      "name": "Neutral_Body",
+      "file": "layers/Neutral_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Neutral_EyesClosed",
+      "file": "layers/Neutral_EyesClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Neutral_MouthOpen",
+      "file": "layers/Neutral_MouthOpen.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_Body",
+      "file": "layers/Lean_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_EyesClosed",
+      "file": "layers/Lean_EyesClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_MouthOpen",
+      "file": "layers/Lean_MouthOpen.png",
+      "visible": true
+    },
+    {
+      "name": "Point_Body",
+      "file": "layers/Point_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Point_EyesClosed",
+      "file": "layers/Point_EyesClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Point_MouthOpen",
+      "file": "layers/Point_MouthOpen.png",
+      "visible": true
+    }
+  ],
+  "stage": "3 pose branches, each with a body, blink overlay and mouth overlay",
+  "limits": "Synchronous eyes; clothing/hair not yet independently swappable"
+}

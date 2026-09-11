@@ -1,0 +1,85 @@
+{
+  "version": 1,
+  "contract": "debate-humanoid-v1",
+  "characters": {
+    "player": {
+      "label": "玩家",
+      "renderer": "live2d",
+      "live2d": {
+        "model": "/static/assets/live2d/male-acting/male-acting.model3.json",
+        "contract": "debate-humanoid-v1"
+      }
+    },
+    "L1_A": {
+      "label": "王阿姨",
+      "renderer": "portrait",
+      "portraits": {
+        "calm": "/static/assets/portrait/L1_A/calm.webp",
+        "tense": "/static/assets/portrait/L1_A/tense.webp",
+        "anxious": "/static/assets/portrait/L1_A/anxious.webp",
+        "desperate": "/static/assets/portrait/L1_A/desperate.webp",
+        "smug": "/static/assets/portrait/L1_A/calm.webp",
+        "shaken": "/static/assets/portrait/L1_A/tense.webp",
+        "defeated": "/static/assets/portrait/L1_A/desperate.webp"
+      },
+      "fallback": "/static/assets/npc_t1.png"
+    },
+    "L2_A": {
+      "label": "林经理",
+      "renderer": "portrait",
+      "portraits": {
+        "calm": "/static/assets/portrait/L2_A/calm.webp",
+        "tense": "/static/assets/portrait/L2_A/tense.webp",
+        "anxious": "/static/assets/portrait/L2_A/anxious.webp",
+        "desperate": "/static/assets/portrait/L2_A/desperate.webp",
+        "smug": "/static/assets/portrait/L2_A/calm.webp",
+        "shaken": "/static/assets/portrait/L2_A/tense.webp",
+        "defeated": "/static/assets/portrait/L2_A/desperate.webp"
+      },
+      "fallback": "/static/assets/npc_t2.png"
+    },
+    "L3_A": {
+      "label": "陈博主",
+      "renderer": "portrait",
+      "portraits": {
+        "calm": "/static/assets/portrait/L3_A/calm.webp",
+        "tense": "/static/assets/portrait/L3_A/tense.webp",
+        "anxious": "/static/assets/portrait/L3_A/anxious.webp",
+        "desperate": "/static/assets/portrait/L3_A/desperate.webp",
+        "smug": "/static/assets/portrait/L3_A/calm.webp",
+        "shaken": "/static/assets/portrait/L3_A/tense.webp",
+        "defeated": "/static/assets/portrait/L3_A/desperate.webp"
+      },
+      "fallback": "/static/assets/npc_t3.png"
+    },
+    "L4_A": {
+      "label": "赵律师",
+      "renderer": "portrait",
+      "portraits": {
+        "calm": "/static/assets/portrait/L4_A/calm.webp",
+        "tense": "/static/assets/portrait/L4_A/tense.webp",
+        "anxious": "/static/assets/portrait/L4_A/anxious.webp",
+        "desperate": "/static/assets/portrait/L4_A/desperate.webp",
+        "smug": "/static/assets/portrait/L4_A/calm.webp",
+        "shaken": "/static/assets/portrait/L4_A/tense.webp",
+        "defeated": "/static/assets/portrait/L4_A/desperate.webp"
+      },
+      "fallback": "/static/assets/npc_t4.png"
+    },
+    "L5_A": {
+      "label": "陆教授",
+      "renderer": "portrait",
+      "portraits": {
+        "calm": "/static/assets/portrait/L5_A/calm.webp",
+        "tense": "/static/assets/portrait/L5_A/tense.webp",
+        "anxious": "/static/assets/portrait/L5_A/anxious.webp",
+        "desperate": "/static/assets/portrait/L5_A/desperate.webp",
+        "smug": "/static/assets/portrait/L5_A/calm.webp",
+        "shaken": "/static/assets/portrait/L5_A/tense.webp",
+        "defeated": "/static/assets/portrait/L5_A/desperate.webp"
+      },
+      "fallback": "/static/assets/npc_t5.png"
+    }
+  },
+  "live2d": {}
+}

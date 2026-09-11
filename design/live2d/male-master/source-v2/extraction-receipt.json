@@ -1,0 +1,200 @@
+{
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-body-without-arm-clean-v1_00001_.png",
+      "mask": "work/live2d/male-master/masks/body-without-arm-clean-keep-v1.png",
+      "visible": true,
+      "save_node": "6",
+      "source_sha256": "7e49dbfea5240fbc7007457c95962918e00ec98265f7735efd621448c52495d1",
+      "mask_sha256": "59e7e8fab7275f46370d08126ad16ad24318706b076ecc26cdc30f605a4a6c0c"
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-hands_00002_.png",
+      "mask": "work/live2d/male-master/masks/idle-arm-l-keep-v1.png",
+      "visible": true,
+      "save_node": "12",
+      "source_sha256": "4e71f2d7ff7463bd37da9a5d9426717e5e4ca1befce55bf1608127efb9518e71",
+      "mask_sha256": "3954aa201b743809ec604e4483040111227ab9bdfe36f26e5e29bacd7388bda7"
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-point-arm65-v1_00001_.png",
+      "mask": "work/live2d/male-master/masks/point-action-keep-65-v1.png",
+      "visible": false,
+      "save_node": "18",
+      "source_sha256": "76894e88e863ae429db35b253af7e5c330e202be49c831ff7065c79b42d5f894",
+      "mask_sha256": "523d7c74fda3a29a165aff98ae402244f990656e6530a746e5f4a0e81eaf5fd5"
+    }
+  ],
+  "prompt": {
+    "1": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_Body-image.png"
+      }
+    },
+    "2": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_Body-mask.png"
+      }
+    },
+    "3": {
+      "class_type": "ImageToMask",
+      "inputs": {
+        "image": [
+          "2",
+          0
+        ],
+        "channel": "red"
+      }
+    },
+    "4": {
+      "class_type": "InvertMask",
+      "inputs": {
+        "mask": [
+          "3",
+          0
+        ]
+      }
+    },
+    "5": {
+      "class_type": "JoinImageWithAlpha",
+      "inputs": {
+        "image": [
+          "1",
+          0
+        ],
+        "alpha": [
+          "4",
+          0
+        ]
+      }
+    },
+    "6": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "5",
+          0
+        ],
+        "filename_prefix": "male-master/body-arm-v2/OutfitA_Body"
+      }
+    },
+    "7": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_ArmLIdle-image.png"
+      }
+    },
+    "8": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_ArmLIdle-mask.png"
+      }
+    },
+    "9": {
+      "class_type": "ImageToMask",
+      "inputs": {
+        "image": [
+          "8",
+          0
+        ],
+        "channel": "red"
+      }
+    },
+    "10": {
+      "class_type": "InvertMask",
+      "inputs": {
+        "mask": [
+          "9",
+          0
+        ]
+      }
+    },
+    "11": {
+      "class_type": "JoinImageWithAlpha",
+      "inputs": {
+        "image": [
+          "7",
+          0
+        ],
+        "alpha": [
+          "10",
+          0
+        ]
+      }
+    },
+    "12": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "11",
+          0
+        ],
+        "filename_prefix": "male-master/body-arm-v2/OutfitA_ArmLIdle"
+      }
+    },
+    "13": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_ArmLPoint-image.png"
+      }
+    },
+    "14": {
+      "class_type": "LoadImage",
+      "inputs": {
+        "image": "body-arm-v2-OutfitA_ArmLPoint-mask.png"
+      }
+    },
+    "15": {
+      "class_type": "ImageToMask",
+      "inputs": {
+        "image": [
+          "14",
+          0
+        ],
+        "channel": "red"
+      }
+    },
+    "16": {
+      "class_type": "InvertMask",
+      "inputs": {
+        "mask": [
+          "15",
+          0
+        ]
+      }
+    },
+    "17": {
+      "class_type": "JoinImageWithAlpha",
+      "inputs": {
+        "image": [
+          "13",
+          0
+        ],
+        "alpha": [
+          "16",
+          0
+        ]
+      }
+    },
+    "18": {
+      "class_type": "SaveImage",
+      "inputs": {
+        "images": [
+          "17",
+          0
+        ],
+        "filename_prefix": "male-master/body-arm-v2/OutfitA_ArmLPoint"
+      }
+    }
+  },
+  "submission": {
+    "prompt_id": "11982ed6-337a-48b1-a5ea-3dd112fec0db",
+    "number": 25,
+    "node_errors": {}
+  }
+}

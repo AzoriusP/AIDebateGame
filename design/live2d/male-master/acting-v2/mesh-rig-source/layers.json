@@ -1,0 +1,70 @@
+{
+  "canvas": {
+    "width": 2048,
+    "height": 1536
+  },
+  "layers": [
+    {
+      "name": "Neutral_Body",
+      "file": "layers/Neutral_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Neutral_Eye",
+      "file": "layers/Neutral_Eye.png",
+      "visible": true
+    },
+    {
+      "name": "Neutral_MouthClosed",
+      "file": "layers/Neutral_MouthClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Neutral_MouthOpen",
+      "file": "layers/Neutral_MouthOpen.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_Body",
+      "file": "layers/Lean_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_Eye",
+      "file": "layers/Lean_Eye.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_MouthClosed",
+      "file": "layers/Lean_MouthClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_MouthOpen",
+      "file": "layers/Lean_MouthOpen.png",
+      "visible": true
+    },
+    {
+      "name": "Point_Body",
+      "file": "layers/Point_Body.png",
+      "visible": true
+    },
+    {
+      "name": "Point_Eye",
+      "file": "layers/Point_Eye.png",
+      "visible": true
+    },
+    {
+      "name": "Point_MouthClosed",
+      "file": "layers/Point_MouthClosed.png",
+      "visible": true
+    },
+    {
+      "name": "Point_MouthOpen",
+      "file": "layers/Point_MouthOpen.png",
+      "visible": true
+    }
+  ],
+  "stage": "3 pose branches with independently extracted eye, closed mouth and open mouth; 12 art meshes",
+  "limits": "Eye mesh is the visible near eye; occluded far eye retained in body. Outfit and hair remain in pose branch."
+}

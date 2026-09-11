@@ -1,0 +1,231 @@
+{
+  "format": "ordinary-raster-psd-v1",
+  "source_manifest": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers.json",
+  "source_manifest_sha256": "489e856c6f3475992995165ed8ed8d85e9bf19759932e903d6a2cca164e972fe",
+  "canvas": {
+    "width": 1024,
+    "height": 1536,
+    "color_mode": "RGBA",
+    "depth": 8
+  },
+  "layer_order": "bottom-to-top",
+  "alpha_bounds_cropped": true,
+  "merged_includes": "visible layers only",
+  "merged_rgb_storage": "white-matted RGB with original alpha; individual layers retain straight RGBA",
+  "psd": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.psd",
+  "psd_sha256": "f5c47b037666d7a4ce27ddc9cfd6f8cccfbb24df9a7da442268230ebe957a1de",
+  "psd_bytes": 10650504,
+  "preview": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\male-master-v2.preview.png",
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_Body.png",
+      "source_sha256": "0cb040566d8687a70b3d473d3e72d75f10c61c063e357d33b20e6661529b6309",
+      "visible": true,
+      "bbox": [
+        166,
+        392,
+        743,
+        1536
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_ArmLIdle.png",
+      "source_sha256": "aed0f2a1ac192b250886c582391070eea07898ce63365b79c4a112a929a24f86",
+      "visible": true,
+      "bbox": [
+        675,
+        466,
+        853,
+        1294
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\OutfitA_ArmLPoint.png",
+      "source_sha256": "20a971f5fa0aede29f20e5e6f6ca6ac97c759cb4d2b99d0068b8afa92876b57d",
+      "visible": false,
+      "bbox": [
+        645,
+        451,
+        907,
+        777
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_Base",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_Base.png",
+      "source_sha256": "32e6cbee5edde5a3021cb07a38dcfc003b6649d1ab27bd8a75ab27532be86bac",
+      "visible": true,
+      "bbox": [
+        405,
+        219,
+        631,
+        470
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_EyeROpen",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeROpen.png",
+      "source_sha256": "371ef3051f83e333454b1c05c3b2534037c35869caf12264c9e42e3344febb3c",
+      "visible": true,
+      "bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_EyeLOpen",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeLOpen.png",
+      "source_sha256": "68cfcb3c6c1c6206a6fbba9fea3e5c3991588167970d56a4e75f853965aa0e90",
+      "visible": true,
+      "bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_BrowR",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_BrowR.png",
+      "source_sha256": "13cef511a877dd9f6f15c7b4befbdcd5b39c6042b934c6333df0822b9e51cb6b",
+      "visible": true,
+      "bbox": [
+        431,
+        267,
+        503,
+        300
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_BrowL",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_BrowL.png",
+      "source_sha256": "00bc028395dea793f88808881feee48bb297b9fbc6e7f21de108b172dfbc5b72",
+      "visible": true,
+      "bbox": [
+        525,
+        268,
+        601,
+        301
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_MouthClosed",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_MouthClosed.png",
+      "source_sha256": "413f9d2dd5abe1b0cc763111b70fb2908d858e2487e772679c7f5ff4e1c3a603",
+      "visible": true,
+      "bbox": [
+        477,
+        368,
+        555,
+        405
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_EyeRClosed",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeRClosed.png",
+      "source_sha256": "62c1f7a1878acd9059430b5f1cab92090ebfe8efa5cbf1fc9ba5b0b3c23edd86",
+      "visible": false,
+      "bbox": [
+        429,
+        288,
+        507,
+        326
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_EyeLClosed",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_EyeLClosed.png",
+      "source_sha256": "bfd072b06ceec06f18a0b871a38586343b8a700963748a606bcda02a1b0ad53c",
+      "visible": false,
+      "bbox": [
+        526,
+        287,
+        601,
+        329
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "FaceA_MouthOpen",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\FaceA_MouthOpen.png",
+      "source_sha256": "d01fd84ac1bcf1c4ed300ea90088adbf761425b787742afdfa3a7bf2a85b6b21",
+      "visible": false,
+      "bbox": [
+        481,
+        360,
+        547,
+        404
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    },
+    {
+      "name": "HairA_Front",
+      "file": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source-v2\\layers\\HairA_Front.png",
+      "source_sha256": "7e0b7d842918098adfc8612b6f7a05697456ffba641150f2991e02036f99f688",
+      "visible": true,
+      "bbox": [
+        339,
+        83,
+        694,
+        412
+      ],
+      "source_canvas": [
+        1024,
+        1536
+      ]
+    }
+  ],
+  "cubism_import": "must be verified in Editor for each production package",
+  "preview_sha256": "7d5dee3c69de7f6252b2d97ba3ed1d0563992a150be5daef4e09cd22b6dcd5a6"
+}

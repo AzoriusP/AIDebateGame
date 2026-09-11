@@ -1,0 +1,143 @@
+{
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "source": "design/art-output/live2d-source/male-master/candidate-03-body-without-arm-clean-v1_00001_.png",
+      "source_sha256": "7e49dbfea5240fbc7007457c95962918e00ec98265f7735efd621448c52495d1",
+      "mask": "work/live2d/male-master/masks/body-without-arm-clean-keep-v1.png",
+      "mask_sha256": "59e7e8fab7275f46370d08126ad16ad24318706b076ecc26cdc30f605a4a6c0c",
+      "comfy_output": "G:\\WBSpace\\AIDebate\\design\\art-output\\live2d-source\\male-master\\body-arm-v2\\OutfitA_Body_00001_.png",
+      "max_alpha_normalization": 1,
+      "rgb_equals_authored_source": true,
+      "alpha_equals_mask": true,
+      "output_sha256": "0cb040566d8687a70b3d473d3e72d75f10c61c063e357d33b20e6661529b6309"
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "source": "design/art-output/live2d-source/male-master/candidate-03-hands_00002_.png",
+      "source_sha256": "4e71f2d7ff7463bd37da9a5d9426717e5e4ca1befce55bf1608127efb9518e71",
+      "mask": "work/live2d/male-master/masks/idle-arm-l-keep-v1.png",
+      "mask_sha256": "3954aa201b743809ec604e4483040111227ab9bdfe36f26e5e29bacd7388bda7",
+      "comfy_output": "G:\\WBSpace\\AIDebate\\design\\art-output\\live2d-source\\male-master\\body-arm-v2\\OutfitA_ArmLIdle_00001_.png",
+      "max_alpha_normalization": 1,
+      "rgb_equals_authored_source": true,
+      "alpha_equals_mask": true,
+      "output_sha256": "aed0f2a1ac192b250886c582391070eea07898ce63365b79c4a112a929a24f86"
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "source": "design/art-output/live2d-source/male-master/candidate-03-point-arm65-v1_00001_.png",
+      "source_sha256": "76894e88e863ae429db35b253af7e5c330e202be49c831ff7065c79b42d5f894",
+      "mask": "work/live2d/male-master/masks/point-action-keep-65-v1.png",
+      "mask_sha256": "523d7c74fda3a29a165aff98ae402244f990656e6530a746e5f4a0e81eaf5fd5",
+      "comfy_output": "G:\\WBSpace\\AIDebate\\design\\art-output\\live2d-source\\male-master\\body-arm-v2\\OutfitA_ArmLPoint_00001_.png",
+      "max_alpha_normalization": 1,
+      "rgb_equals_authored_source": true,
+      "alpha_equals_mask": true,
+      "output_sha256": "20a971f5fa0aede29f20e5e6f6ca6ac97c759cb4d2b99d0068b8afa92876b57d"
+    },
+    {
+      "name": "FaceA_Base",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_Base.png",
+      "sha256": "32e6cbee5edde5a3021cb07a38dcfc003b6649d1ab27bd8a75ab27532be86bac",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeROpen",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeROpen.png",
+      "sha256": "371ef3051f83e333454b1c05c3b2534037c35869caf12264c9e42e3344febb3c",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeLOpen",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeLOpen.png",
+      "sha256": "68cfcb3c6c1c6206a6fbba9fea3e5c3991588167970d56a4e75f853965aa0e90",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_BrowR",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_BrowR.png",
+      "sha256": "13cef511a877dd9f6f15c7b4befbdcd5b39c6042b934c6333df0822b9e51cb6b",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_BrowL",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_BrowL.png",
+      "sha256": "00bc028395dea793f88808881feee48bb297b9fbc6e7f21de108b172dfbc5b72",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_MouthClosed",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_MouthClosed.png",
+      "sha256": "413f9d2dd5abe1b0cc763111b70fb2908d858e2487e772679c7f5ff4e1c3a603",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeRClosed",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeRClosed.png",
+      "sha256": "62c1f7a1878acd9059430b5f1cab92090ebfe8efa5cbf1fc9ba5b0b3c23edd86",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_EyeLClosed",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeLClosed.png",
+      "sha256": "bfd072b06ceec06f18a0b871a38586343b8a700963748a606bcda02a1b0ad53c",
+      "exact_file_copy": true
+    },
+    {
+      "name": "FaceA_MouthOpen",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_MouthOpen.png",
+      "sha256": "d01fd84ac1bcf1c4ed300ea90088adbf761425b787742afdfa3a7bf2a85b6b21",
+      "exact_file_copy": true
+    },
+    {
+      "name": "HairA_Front",
+      "inherited_from": "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\HairA_Front.png",
+      "sha256": "7e0b7d842918098adfc8612b6f7a05697456ffba641150f2991e02036f99f688",
+      "exact_file_copy": true
+    }
+  ],
+  "pose_visibility_overrides": {
+    "neutral": {},
+    "closed": {
+      "FaceA_EyeROpen": false,
+      "FaceA_EyeLOpen": false,
+      "FaceA_EyeRClosed": true,
+      "FaceA_EyeLClosed": true
+    },
+    "talking": {
+      "FaceA_MouthClosed": false,
+      "FaceA_MouthOpen": true
+    },
+    "objection": {
+      "OutfitA_ArmLIdle": false,
+      "OutfitA_ArmLPoint": true,
+      "FaceA_MouthClosed": false,
+      "FaceA_MouthOpen": true
+    }
+  },
+  "original_source_unchanged": true,
+  "original_source_sha256": {
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers.json": "48956e864f185bcb7ac170ebf4bf5ab7435852de71b34a2402082b3c9f3bb921",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\male-master-face-v1.psd": "8983ba1462292b8f60a32c0a14789c5096755f23a18480796318ba1f0226c13a",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\OutfitA_Body.png": "25a0b5e872d7c350442f929efcdce37e9819771d3c76b2a54cd6907e578ecebc",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_Base.png": "32e6cbee5edde5a3021cb07a38dcfc003b6649d1ab27bd8a75ab27532be86bac",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeROpen.png": "371ef3051f83e333454b1c05c3b2534037c35869caf12264c9e42e3344febb3c",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeLOpen.png": "68cfcb3c6c1c6206a6fbba9fea3e5c3991588167970d56a4e75f853965aa0e90",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_BrowR.png": "13cef511a877dd9f6f15c7b4befbdcd5b39c6042b934c6333df0822b9e51cb6b",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_BrowL.png": "00bc028395dea793f88808881feee48bb297b9fbc6e7f21de108b172dfbc5b72",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_MouthClosed.png": "413f9d2dd5abe1b0cc763111b70fb2908d858e2487e772679c7f5ff4e1c3a603",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeRClosed.png": "62c1f7a1878acd9059430b5f1cab92090ebfe8efa5cbf1fc9ba5b0b3c23edd86",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_EyeLClosed.png": "bfd072b06ceec06f18a0b871a38586343b8a700963748a606bcda02a1b0ad53c",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\FaceA_MouthOpen.png": "d01fd84ac1bcf1c4ed300ea90088adbf761425b787742afdfa3a7bf2a85b6b21",
+    "G:\\WBSpace\\AIDebate\\design\\live2d\\male-master\\source\\layers\\HairA_Front.png": "7e0b7d842918098adfc8612b6f7a05697456ffba641150f2991e02036f99f688"
+  },
+  "comfy_nodes": [
+    "ImageToMask",
+    "InvertMask",
+    "JoinImageWithAlpha",
+    "LoadImage",
+    "SaveImage"
+  ],
+  "sampling_used": false
+}

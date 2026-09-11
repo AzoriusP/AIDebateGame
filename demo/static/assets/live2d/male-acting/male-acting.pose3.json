@@ -1,0 +1,17 @@
+{
+  "Type": "Live2D Pose",
+  "FadeInTime": 0.01,
+  "Groups": [
+    [
+      {
+        "Id": "PoseNeutral"
+      },
+      {
+        "Id": "PoseLean"
+      },
+      {
+        "Id": "PosePoint"
+      }
+    ]
+  ]
+}

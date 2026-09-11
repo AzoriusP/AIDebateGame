@@ -1,0 +1,86 @@
+[
+  {
+    "name": "Neutral_Body",
+    "part": "PoseNeutral",
+    "opacity": 255,
+    "part_opacity": 255,
+    "pixels_verified": true
+  },
+  {
+    "name": "Neutral_Eye",
+    "part": "PoseNeutral",
+    "opacity": 255,
+    "part_opacity": 255,
+    "pixels_verified": true
+  },
+  {
+    "name": "Neutral_MouthClosed",
+    "part": "PoseNeutral",
+    "opacity": 255,
+    "part_opacity": 255,
+    "pixels_verified": true
+  },
+  {
+    "name": "Neutral_MouthOpen",
+    "part": "PoseNeutral",
+    "opacity": 0,
+    "part_opacity": 255,
+    "pixels_verified": true
+  },
+  {
+    "name": "Lean_Body",
+    "part": "PoseLean",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Lean_Eye",
+    "part": "PoseLean",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Lean_MouthClosed",
+    "part": "PoseLean",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Lean_MouthOpen",
+    "part": "PoseLean",
+    "opacity": 0,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Point_Body",
+    "part": "PosePoint",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Point_Eye",
+    "part": "PosePoint",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Point_MouthClosed",
+    "part": "PosePoint",
+    "opacity": 255,
+    "part_opacity": 0,
+    "pixels_verified": true
+  },
+  {
+    "name": "Point_MouthOpen",
+    "part": "PosePoint",
+    "opacity": 0,
+    "part_opacity": 0,
+    "pixels_verified": true
+  }
+]

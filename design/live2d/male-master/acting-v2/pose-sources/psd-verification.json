@@ -1,0 +1,42 @@
+{
+  "canvas": [
+    2048,
+    1536
+  ],
+  "layers": [
+    {
+      "name": "Neutral_PoseReference",
+      "visible": true,
+      "bbox": [
+        531,
+        65,
+        1180,
+        1536
+      ],
+      "max_channel_delta": 0
+    },
+    {
+      "name": "Lean_PoseReference",
+      "visible": false,
+      "bbox": [
+        503,
+        89,
+        1253,
+        1536
+      ],
+      "max_channel_delta": 0
+    },
+    {
+      "name": "Point_PoseReference",
+      "visible": false,
+      "bbox": [
+        601,
+        56,
+        1787,
+        1536
+      ],
+      "max_channel_delta": 0
+    }
+  ],
+  "result": "passed; layer pixels and visibility preserved; Cubism import not checked"
+}

@@ -1,0 +1,41 @@
+{
+  "Version": 3,
+  "Meta": {
+    "Duration": 1.6,
+    "Fps": 30,
+    "Loop": false,
+    "AreBeziersRestricted": true,
+    "CurveCount": 1,
+    "TotalSegmentCount": 5,
+    "TotalPointCount": 6,
+    "UserDataCount": 0,
+    "TotalUserDataSize": 0,
+    "FadeInTime": 0.08,
+    "FadeOutTime": 0.15
+  },
+  "Curves": [
+    {
+      "Target": "Parameter",
+      "Id": "ParamObjection",
+      "Segments": [
+        0,
+        0,
+        0,
+        0.16,
+        0,
+        0,
+        0.3,
+        1,
+        0,
+        0.95,
+        1,
+        0,
+        1.4,
+        0,
+        0,
+        1.6,
+        0
+      ]
+    }
+  ]
+}

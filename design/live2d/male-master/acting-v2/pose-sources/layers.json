@@ -1,0 +1,32 @@
+{
+  "canvas": {
+    "width": 2048,
+    "height": 1536
+  },
+  "layers": [
+    {
+      "name": "Neutral_PoseReference",
+      "file": "layers/Neutral.png",
+      "visible": true
+    },
+    {
+      "name": "Lean_PoseReference",
+      "file": "layers/Lean.png",
+      "visible": false
+    },
+    {
+      "name": "Point_PoseReference",
+      "file": "layers/Point.png",
+      "visible": false
+    }
+  ],
+  "stage": "pose reference board; three complete poses, NOT segmented rig parts",
+  "registration": "Approximate lower-pelvis center at x=896. Translation only; head/shoulder keypoints remain pose-specific.",
+  "remaining": [
+    "color consistency",
+    "semantic layers and hidden surfaces",
+    "eyes/mouth variants",
+    "Cubism binding",
+    "real export and runtime integration"
+  ]
+}

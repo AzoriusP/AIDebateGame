@@ -1,0 +1,140 @@
+{
+  "kind": "original-geometry-pipeline-test-only",
+  "production_character": false,
+  "purpose": "Verify layered PSD import, real Cubism mesh/parameter setup and real Editor export.",
+  "canvas": {
+    "width": 512,
+    "height": 512,
+    "color_mode": "RGBA",
+    "depth": 8
+  },
+  "layers_bottom_first": [
+    {
+      "name": "Proof_Body",
+      "file": "Proof_Body.png",
+      "bbox": [
+        144,
+        272,
+        313,
+        451
+      ],
+      "sha256": "c29496183e8fc6aa91be6176da0e4fa98220bfe0c6c1ac233b35bdc1b430c841"
+    },
+    {
+      "name": "Proof_Head",
+      "file": "Proof_Head.png",
+      "bbox": [
+        132,
+        110,
+        325,
+        295
+      ],
+      "sha256": "e8e3b041f9cb85f177934485ac9fd0acc1eda6e8ab5da27b36510044ca7c83ca"
+    },
+    {
+      "name": "Proof_EyeL",
+      "file": "Proof_EyeL.png",
+      "bbox": [
+        174,
+        166,
+        195,
+        217
+      ],
+      "sha256": "04391cc8b279eae69ae88cd29e79202b327ae92fecc8e61377a43a7cf107b277"
+    },
+    {
+      "name": "Proof_EyeR",
+      "file": "Proof_EyeR.png",
+      "bbox": [
+        262,
+        166,
+        283,
+        217
+      ],
+      "sha256": "5044866695b0cb292e97ffeb2c7ecfcbf291265a1b7afe93d78b4df69971e36c"
+    },
+    {
+      "name": "Proof_ArrowArm",
+      "file": "Proof_ArrowArm.png",
+      "bbox": [
+        280,
+        280,
+        445,
+        373
+      ],
+      "sha256": "c5a409ad405cec6bba9a13a0fd9e443323be544447d8e28116d8cdb33cff7d7f"
+    }
+  ],
+  "psd": "pipeline-proof.psd",
+  "psd_sha256": "5c217b9ec7f7adebe23392680da9e868e5c2bffaf64102151955b7fa9051bf45",
+  "source_script": "tools/live2d/make_pipeline_proof.py",
+  "provenance": "Original simple shapes authored programmatically for this project; no AI/image/reference assets.",
+  "validation": {
+    "pillow_psd_read": "passed",
+    "merged_rgba_pixel_roundtrip": "passed",
+    "five_named_raster_layers": "passed",
+    "independent_psd_tools_layer_pixels": "passed",
+    "independent_psd_tools_forced_recomposition": "passed",
+    "cubism_import": "passed",
+    "cubism_import_editor": "Live2D Cubism Editor 5.3.04 FREE",
+    "cubism_import_date": "2026-09-09",
+    "cubism_import_verified_psd_sha256": "5c217b9ec7f7adebe23392680da9e868e5c2bffaf64102151955b7fa9051bf45",
+    "cubism_import_evidence": {
+      "editor_log": "work/live2d/logs/cubism-editor-20260909-034305-888.stdout.log",
+      "read_image_resources_bytes": 32,
+      "read_layer_and_mask_info_bytes": 334220,
+      "read_image_data_bytes": 1048578,
+      "five_layers_and_composite": "visually verified in the Editor by the main task",
+      "saved_editor_project": "design/live2d/pipeline-proof/proof.cmo3"
+    },
+    "cubism_export": "passed",
+    "cubism_export_editor": "Live2D Cubism Editor 5.3.04 FREE",
+    "cubism_export_date": "2026-09-09",
+    "cubism_export_evidence": {
+      "saved_editor_project": "design/live2d/pipeline-proof/proof.cmo3",
+      "moc": "demo/static/assets/live2d/pipeline-proof/proof.moc3",
+      "moc_bytes": 17792,
+      "moc_sha256": "273bf4ede70158a449936843899917235f3d30cc7e80e53a172fd2079602bd9e",
+      "model_manifest": "demo/static/assets/live2d/pipeline-proof/proof.model3.json",
+      "display_info": "demo/static/assets/live2d/pipeline-proof/proof.cdi3.json",
+      "texture": "demo/static/assets/live2d/pipeline-proof/proof.1024/texture_00.png",
+      "texture_size": [1024, 1024]
+    },
+    "core_audit": {
+      "result": "passed",
+      "report": "work/live2d/proof-core-audit.json",
+      "sdk": "Cubism SDK for Web 5-r.5",
+      "core_version": "06.00.0001",
+      "moc_version": 6,
+      "drawable_count": 5,
+      "parameter_count": 28,
+      "bound_required_parameter_count": 4,
+      "part_count": 0,
+      "source_moc_unchanged": true
+    },
+    "browser_validation": {
+      "result": "passed",
+      "page": "/static/live2d-preview.html",
+      "verified_by": "main task using the real browser",
+      "rendered_real_model": true,
+      "four_required_parameters": "passed",
+      "closed_eyes_and_pointing": "visually verified",
+      "objection_motion_duration_seconds": 1.6,
+      "objection_motion_returns_to_idle": true
+    }
+  },
+  "suggested_bindings": {
+    "ParamBreath": "Proof_Body vertical scaling from lower edge, 0..1",
+    "ParamEyeLOpen": "Proof_EyeL vertical compression about center, 0..1",
+    "ParamEyeROpen": "Proof_EyeR vertical compression about center, 0..1",
+    "ParamObjection": "Proof_ArrowArm movement/rotation, 0..1"
+  },
+  "implemented_bindings": {
+    "ParamBreath": { "min": 0, "max": 1, "default": 0, "target": "Proof_Body", "behavior": "body breathing deformation" },
+    "ParamEyeLOpen": { "min": 0, "max": 1, "default": 1, "target": "Proof_EyeL", "behavior": "vertical compression to closed eye at zero" },
+    "ParamEyeROpen": { "min": 0, "max": 1, "default": 1, "target": "Proof_EyeR", "behavior": "vertical compression to closed eye at zero" },
+    "ParamObjection": { "min": 0, "max": 1, "default": 0, "target": "Proof_ArrowArm", "deformer": "Proof_ArmPivot", "rotation_degrees_at_min": 65, "rotation_degrees_at_max": 0 }
+  },
+  "regeneration_note": "Running make_pipeline_proof.py regenerates source assets and resets this manifest's Editor/Core/browser validation metadata. Preserve the verified manifest before rerunning and repeat applicable verification.",
+  "limitations": "This is a runnable geometric pipeline proof, not the male player, an NPC, a production character rig, or an artistic approval candidate. Hair/face/outfit swapping and production character art are not validated."
+}

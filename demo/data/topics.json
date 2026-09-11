@@ -1,0 +1,602 @@
+[
+  {
+    "id": "T101",
+    "tier": 1,
+    "domain": "家庭",
+    "topic": "年轻人就该早点结婚生孩子，拖到30岁还不结婚就是自私",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T102",
+    "tier": 1,
+    "domain": "消费",
+    "topic": "现在的年轻人太爱乱花钱，存不下钱就是不懂事",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T103",
+    "tier": 1,
+    "domain": "养生",
+    "topic": "吃保健品比去医院强，西药都是骗钱的",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T104",
+    "tier": 1,
+    "domain": "家庭",
+    "topic": "子女就应该听父母的，父母都是为了孩子好",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T105",
+    "tier": 1,
+    "domain": "消费",
+    "topic": "网上买东西都是假货，还是实体店靠谱",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T106",
+    "tier": 1,
+    "domain": "养生",
+    "topic": "坐月子不能洗头不能吹风，老祖宗的规矩不能破",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T107",
+    "tier": 1,
+    "domain": "家庭",
+    "topic": "生了孩子就该爷爷奶奶带，送托儿所就是图省事",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T108",
+    "tier": 1,
+    "domain": "消费",
+    "topic": "年轻人就该多存钱，超前消费花呗信用卡都是毒药",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T109",
+    "tier": 1,
+    "domain": "养生",
+    "topic": "中医偏方都是宝贝，西医只会开一堆检查费钱",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T110",
+    "tier": 1,
+    "domain": "家庭",
+    "topic": "女人到了年纪就该相夫教子，事业是男人的事",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T201",
+    "tier": 2,
+    "domain": "职场",
+    "topic": "年轻人就该拼命加班，996是福报",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T202",
+    "tier": 2,
+    "domain": "理财",
+    "topic": "买房一定要趁早，租房就是给房东打工",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T203",
+    "tier": 2,
+    "domain": "职场",
+    "topic": "稳定工作最重要，辞职创业都是不务正业",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T204",
+    "tier": 2,
+    "domain": "理财",
+    "topic": "年轻人就该把钱全存银行，买基金股票都是赌博",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T205",
+    "tier": 2,
+    "domain": "职场",
+    "topic": "学历最重要，没学历的人能力再强也没用",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T206",
+    "tier": 2,
+    "domain": "消费",
+    "topic": "该花的钱不能省，名牌才有面子",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "IDENTITY",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T207",
+    "tier": 2,
+    "domain": "职场",
+    "topic": "年轻就该多跳槽涨工资，忠诚是傻子才干的事",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T208",
+    "tier": 2,
+    "domain": "理财",
+    "topic": "钱生钱才是硬道理，上班永远发不了财",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T209",
+    "tier": 2,
+    "domain": "职场",
+    "topic": "加班就是能力不行，高效的人从不加班",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T210",
+    "tier": 2,
+    "domain": "消费",
+    "topic": "没房没车就没资格结婚，这是硬条件",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "IDENTITY",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T301",
+    "tier": 3,
+    "domain": "科技",
+    "topic": "AI迟早取代大部分工作，普通人学什么都没用",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T302",
+    "tier": 3,
+    "domain": "网络",
+    "topic": "网红带货全是割韭菜，就该抵制",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T303",
+    "tier": 3,
+    "domain": "社会",
+    "topic": "追星打榜是年轻人的自由，外人管不着",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "UTILITY",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T304",
+    "tier": 3,
+    "domain": "网络",
+    "topic": "网上就该全面实名制，匿名才导致网络暴力",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T305",
+    "tier": 3,
+    "domain": "科技",
+    "topic": "手机短视频毁了一代人，就该限制使用",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T306",
+    "tier": 3,
+    "domain": "社会",
+    "topic": "躺平是这代人最清醒的选择",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "UTILITY",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T307",
+    "tier": 3,
+    "domain": "网络",
+    "topic": "流量就是正义，没流量再好的内容也没用",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T308",
+    "tier": 3,
+    "domain": "科技",
+    "topic": "全民都应该学编程，否则就被时代淘汰",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T309",
+    "tier": 3,
+    "domain": "社会",
+    "topic": "网红比科学家更值得年轻人学习",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "IDENTITY",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T310",
+    "tier": 3,
+    "domain": "网络",
+    "topic": "网络让信息更自由，利大于弊",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T401",
+    "tier": 4,
+    "domain": "法律",
+    "topic": "面对网络暴力，就该以暴制暴",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T402",
+    "tier": 4,
+    "domain": "教育",
+    "topic": "高考是普通人唯一的公平出路",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T403",
+    "tier": 4,
+    "domain": "法律",
+    "topic": "未成年人没有隐私权，家长有权查看孩子的一切",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T404",
+    "tier": 4,
+    "domain": "法律",
+    "topic": "死刑应该废除，任何情况都不能剥夺生命",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T405",
+    "tier": 4,
+    "domain": "社会",
+    "topic": "正当防卫认定太严，被打就该还手",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "AUTHORITY",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T406",
+    "tier": 4,
+    "domain": "教育",
+    "topic": "体罚孩子是天经地义的，不打不成器",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T407",
+    "tier": 4,
+    "domain": "法律",
+    "topic": "网络诽谤就该入刑，键盘侠必须严惩",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "AUTHORITY",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T408",
+    "tier": 4,
+    "domain": "社会",
+    "topic": "宠物伤人，主人就该连带坐牢",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T409",
+    "tier": 4,
+    "domain": "教育",
+    "topic": "学区房是公平的，努力买房就是为孩子负责",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T410",
+    "tier": 4,
+    "domain": "法律",
+    "topic": "酒驾就该终身禁驾，一次都不能放过",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "AUTHORITY"
+    ]
+  },
+  {
+    "id": "T501",
+    "tier": 5,
+    "domain": "科技",
+    "topic": "人工智能终将拥有意识，人类应该让位",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "LOGIC"
+    ]
+  },
+  {
+    "id": "T502",
+    "tier": 5,
+    "domain": "哲学",
+    "topic": "自由意志并不存在，一切早已注定",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T503",
+    "tier": 5,
+    "domain": "教育",
+    "topic": "应试教育扼杀创造力，应该彻底废除",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T504",
+    "tier": 5,
+    "domain": "哲学",
+    "topic": "人生本来没有意义，意义只能靠自己赋予",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T505",
+    "tier": 5,
+    "domain": "科技",
+    "topic": "人类应该追求永生，死亡只是一个技术问题",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "EVIDENCE"
+    ]
+  },
+  {
+    "id": "T506",
+    "tier": 5,
+    "domain": "教育",
+    "topic": "通识教育比专业教育更重要",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "UTILITY"
+    ]
+  },
+  {
+    "id": "T507",
+    "tier": 5,
+    "domain": "哲学",
+    "topic": "道德是相对的，没有绝对的善恶",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "LOGIC",
+      "IDENTITY"
+    ]
+  },
+  {
+    "id": "T508",
+    "tier": 5,
+    "domain": "科技",
+    "topic": "科技越发达，人类越孤独",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "EVIDENCE",
+      "EMOTION"
+    ]
+  },
+  {
+    "id": "T509",
+    "tier": 5,
+    "domain": "哲学",
+    "topic": "人应该为热爱而活，而不是为责任而活",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "IDENTITY",
+      "EMOTION"
+    ]
+  },
+  {
+    "id": "T510",
+    "tier": 5,
+    "domain": "教育",
+    "topic": "大学应该取消分数线，人人都有受教育的权利",
+    "npc_stance": "支持",
+    "target_stance": "反对",
+    "weakness_hint": [
+      "UTILITY",
+      "EVIDENCE"
+    ]
+  }
+]

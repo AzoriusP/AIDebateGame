@@ -1,0 +1,256 @@
+{
+  "prompt": [
+    25,
+    "11982ed6-337a-48b1-a5ea-3dd112fec0db",
+    {
+      "1": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_Body-image.png"
+        }
+      },
+      "2": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_Body-mask.png"
+        }
+      },
+      "3": {
+        "class_type": "ImageToMask",
+        "inputs": {
+          "image": [
+            "2",
+            0
+          ],
+          "channel": "red"
+        }
+      },
+      "4": {
+        "class_type": "InvertMask",
+        "inputs": {
+          "mask": [
+            "3",
+            0
+          ]
+        }
+      },
+      "5": {
+        "class_type": "JoinImageWithAlpha",
+        "inputs": {
+          "image": [
+            "1",
+            0
+          ],
+          "alpha": [
+            "4",
+            0
+          ]
+        }
+      },
+      "6": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "5",
+            0
+          ],
+          "filename_prefix": "male-master/body-arm-v2/OutfitA_Body"
+        }
+      },
+      "7": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_ArmLIdle-image.png"
+        }
+      },
+      "8": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_ArmLIdle-mask.png"
+        }
+      },
+      "9": {
+        "class_type": "ImageToMask",
+        "inputs": {
+          "image": [
+            "8",
+            0
+          ],
+          "channel": "red"
+        }
+      },
+      "10": {
+        "class_type": "InvertMask",
+        "inputs": {
+          "mask": [
+            "9",
+            0
+          ]
+        }
+      },
+      "11": {
+        "class_type": "JoinImageWithAlpha",
+        "inputs": {
+          "image": [
+            "7",
+            0
+          ],
+          "alpha": [
+            "10",
+            0
+          ]
+        }
+      },
+      "12": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "11",
+            0
+          ],
+          "filename_prefix": "male-master/body-arm-v2/OutfitA_ArmLIdle"
+        }
+      },
+      "13": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_ArmLPoint-image.png"
+        }
+      },
+      "14": {
+        "class_type": "LoadImage",
+        "inputs": {
+          "image": "body-arm-v2-OutfitA_ArmLPoint-mask.png"
+        }
+      },
+      "15": {
+        "class_type": "ImageToMask",
+        "inputs": {
+          "image": [
+            "14",
+            0
+          ],
+          "channel": "red"
+        }
+      },
+      "16": {
+        "class_type": "InvertMask",
+        "inputs": {
+          "mask": [
+            "15",
+            0
+          ]
+        }
+      },
+      "17": {
+        "class_type": "JoinImageWithAlpha",
+        "inputs": {
+          "image": [
+            "13",
+            0
+          ],
+          "alpha": [
+            "16",
+            0
+          ]
+        }
+      },
+      "18": {
+        "class_type": "SaveImage",
+        "inputs": {
+          "images": [
+            "17",
+            0
+          ],
+          "filename_prefix": "male-master/body-arm-v2/OutfitA_ArmLPoint"
+        }
+      }
+    },
+    {
+      "client_id": "aidebate-male-master",
+      "create_time": 1788941297133
+    },
+    [
+      "18",
+      "6",
+      "12"
+    ]
+  ],
+  "outputs": {
+    "18": {
+      "images": [
+        {
+          "filename": "OutfitA_ArmLPoint_00001_.png",
+          "subfolder": "male-master\\body-arm-v2",
+          "type": "output"
+        }
+      ]
+    },
+    "6": {
+      "images": [
+        {
+          "filename": "OutfitA_Body_00001_.png",
+          "subfolder": "male-master\\body-arm-v2",
+          "type": "output"
+        }
+      ]
+    },
+    "12": {
+      "images": [
+        {
+          "filename": "OutfitA_ArmLIdle_00001_.png",
+          "subfolder": "male-master\\body-arm-v2",
+          "type": "output"
+        }
+      ]
+    }
+  },
+  "status": {
+    "status_str": "success",
+    "completed": true,
+    "messages": [
+      [
+        "execution_start",
+        {
+          "prompt_id": "11982ed6-337a-48b1-a5ea-3dd112fec0db",
+          "timestamp": 1788941297134
+        }
+      ],
+      [
+        "execution_cached",
+        {
+          "nodes": [],
+          "prompt_id": "11982ed6-337a-48b1-a5ea-3dd112fec0db",
+          "timestamp": 1788941297191
+        }
+      ],
+      [
+        "execution_success",
+        {
+          "prompt_id": "11982ed6-337a-48b1-a5ea-3dd112fec0db",
+          "timestamp": 1788941297584
+        }
+      ]
+    ]
+  },
+  "meta": {
+    "18": {
+      "node_id": "18",
+      "display_node": "18",
+      "parent_node": null,
+      "real_node_id": "18"
+    },
+    "6": {
+      "node_id": "6",
+      "display_node": "6",
+      "parent_node": null,
+      "real_node_id": "6"
+    },
+    "12": {
+      "node_id": "12",
+      "display_node": "12",
+      "parent_node": null,
+      "real_node_id": "12"
+    }
+  }
+}

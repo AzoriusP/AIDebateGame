@@ -1,0 +1,307 @@
+<!DOCTYPE html>
+<html lang="zh-CN" class="ui-booting" data-page-node-id="QYsFv5iJC2tD42JCOCh133" data-dm-ref="1"><head data-page-node-id="RbxwkjjVdldWPPP8YDQN38">
+<meta charset="UTF-8" data-page-node-id="ELaCPCp1TbJv1jF55EFRNS">
+<meta name="viewport" content="width=device-width, initial-scale=1.0" data-page-node-id="ByyrOxy77Dt8qPQaMjpD9a">
+<title>抬杠模拟器</title>
+<link rel="stylesheet" href="/static/style.css?v=auth-flow-1" data-page-node-id="41OZR9aUtS8yTwlECcIAGd">
+  <link rel="stylesheet" href="/static/characters.css?v=stable-layout-4" data-page-node-id="zKedB9fCdUi164dR5aD6U5">
+  <link rel="stylesheet" href="/static/lobby.css?v=5">
+<link rel="stylesheet" href="/static/theme.css?v=5">
+<script>window.addEventListener("DOMContentLoaded",()=>requestAnimationFrame(()=>document.documentElement.classList.remove("ui-booting")),{once:true});</script>
+<style id="__dm_no_drag_style__">* { -webkit-user-drag: none !important; }</style><style id="__dm_bindable_badge_style__">[data-sp-bindable="database"]{outline:1px dashed #0088ff;outline-offset:2px;border-radius:4px;}[data-sp-bindable="database"] *{pointer-events:none !important;transition:none !important;animation:none !important;}[data-sp-bindable="database"]{transition:none !important;animation:none !important;}</style></head>
+<body data-page-node-id="1UkXrxQXDTFYvL1dYXipHS" style="">
+<div id="app" data-page-node-id="urIGnqgyiZtGXNKmKFltMq">
+
+  <header id="topbar" data-page-node-id="f1ABoxIwYrnectIIjwFg5C">
+    <div id="topic-box" data-page-node-id="puuKg6lBH2QJ48PbEEuM1V">
+      <span id="topic-domain" class="chip" data-page-node-id="8lIw1axS8Y2tE54HtvvwVl"></span>
+      <span id="topic-text" data-page-node-id="n7Hg0mkksCYgHK7W2bpiJx"></span>
+    </div>
+  </header>
+
+  <div id="series-bar" class="hidden" data-page-node-id="2bkzIrm21uwSVlaKNolgnh">
+    <span id="series-text" data-page-node-id="kHsJmEFIQPGcgcIsTjwfTx"></span><span id="series-score" class="sc" data-page-node-id="Xly3QFraEG5bFvT6RoqiJl"></span>
+  </div>
+
+  <main id="stage" data-page-node-id="VX7eFQJQRDjnbOxNSPT1JW">
+    <section class="portrait" id="player-side" data-page-node-id="9NvjltausXC29Y98aik5r2">
+      <div class="stance-chip you" id="player-stance-chip" data-page-node-id="pA8hb0elr621YI9eYyyI4J">正方</div>
+      <div class="avatar" id="player-avatar" data-page-node-id="ychSEVZdYBCWyH9H09WrWa"></div>
+      <div class="pinfo" data-page-node-id="uwQb2Dg76fXCovbm9JVwV5">
+        <div class="pname" data-page-node-id="IVjVH3bQWJJaEVEUWYQMXq">你</div>
+        <div class="emotion-row" data-page-node-id="ZePFFZU6InHBtJsjeBtesP">
+          <span class="emotion" id="player-emotion" data-page-node-id="b6kjArViw5SuxvnBg0UypD">😄</span>
+          <span class="emotion-label" id="player-emotion-label" data-page-node-id="5aRUq9VWrfB5b1WonVHHtY">从容</span>
+        </div>
+      </div>
+    </section>
+
+    <section id="center" data-page-node-id="UdK1AWd1iLbY25ICe3O9Xb">
+      <div id="dialogue" class="scroll" data-page-node-id="NGpW8RIvASB9Ya1eKfvn3a"></div>
+    </section>
+
+    <section class="portrait" id="npc-side" data-page-node-id="T6m809TH2yz0NS3cUKpLzL">
+      <div class="stance-chip npc" id="npc-stance-chip" data-page-node-id="OG9D8wuRWjfl2J1YcwcZn5">反方</div>
+      <div class="conf-box" data-page-node-id="wthjAqYTMK3X8r3TkA1ZoA">
+        <div class="conf-label" data-page-node-id="D4DUfl8ZFCutqBtfzoGbTz">自信度 <span id="confidence-num" data-page-node-id="n213sv235zRTPGGptDDBZM">100</span></div>
+        <div id="confidence-bar" data-page-node-id="OlDZCCRlKHNSvCmEYAxmE2"><div id="confidence-fill" data-page-node-id="TmUFJF8HUsyW2MFDcFXLx1"></div></div>
+      </div>
+      <div class="avatar" id="npc-avatar" data-page-node-id="Ew9TMZw7ZxZty7vpKsmCDn">
+        <img src="/static/assets/portrait/L1_A/calm.webp" alt="对手立绘" data-page-node-id="AEusy7jlNNQYOfbTBewCc3">
+      </div>
+      <div class="pinfo" data-page-node-id="yLeKz6hLTfCmmLYOt6sPM1">
+        <div class="pname" id="npc-name2" data-page-node-id="tSEQ6FqTgk4PC0dBfTB3C5">王阿姨</div>
+        <div class="emotion-row" data-page-node-id="AUked4Ne80W3xmHbsAQ5qA">
+          <span class="emotion" id="npc-emotion" data-page-node-id="O5IwfQU4UtDLGsw4po7GFa">😏</span>
+          <span class="emotion-label" id="npc-emotion-label" data-page-node-id="25x1vFN8L5LOWCDZtAloud">得意</span>
+        </div>
+      </div>
+      <div class="portrait-actions" data-page-node-id="l4wjGx6XI0AVSAx12780WW">
+        <button id="npc-info-btn" title="查看 TA 的底细（六维 / 软肋 / 话柄）" data-page-node-id="WwUPjwkI3jwvpcpwYPmWlc">ⓘ</button>
+        <button id="mute-btn" title="语音开关" data-page-node-id="RpzM8BZLAFvmEYPPuwodni">🔊</button>
+      </div>
+    </section>
+  </main>
+
+  <footer id="bottom-bar" data-page-node-id="O1CrG6zP2UBysHl33iGSTh">
+    <div id="status-col" data-page-node-id="Ohpb9w0MnuShnXeq2zOnSR">
+      <div id="token-box" data-page-node-id="mu4WUGvEB36X4JNsiaLCW9">🪙 <span id="token-num" data-page-node-id="1wRf44F7G3NI6FfApHCPiA">400</span></div>
+      <div id="timer" data-page-node-id="kg7NbXil6NQ4oNbaxVLnyS">⏱ <span id="timer-num" data-page-node-id="EdlJh50Q2ChPfkO3r1s536">8:00</span></div>
+    </div>
+    <div id="input-row" data-page-node-id="Tw7ZKbvDt6SFJEAMym3U1F">
+      <button id="hint" title="不知道怎么辩？点我获得提示" data-page-node-id="WMFloBwbcjyQES5FEWu7o7">💡 提示</button>
+      <input id="input" type="text" placeholder="输入你的论点，命中 TA 的薄弱点…" autocomplete="off" maxlength="300" data-page-node-id="IPh30YjCgMzcxlSUO5Bivj">
+      <button id="mic" title="按住说话，语音转文字" data-page-node-id="2tavR1rTlcI4FvCxVwjwGv">🎤</button>
+      <button id="send" data-page-node-id="tBliUVYy3tGMIpIFCERBQV">发送</button>
+    </div>
+    <button id="surrender" title="主动认输" data-page-node-id="e0YMi8HplvLtMpZCYSjFri">投降</button>
+  </footer>
+</div>
+
+<div id="entry-screen" class="hidden" data-page-node-id="lI9uy5UAa5aFha1KPmHH5M">
+  <div id="entry-inner" data-page-node-id="GraRqyZgtaDHQC0iUH5Fwd">
+    <div id="entry-brand" data-page-node-id="2vEajp4hVxeF3Q8d1FoGWH">
+      <h1 id="entry-title" data-page-node-id="Onv3JOcU0jAHKk7KR0mcTx">抬杠模拟器</h1>
+    </div>
+    
+    
+    <div id="entry-actions" data-page-node-id="pz85CR5rFtyiFgSE78cRAY">
+      <button id="entry-guest" data-page-node-id="HVV02LsPPPNCqsKT24NfAV">游客登录</button>
+      <button id="entry-account" data-page-node-id="fLJ0gGHmu4TY4ouwgW3ltY">账号登录 / 注册</button>
+    </div>
+    <div id="entry-account-panel" class="hidden" aria-live="polite">
+      <div class="auth-heading">
+        <button id="auth-back" type="button" aria-label="返回身份选择">←</button>
+        <h2 id="auth-title">账号登录</h2>
+      </div>
+      <div class="auth-tabs" id="auth-method-tabs">
+        <button type="button" class="on" data-auth-method="credential">邮箱 / 用户名</button>
+        <button type="button" data-auth-method="phone">手机验证码</button>
+      </div>
+      <div class="auth-field hidden" id="auth-username-row">
+        <label for="auth-username">用户名</label>
+        <input id="auth-username" type="text" maxlength="20" autocomplete="username" placeholder="2～20 个字符">
+      </div>
+      <div class="auth-field" id="auth-identifier-row">
+        <label id="auth-identifier-label" for="auth-identifier">邮箱或用户名</label>
+        <input id="auth-identifier" type="text" maxlength="64" autocomplete="username" placeholder="输入邮箱或用户名">
+      </div>
+      <div class="auth-field" id="auth-password-row">
+        <label for="auth-password">密码</label>
+        <input id="auth-password" type="password" maxlength="64" autocomplete="current-password" placeholder="输入密码">
+      </div>
+      <div class="auth-field hidden" id="auth-code-row">
+        <label for="auth-code">验证码</label>
+        <div class="auth-code-input">
+          <input id="auth-code" type="text" inputmode="numeric" maxlength="6" autocomplete="one-time-code" placeholder="6 位验证码">
+          <button id="auth-send-code" type="button">获取验证码</button>
+        </div>
+      </div>
+      <div id="auth-status" role="status"></div>
+      <button id="auth-submit" type="button">登录</button>
+      <div class="auth-links">
+        <button id="auth-switch-mode" type="button">还没有账号？注册账号</button>
+        <button id="auth-forgot" type="button">忘记密码</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loading-screen" class="hidden" role="status" aria-live="polite" aria-label="正在加载游戏资源">
+  <div id="loading-panel">
+    <div id="loading-kicker">ARGUMENT SYSTEM // BOOT SEQUENCE</div>
+    <div id="loading-mark" aria-hidden="true"><span></span></div>
+    <h2>正在连接辩论终端</h2>
+    <p id="loading-detail">准备账号资料…</p>
+    <div id="loading-track" aria-hidden="true">
+      <div id="loading-fill"></div>
+      <i></i><i></i><i></i><i></i>
+    </div>
+    <div id="loading-meta">
+      <span id="loading-stage">IDENTITY SYNC</span>
+      <b id="loading-percent">0%</b>
+    </div>
+  </div>
+</div>
+
+<!-- 全屏演出层：常驻双层渐变（金/红），只动 opacity + transform -->
+<div id="objection-overlay" data-side="" data-page-node-id="d9xO5kqgbv6RPHHPGvlt8W">
+  <div class="ob-glow gold" data-page-node-id="sBU3AzSoACo5l4UO5rYsZi"></div>
+  <div class="ob-glow red" data-page-node-id="xOXrEjmmGmfvtji4Ux6eQJ"></div>
+  <div id="objection-text" data-page-node-id="jpoDlyx1PuyNo4dOOZvEu3">我有异议！</div>
+</div>
+
+<!-- 翻旧账：开局金字，数据来自现有记忆接口 -->
+<div id="recall-toast" class="hidden" aria-live="polite" data-page-node-id="vqPmUkUwUo8w26WwH7PWr0"></div>
+
+<div id="npc-info-overlay" class="hidden" data-page-node-id="Brg8yizLsUS8dybvnN8vpz">
+  <div id="npc-info-box" data-page-node-id="C3kGibg4CElLEzSpx0LBuF">
+    <div id="npc-info-head" data-page-node-id="fBrpcTucKGg0KZWk1uJedh">
+      <span id="npc-info-title" data-page-node-id="NgzbtcTNjAlxFlkuEJiCcF">对手底细</span>
+      <button id="npc-info-close" data-page-node-id="iSkCy7Fl6FI5MAeTPbDK5j">✕</button>
+    </div>
+    <div id="npc-info-emotion" data-page-node-id="1TgHPe2G8KDqYkgIbeWt1P">
+      <span id="npc-info-emoji" data-page-node-id="lJlBHLuY3Cltm9ALnf7g4E">😏</span>
+      <span id="npc-info-emotion-label" data-page-node-id="BZnoz1RdFzIH2ghNh7FJF5">得意</span>
+      <span class="npc-info-note" data-page-node-id="v7ozmIR703NzPBoAhUCinQ">此刻的心理状态</span>
+    </div>
+    <div id="radar-wrap" data-page-node-id="PrAP0J2dpNdYn7lfAs6Zya">
+      <svg id="radar" viewBox="0 0 320 300" role="img" aria-label="NPC 六维雷达图" data-page-node-id="txxRBFqsC6SDSBlXnKt7Bs"></svg>
+    </div>
+    <div id="npc-info-weak" data-page-node-id="4X6N24k0UlA4DsHlE26SGG">软肋：<b id="npc-weakness-text" data-page-node-id="IZuFs223yludwwMYPSXAPe"></b></div>
+    <div id="npc-info-tags-row" data-page-node-id="efWZB1Nd0Et8KmWRLeyX5c"><span class="tags-label-inline" data-page-node-id="SyNCsjB5DtH1UQcG6YLI04">可当话柄：</span><span id="npc-tags" data-page-node-id="qeeylXkiKQKQQe0SS2ACuo"></span></div>
+  </div>
+</div>
+
+<div id="mode-screen" data-page-node-id="DGzjgKk6aNNtpeCH7fFl4J">
+  <div id="mode-inner" data-page-node-id="Hrw8rQJiDisXUVGLprBylV">
+    <div id="identity-strip" class="hidden" data-page-node-id="WNnpvDplUqor1ttsk1K6vq">
+      <span id="identity-title" data-page-node-id="CowEWrBF0u5onA9dwT7XWe">当前身份：</span>
+      <span id="identity-name" data-page-node-id="GR1G5JA8Qz6wnChSf7NACS"></span>
+      <span id="identity-token" class="hidden" data-page-node-id="IMgOScQYKMtc1yoDZXwm3V">账号代币：<b id="identity-token-num" data-page-node-id="mefYFl2DyIENOcHhAeHVGE">0</b></span>
+      <div id="identity-feature-hints" class="hidden" data-page-node-id="8yl9dHuecnYVIsXza4IZcD"></div>
+      <div id="identity-token-actions" data-page-node-id="LqXNReWgZFw0BrBEYjN6zS">
+        <button id="identity-ad-reward" class="identity-action-btn" data-page-node-id="7rxXUSj8ZWJvJo3EJ13AIS">看广告+100</button>
+        <button id="identity-buy" class="identity-action-btn" data-page-node-id="bM2lmxIUdDvWn7ogNes5mA">购买+500</button>
+      </div>
+      <button id="identity-switch" data-page-node-id="kOASzwIGQiISqoDGKG0PJe">切换身份</button>
+    </div>
+    <div id="identity-summary" class="hidden" data-page-node-id="00L2I2CaQG5P8uJij7Cn9O">
+      <span data-page-node-id="lbDgSgAe9cfoAWIA1k4l9k">历史对局：<b id="identity-history" data-page-node-id="bfn0TJUiNeHWdQ4nIPh7DG">0</b></span>
+      <span id="identity-last" data-page-node-id="VOIppG2b3rK4fZ4aPmUIaH">｜最后对局：<b id="identity-last-result" data-page-node-id="RRUlejoEhDDQuChlhP9xXx">暂无</b></span>
+    </div>
+    <h1 id="game-title" data-page-node-id="9FaUGr6n0swQib7ng8PaZj">抬杠模拟器</h1>
+    <p id="game-sub" data-page-node-id="YFxql5vrpAdrZC9Ak9apEQ">用嘴皮子说服 AI——把 TA 的「自信度」说到归零，你就赢了。</p>
+    <div id="mode-cards" data-page-node-id="13pHD884Dwo4OCywUNKhWl">
+      <div class="mode-card" id="mode-ladder" data-page-node-id="dJwu3dzOUBhuJ2xC301si0">
+        <div class="mode-name" data-page-node-id="mWYNQSu29BD3wqmxYYCJyL">天梯赛</div>
+        <div class="mode-desc" data-page-node-id="pqGgsxDw2MAjo1SR7rd1pE">和同一个对手三局两胜，TA 会记住你的打法、越打越懂你</div>
+      </div>
+      <div class="mode-card" id="mode-free" data-page-node-id="HTooISJJNweLXLIJDmndij">
+        <div class="mode-name" data-page-node-id="9qkQceGz5xeL1id79V22ys">自由切磋</div>
+        <div class="mode-desc" data-page-node-id="ChR5BH6JlExNfHI95YyRUB">随便挑个对手练手，记忆与成长可以开关</div>
+      </div>
+      <div class="mode-card" id="mode-tutorial" data-page-node-id="tutModeCard01">
+        <div class="mode-name">新手教学</div>
+        <div class="mode-desc">三十秒看懂怎么赢：先看软肋，再出拳。不计战绩、随时可跳过</div>
+      </div>
+    </div>
+    <div id="avatar-card" data-page-node-id="3ciHsizvnZfvl9fWdwqGn6">
+      <h3 data-page-node-id="PSz9eeFHnPh1mXm9QStrNF">🎭 主角</h3>
+      <p class="ac-hint" data-page-node-id="tCzpDxkkZ0ySlQSEgInWnZ">你将扮演同一位主角，向五位对手发起挑战。</p>
+      <div id="avatar-preview" data-page-node-id="apOiHPow7sjyGtPXGTteIN"></div>
+      <div id="avatar-controls" data-page-node-id="ZvQDzEx1KMuQh6LFYYkVTf"></div>
+    </div>
+    <div id="mode-bottom" data-page-node-id="jeemMn0GRdfeKFhNOA737i">
+      <button id="mode-reset" data-page-node-id="5p9ILN9rAaIGZ5acZeOtZp">重置所有 NPC 的记忆与成长</button>
+      <button id="mode-fx" title="演出降级开关" data-page-node-id="872EAILlG0E60LPE554uB3">⚙ 演出设置</button>
+    </div>
+    <div id="fx-panel" class="hidden" data-page-node-id="QHRbY0PhdmwbA4OcpPA5Hr">
+      <label class="switch-label" data-page-node-id="C5KKlWgTKgsiTWHHR66sJn">演出效果（闪屏 · 金印 · 暗角）
+        <span class="switch" id="fx-master" data-page-node-id="a8aBW6NfRys3s4UgdQmeDm"><span class="knob" data-page-node-id="XLx7RRaimUfL5bcUHVykYg"></span></span>
+      </label>
+      <label class="switch-label" id="fx-shake-row" data-page-node-id="gGrWmYcwOXKO4VFxJA0MkC">屏幕震动
+        <span class="switch" id="fx-shake" data-page-node-id="h6Jd7RMNfv5n9dULbHXBxD"><span class="knob" data-page-node-id="mlGj5dRg2aBEwcCCMaAOR3"></span></span>
+      </label>
+      <label class="switch-label" data-page-node-id="3xnmsr9Wg1wH79hzKQgpco">角色动态
+        <span class="switch" id="fx-motion" data-page-node-id="y0m62hcTbEMXMeaQGsEwtn"><span class="knob" data-page-node-id="nZW4Im3ZSRMmsR3tG8WzxX"></span></span>
+      </label>
+      <div class="fx-note" id="fx-note" data-page-node-id="LVVB4KkUvSt9YhI1SjHCHD"></div>
+    </div>
+  </div>
+</div>
+
+<div id="tier-screen" class="hidden" data-page-node-id="FU6UFYJTv4EoCD1tquVpC8">
+  <div id="tier-inner" data-page-node-id="eGCNA0orHJ6RrUJZKbDQik">
+    <button class="back-btn" id="tier-back" data-page-node-id="4A7OVMzHa2FOcI4tubaTNv">← 主界面</button>
+    <h1 id="tier-title" data-page-node-id="ObdJw5rncOckfw1RED1LfJ">天梯 · 三局两胜</h1>
+    <p id="tier-sub" data-page-node-id="drn2Fodk6gR1INUiEXChN5">选择你的对手。难度越高，token 越少、软肋越少。系列赛内 TA 会记住你。</p>
+    <div id="tier-list" data-page-node-id="qHAApQhSZwxTMpCfdgmCc7"></div>
+  </div>
+</div>
+
+<div id="free-screen" class="hidden" data-page-node-id="H4e8Y79bOnSHQpWm74PJHB">
+  <div id="free-inner" data-page-node-id="6S1fc6nrnFVgD7Qo33lolA">
+    <button class="back-btn" id="free-back" data-page-node-id="MozckGLnDXP1qSH7HfIYo7">← 主界面</button>
+    <h1 id="free-title" data-page-node-id="2wLNFYhGZMXda0stp1W0Os">自由切磋</h1>
+    <div id="free-memrow" data-page-node-id="pqi5qhp1R97BLFGXEpCxCi">
+      <label class="switch-label" data-page-node-id="2rGOfu94B8YVezHOXHkCYJ">NPC 记忆与成长
+        <span class="switch" id="free-mem-switch" data-page-node-id="cKGQnzhlBNmFvnRRFZE34x"><span class="knob" data-page-node-id="OKkEyuIi6NbZSSYVRfYPI4"></span></span>
+      </label>
+      <span class="mem-hint" id="free-mem-hint" data-page-node-id="etFOKL1bbXFiunzGSaAHCX">关</span>
+    </div>
+    <div id="free-list" data-page-node-id="fE0v5ccEVhFiJ38oBJn0ge"></div>
+  </div>
+</div>
+
+<div id="stance-screen" class="hidden" data-page-node-id="hc3VNDtfTJYzxNEK5ILflm">
+  <div id="stance-inner" data-page-node-id="F1RMhbGkPDFSKEcRlGBZcB">
+    <div id="stance-npc" data-page-node-id="pCDJTdP4gLyi1howTMZLBP">
+      <img id="stance-avatar" src="" alt="" data-page-node-id="uqI30fMMEIyEmUZqU0jRQy">
+      <span data-page-node-id="4C72C7fEM2HTOReqvWFmm2">对手：<b id="stance-npc-name" data-page-node-id="BLhHEuRQxGVtRyhSsY1ZSa"></b></span>
+      <span id="stance-mem" class="mem-chip" data-page-node-id="kP3qzjm7CTaNJtAZ8niHOn"></span>
+    </div>
+    <h2 id="stance-label" data-page-node-id="fj0TiL65HpwK6SL302UtYp">辩题</h2>
+    <div id="stance-topic" data-page-node-id="0wgAxdHFTSEzvswBTdRE4Y"></div>
+    <div class="tags-label" data-page-node-id="w1SCh11kzoq5vMPtDrt2En">TA 的底细 · 可当话柄</div>
+    <div id="stance-tags" data-page-node-id="5U3kEnuHXQGNyfkRCg6nmJ"></div>
+    <div id="stance-rows" data-page-node-id="3NMJSrPJ0ATObQzZ5y2Eir">
+      <div class="side-row npc" data-page-node-id="GeF9DLJPVKhSpFVW4jsVaq"><span id="side-npc-text" data-page-node-id="ooUn9UHgF24hjx9tgkQOdE">对方 · 正方（支持）</span></div>
+      <div class="side-row you" data-page-node-id="zrqC5xkB0ZQQrVy5VWmFSV"><span id="side-you-text" data-page-node-id="oORKHavi01pcomM48LOBxn">你 · 反方（反对）</span></div>
+    </div>
+    <p id="stance-prompt" data-page-node-id="ZecnIyU9vInWrN8quJOZbR">说服 TA 改口：把 TA 的自信度说到归零即赢。准备好了吗？</p>
+    <div id="stance-buttons" data-page-node-id="lwUlV2brEQzTdhzVLx4wd6">
+      <button id="stance-start" class="stance-btn support" data-page-node-id="ULd7tq4txAZMvrGqfgwUAH">开 辩</button>
+    </div>
+    <div id="stance-actions" data-page-node-id="di3p8jTNDDnDBgjNbtwOCk">
+      <button id="stance-back" data-page-node-id="JsZ5GBMyYNfReP69Qxt7cz">← 返回</button>
+      <button id="stance-reroll" data-page-node-id="pynHHSEAH4hhd7ioL0fgeq">🔄 换一题</button>
+    </div>
+  </div>
+</div>
+
+<div id="result-overlay" class="hidden" data-page-node-id="J0mFq1tQcqi6dLXUvGIBun">
+  <div id="result-box" data-page-node-id="XEPqFaigEWovGhJAtEBDZF">
+    <div id="result-stamp" class="hidden" aria-hidden="true" data-page-node-id="pUBtE1AVrLqlbxbTzx9v2K">
+      <svg viewBox="0 0 120 120" role="img" aria-label="晋级印章" data-page-node-id="BoNmSlcmyaFIDFHuG3d68k">
+        <rect x="7" y="7" width="106" height="106" rx="10" fill="none" stroke="currentColor" stroke-width="8" data-page-node-id="hlurjbPQeMxTuJ4GcSaIyT"></rect>
+        <rect x="21" y="21" width="78" height="78" rx="5" fill="none" stroke="currentColor" stroke-width="2" data-page-node-id="Uf6HYQKmihK5zR0imsiKdY"></rect>
+        <text x="60" y="74" text-anchor="middle" font-size="46" font-weight="900" fill="currentColor" data-page-node-id="kHrGjtT7IlWnUtYdp4Q5rH">晋级</text>
+      </svg>
+    </div>
+    <div id="result-series" data-page-node-id="nd01YZhdvVAycZHFIMM2zZ"></div>
+    <div id="result-title" data-page-node-id="Ct8zzMbHPJ0iDjDh01RcHG"></div>
+    <div id="result-sub" data-page-node-id="v1yQB9BF1ydnnXg8Z6p38T"></div>
+    <div id="result-retrospect" data-page-node-id="I2ASEPPwLG2BsGMsmYxgvi"></div>
+    <button id="restart" data-page-node-id="F5yLJSLaQMTNHeDmzRZFYQ">再来一局</button>
+  </div>
+</div>
+
+<script src="/static/character-performance.js"></script>
+<script src="/static/characters.js?v=stable-layout-2"></script>
+<script src="/static/app.js?v=screen-isolation-3"></script>
+<script src="/static/lobby.js?v=2"></script>
+<script src="/static/tutorial.js?v=4"></script>
+
+
+</body></html>

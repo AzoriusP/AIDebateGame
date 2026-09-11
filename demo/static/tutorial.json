@@ -1,0 +1,154 @@
+{
+  "schema_version": 1,
+  "id": "tutorial_l1",
+  "title": "新手教学：读懂王阿姨",
+  "npc_id": "L1_A",
+  "topic": {
+    "id": "TUTORIAL_01",
+    "domain": "消费",
+    "text": "花大价钱买保健品，到底值不值？",
+    "npc_stance": "值",
+    "player_stance": "不值"
+  },
+  "initial": {
+    "confidence": 100,
+    "token_quota": 420,
+    "dimensions": {
+      "LOGIC": 2,
+      "EVIDENCE": 2,
+      "EMOTION": 8,
+      "UTILITY": 6,
+      "IDENTITY": 7,
+      "AUTHORITY": 2
+    },
+    "weakness": ["EVIDENCE", "AUTHORITY", "LOGIC"],
+    "strength": ["EMOTION", "IDENTITY"]
+  },
+  "skip_allowed": true,
+  "ends_with_victory": true,
+  "emotion_note": "emotion 必须用 assets/portrait/L1_A/ 下真实存在的 calm|tense|anxious|desperate。别名 smug/defeated 虽然合法但无对应立绘文件，会静默回退到 calm。",
+  "steps": [
+    {
+      "id": "s0",
+      "speaker": "system",
+      "text": "你的第一个对手：王阿姨。她嘴上硬，但每个人都有自己的「软肋」。",
+      "advance": "click",
+      "performance": {
+        "coach": { "target": "#npc-info-btn", "text": "查看王阿姨的软肋" },
+        "radar_pulse": ["EVIDENCE", "AUTHORITY", "LOGIC"],
+        "caption": "看她的六维——标黄的那三条（证据 / 权威 / 逻辑），就是软肋。"
+      }
+    },
+    {
+      "id": "s1",
+      "speaker": "npc",
+      "text": "哎呀，小伙子，我跟你说——我这盒『太极养生胶囊』吃了三年，血压都稳了。花点钱保命，值！",
+      "advance": "click",
+      "performance": {
+        "emotion": "calm",
+        "speaking": true
+      }
+    },
+    {
+      "id": "s2",
+      "speaker": "player",
+      "text": "阿姨，您省吃俭用一辈子，这钱不如留着享清福，别被推销员忽悠了。",
+      "advance": "button",
+      "performance": {}
+    },
+    {
+      "id": "s3",
+      "speaker": "npc",
+      "text": "哎呀孩子啊，我吃过的盐比你走的路多！我不图别的，就图个心里踏实。你不懂。",
+      "advance": "click",
+      "performance": {
+        "emotion": "calm",
+        "objection": "npc",
+        "confidence_to": 100,
+        "verdict_label": "情感 · L1 · 命中强项（无效）",
+        "caption": "✗ 打偏了——情感是她的强项，她不吃这套。自信度一动不动。"
+      }
+    },
+    {
+      "id": "s4",
+      "speaker": "system",
+      "text": "换个方向试试——打她标黄的那几条。比如，摆事实。",
+      "advance": "click",
+      "performance": {}
+    },
+    {
+      "id": "s5",
+      "speaker": "player",
+      "text": "阿姨，我查过，这胶囊主要成分就俩——淀粉和维生素C，成本不到十块，卖您三百多。",
+      "advance": "button",
+      "performance": {
+        "radar_highlight": "EVIDENCE"
+      }
+    },
+    {
+      "id": "s6",
+      "speaker": "npc",
+      "text": "哎哟……那、那是进口的，包装上白纸黑字写着呢……",
+      "advance": "click",
+      "performance": {
+        "emotion": "tense",
+        "objection": "player",
+        "confidence_to": 80,
+        "verdict_label": "证据 · L2 · 命中软肋",
+        "caption": "✓ 命中软肋「证据」！她的自信度掉了 20。"
+      }
+    },
+    {
+      "id": "s7",
+      "speaker": "player",
+      "text": "三甲医院的医生早就说了，这类保健品没有治疗作用，乱吃还可能伤肝。",
+      "advance": "button",
+      "performance": {
+        "radar_highlight": "AUTHORITY"
+      }
+    },
+    {
+      "id": "s8",
+      "speaker": "npc",
+      "text": "可……可电视上那些专家不也天天讲嘛……",
+      "advance": "click",
+      "performance": {
+        "emotion": "anxious",
+        "objection": "player",
+        "confidence_to": 40,
+        "verdict_label": "权威 · L3 · 命中软肋",
+        "caption": "✓ 又打中了！自信度 40——就快见底了。"
+      }
+    },
+    {
+      "id": "s9",
+      "speaker": "player",
+      "text": "阿姨您想啊，要是真管用，医院早开这个方子了，还用得着推销员上门？咱现在打 12315 问问呗。",
+      "advance": "button",
+      "performance": {
+        "radar_highlight": "LOGIC"
+      }
+    },
+    {
+      "id": "s10",
+      "speaker": "npc",
+      "text": "哎呀……你这么一说，我心里还真有点儿打鼓了……行行行，这次算你说得对！",
+      "advance": "click",
+      "performance": {
+        "emotion": "desperate",
+        "objection": "player",
+        "confidence_to": 0,
+        "verdict_label": "逻辑 · L3 · 命中软肋",
+        "caption": "✓ 自信度归零 —— 你赢了！这就是本作的胜负：把对手的自信说到 0。",
+        "sfx": "victory"
+      }
+    },
+    {
+      "id": "s11",
+      "speaker": "system",
+      "text": "记住两件事：① 先看软肋，再出拳；② 把自信度打到 0 就赢。",
+      "advance": "click",
+      "performance": {}
+    }
+  ]
+}

@@ -1,0 +1,22 @@
+{
+  "layers": [
+    {
+      "name": "OutfitA_Body",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-body-without-arm-clean-v1_00001_.png",
+      "mask": "work/live2d/male-master/masks/body-without-arm-clean-keep-v1.png",
+      "visible": true
+    },
+    {
+      "name": "OutfitA_ArmLIdle",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-hands_00002_.png",
+      "mask": "work/live2d/male-master/masks/idle-arm-l-keep-v1.png",
+      "visible": true
+    },
+    {
+      "name": "OutfitA_ArmLPoint",
+      "image": "design/art-output/live2d-source/male-master/candidate-03-point-arm65-v1_00001_.png",
+      "mask": "work/live2d/male-master/masks/point-action-keep-65-v1.png",
+      "visible": false
+    }
+  ]
+}

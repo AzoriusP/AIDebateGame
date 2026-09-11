@@ -1,0 +1,25 @@
+{
+  "canvas": [
+    2048,
+    1536
+  ],
+  "layers": [
+    {
+      "name": "Neutral_PoseReference",
+      "visible": true,
+      "max_channel_delta": 0
+    },
+    {
+      "name": "Lean_PoseReference",
+      "visible": false,
+      "max_channel_delta": 0
+    },
+    {
+      "name": "Point_PoseReference",
+      "visible": false,
+      "max_channel_delta": 0
+    }
+  ],
+  "neutral_and_lean_unchanged": true,
+  "result": "PSD pixels and visibility pass; Cubism import not yet tested"
+}

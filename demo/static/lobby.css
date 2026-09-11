@@ -1,0 +1,625 @@
+:root {
+  --lobby-ink: #24333d;
+  --lobby-ink-soft: #647680;
+  --lobby-line: #687b83;
+  --lobby-blue: #46c5ef;
+  --lobby-blue-deep: #087fac;
+  --lobby-cyan-pale: #d9f7ff;
+  --lobby-paper: rgba(252, 251, 245, 0.96);
+  --lobby-gold: #c7ad72;
+  --lobby-shadow: rgba(35, 64, 76, 0.28);
+}
+
+/* 首帧在所有主题和结构脚本就绪后再显露，避免旧版布局闪现。 */
+html.ui-booting {
+  background: #d9f1f7;
+}
+
+html.ui-booting body { visibility: hidden; }
+
+html.ui-booting::before {
+  content: "SYSTEM INITIALIZING";
+  position: fixed;
+  z-index: 9999;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  color: rgba(25, 126, 158, 0.62);
+  font: 700 9px/1 var(--sans);
+  letter-spacing: 0.42em;
+}
+
+html.ui-booting::after {
+  content: "";
+  position: fixed;
+  z-index: 9999;
+  left: calc(50% - 100px);
+  top: calc(50% + 18px);
+  width: 200px;
+  height: 3px;
+  background: linear-gradient(90deg, transparent, #2db4df, transparent);
+}
+
+/* HTML 中的静态占位图不参与首帧，角色控制器接管后再决定渲染方式。 */
+#player-avatar:not(.character-view) > img,
+#npc-avatar:not(.character-view) > img,
+#avatar-preview:not(.character-view) > img { visibility: hidden; }
+
+#mode-screen {
+  position: fixed;
+  inset: 0;
+  align-items: stretch;
+  overflow: hidden;
+  padding: 0;
+  color: var(--lobby-ink);
+  perspective: 900px;
+  background:
+    linear-gradient(108deg, rgba(218, 244, 252, 0.2), rgba(246, 253, 255, 0.9) 54%, rgba(209, 239, 247, 0.92)),
+    #eaf8fc;
+}
+
+#mode-screen.lobby-pre-entry {
+  opacity: 0;
+  transform: translateY(26px) scale(0.98);
+  pointer-events: none;
+}
+
+#mode-screen.lobby-boot-in {
+  animation: lobby-boot-in 560ms cubic-bezier(0.16, 0.78, 0.25, 1) forwards;
+}
+
+#mode-screen.lobby-boot-in #mode-inner {
+  animation: lobby-content-fall 560ms cubic-bezier(0.16, 0.78, 0.25, 1) forwards;
+}
+
+#mode-inner {
+  position: relative;
+  isolation: isolate;
+  display: grid;
+  grid-template-columns: minmax(360px, 41%) minmax(520px, 59%);
+  grid-template-rows: 112px minmax(0, 1fr) 84px;
+  gap: 0;
+  width: 100%;
+  max-width: none;
+  min-height: 100dvh;
+  padding: 0;
+  overflow: hidden;
+  text-align: left;
+  background:
+    linear-gradient(90deg, rgba(88, 174, 202, 0.22) 1px, transparent 1px) 0 0 / 22% 100%,
+    linear-gradient(rgba(99, 173, 198, 0.17) 1px, transparent 1px) 0 14% / 100% 18%,
+    radial-gradient(circle at 74% 55%, rgba(255, 255, 255, 0.98) 0 12%, rgba(218, 242, 249, 0.7) 38%, transparent 64%),
+    linear-gradient(135deg, #bce7f4 0%, #f8fdff 50%, #d5edf4 100%);
+}
+
+@keyframes lobby-boot-in {
+  0% {
+    opacity: 0;
+    transform: translateY(18px) scale(0.98) rotateX(16deg);
+    filter: blur(3px);
+  }
+  60% {
+    opacity: 1;
+    transform: translateY(2px) scale(1) rotateX(4deg);
+    filter: blur(1px);
+  }
+  100% {
+    opacity: 1;
+    transform: translateY(0) scale(1) rotateX(0);
+    filter: blur(0);
+  }
+}
+
+@keyframes lobby-content-fall {
+  0% {
+    opacity: 0;
+    transform: translateY(30px) rotateX(18deg) scale(0.985);
+    filter: blur(2px);
+  }
+  72% {
+    opacity: 1;
+    transform: translateY(0) rotateX(0) scale(1.008);
+    filter: blur(0);
+  }
+  100% {
+    transform: scale(1);
+    opacity: 1;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mode-screen.lobby-boot-in,
+  #mode-screen.lobby-boot-in #mode-inner {
+    animation: none !important;
+    opacity: 1;
+    transform: none;
+    filter: none;
+    pointer-events: auto;
+  }
+}
+
+/* 未来室内的墙体、灯带和地面，用轻量 CSS 搭建，保持加载速度。 */
+#mode-inner::before {
+  content: "";
+  position: absolute;
+  z-index: -2;
+  inset: 0;
+  pointer-events: none;
+  background:
+    linear-gradient(172deg, transparent 0 72%, rgba(105, 165, 181, 0.2) 72.2% 72.6%, rgba(244, 253, 255, 0.76) 72.8%),
+    linear-gradient(90deg, transparent 0 56%, rgba(255, 255, 255, 0.9) 56% 56.35%, transparent 56.35% 82%, rgba(255, 255, 255, 0.75) 82% 82.25%, transparent 82.25%),
+    linear-gradient(180deg, transparent 0 13.5%, rgba(255, 255, 255, 0.94) 13.7% 14.1%, rgba(83, 202, 233, 0.33) 14.25% 14.55%, transparent 14.7%);
+}
+
+#mode-inner::after {
+  content: "LOBBY // ARGUMENT SYSTEM";
+  position: absolute;
+  z-index: -1;
+  right: 2.4vw;
+  bottom: 15px;
+  color: rgba(16, 124, 160, 0.38);
+  font: 600 10px/1 var(--sans);
+  letter-spacing: 0.34em;
+  pointer-events: none;
+}
+
+#lobby-account {
+  grid-area: 1 / 1;
+  z-index: 5;
+  display: flex;
+  align-items: flex-start;
+  gap: 12px;
+  padding: 18px 0 0 18px;
+}
+
+#lobby-identity {
+  position: relative;
+  min-width: 156px;
+  max-width: 56%;
+  min-height: 54px;
+  padding: 8px 22px 8px 44px;
+  overflow: hidden;
+  color: #263641;
+  border: 2px solid #5d717a;
+  border-radius: 4px;
+  background: linear-gradient(180deg, rgba(255,255,255,0.98), rgba(238,241,238,0.96));
+  box-shadow: 0 3px 8px var(--lobby-shadow), inset 0 0 0 2px rgba(255,255,255,0.72);
+  font-family: var(--serif);
+  font-size: 17px;
+  font-weight: 700;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  clip-path: polygon(14px 0, 100% 0, 100% 100%, 14px 100%, 0 50%);
+}
+
+#lobby-identity::before {
+  content: "◀";
+  position: absolute;
+  left: 17px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #1e4b76;
+  font-family: var(--sans);
+  font-size: 18px;
+}
+
+#lobby-wallet {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  height: 46px;
+  padding: 4px 6px 4px 8px;
+  border: 1px solid rgba(49, 115, 139, 0.48);
+  border-radius: 23px;
+  background: linear-gradient(115deg, rgba(220,249,255,0.95), rgba(113,190,217,0.92));
+  color: #fff;
+  box-shadow: 0 3px 8px rgba(37, 109, 133, 0.2), inset 0 1px rgba(255,255,255,0.9);
+}
+
+.lobby-coin {
+  display: grid;
+  place-items: center;
+  width: 32px;
+  height: 32px;
+  border: 2px solid #a15d33;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 30%, #ffe7aa, #be7440 75%);
+  color: #7a4d30;
+  font-size: 19px;
+}
+
+#lobby-balance {
+  min-width: 35px;
+  color: #fff;
+  font-size: 18px;
+  font-weight: 800;
+  text-shadow: 0 1px 3px #31586b;
+}
+
+#lobby-topup {
+  width: 30px;
+  height: 30px;
+  padding: 0;
+  border: 1px solid #9a6c35;
+  border-radius: 50%;
+  background: linear-gradient(#f4ddaa, #d8ac63);
+  color: #815632;
+  font-size: 23px;
+  line-height: 1;
+}
+
+#lobby-brand {
+  grid-area: 1 / 2;
+  z-index: 3;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  justify-content: center;
+  padding: 20px 34px 8px 30px;
+  text-align: right;
+}
+
+#lobby-brand #game-title {
+  margin: 0;
+  color: #f9feff;
+  font-family: var(--serif);
+  font-size: clamp(35px, 4vw, 62px);
+  font-weight: 800;
+  letter-spacing: 0.12em;
+  line-height: 1;
+  text-shadow: 0 2px 0 #416f80, 0 0 12px rgba(37, 130, 163, 0.65), 0 0 2px #244c5c;
+}
+
+#lobby-brand #game-sub {
+  width: min(540px, 90%);
+  margin: 8px 0 0;
+  overflow: hidden;
+  color: rgba(38, 96, 118, 0.76);
+  font-size: clamp(10px, 1vw, 13px);
+  letter-spacing: 0.1em;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+#mode-inner #avatar-card {
+  grid-area: 1 / 1 / 4 / 2;
+  z-index: 1;
+  align-self: stretch;
+  width: 100%;
+  max-width: none;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  overflow: visible;
+  border: 0;
+  border-radius: 0;
+  background: transparent;
+  clip-path: none;
+  pointer-events: none;
+}
+
+#avatar-card > h3,
+#avatar-card > .ac-hint,
+#avatar-card > #avatar-controls { display: none; }
+
+#mode-inner #avatar-preview {
+  position: absolute;
+  /* 容器必须完整落在视口内：全身景别下，超出视口的部分就是真的看不见
+     （旧值 bottom:-3% + scale(1.1) 是给「底部裁切的半身立绘」设计的，人物腿部会被视口切掉）。 */
+  inset: 7% auto 6% 1vw;
+  width: min(46vw, 680px);
+  height: 87%;
+  min-height: 0;
+  margin: 0;
+  transform: none;
+  transform-origin: left bottom;
+  filter: drop-shadow(16px 8px 12px rgba(23, 51, 66, 0.34));
+}
+
+#mode-inner #avatar-preview::after {
+  content: "";
+  position: absolute;
+  z-index: -1;
+  left: 10%;
+  right: 5%;
+  bottom: 2%;
+  height: 12%;
+  border-radius: 50%;
+  background: rgba(29, 91, 113, 0.2);
+  filter: blur(18px);
+}
+
+#mode-inner #avatar-preview img,
+#mode-inner #avatar-preview canvas {
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+  object-position: left bottom;
+}
+
+#mode-inner #mode-cards {
+  grid-area: 2 / 2;
+  z-index: 4;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(10px, 1.8vh, 18px);
+  left: -3vw;
+  width: min(calc(100% - 7vw), 980px);
+  margin: 0;
+  padding: 12px 0;
+}
+
+@media (min-width: 1600px) {
+  #mode-inner { grid-template-columns: minmax(520px, 39%) minmax(720px, 61%); }
+  #mode-inner #avatar-preview {
+    top: 9%;
+    left: 3.5vw;
+    width: min(44vw, 760px);
+    transform: none;
+  }
+  #mode-inner #mode-cards {
+    left: -4vw;
+    width: min(calc(100% - 9vw), 1040px);
+  }
+}
+
+#mode-cards .mode-card,
+#lobby-history,
+#lobby-settings {
+  position: relative;
+  flex: 0 0 auto;
+  width: 100%;
+  max-width: none;
+  min-height: clamp(82px, 11vh, 108px);
+  padding: 14px 50px 18px 74px;
+  overflow: hidden;
+  border: 2px solid var(--lobby-line);
+  border-radius: 9px;
+  background:
+    linear-gradient(90deg, transparent 0 70%, rgba(199, 173, 114, 0.06) 70%),
+    repeating-linear-gradient(135deg, transparent 0 8px, rgba(172, 155, 117, 0.04) 8px 9px),
+    linear-gradient(180deg, rgba(255,255,255,0.99), rgba(244,242,233,0.98));
+  color: var(--lobby-ink);
+  box-shadow: 0 7px 8px rgba(43, 66, 73, 0.23), inset 0 0 0 2px rgba(255,255,255,0.88);
+  clip-path: polygon(19px 0, 100% 0, 100% 100%, 19px 100%, 19px 67%, 0 50%, 19px 33%);
+  transition: transform 160ms ease, border-color 160ms ease, box-shadow 160ms ease, filter 160ms ease;
+}
+
+#mode-cards .mode-card::before,
+#lobby-history::before,
+#lobby-settings::before {
+  content: "";
+  position: absolute;
+  left: 30px;
+  right: 22px;
+  bottom: 16px;
+  height: 5px;
+  background: linear-gradient(90deg, transparent, #8ad9ee 15%, #219dc7 66%, transparent);
+  box-shadow: 0 -2px 8px rgba(56, 195, 233, 0.26);
+}
+
+#mode-cards .mode-card::after,
+#lobby-history::after,
+#lobby-settings::after {
+  content: attr(data-kicker);
+  position: absolute;
+  left: 50%;
+  bottom: 5px;
+  transform: translateX(-50%);
+  color: rgba(74, 135, 156, 0.78);
+  font-size: 9px;
+  font-weight: 700;
+  letter-spacing: 0.42em;
+  white-space: nowrap;
+}
+
+#mode-cards .mode-card:hover,
+#mode-cards .mode-card:focus-visible,
+#lobby-history:hover,
+#lobby-history:focus-visible,
+#lobby-settings:hover,
+#lobby-settings:focus-visible {
+  z-index: 2;
+  outline: none;
+  transform: translateX(-10px);
+  border-color: #2ba8d0;
+  box-shadow: 0 9px 14px rgba(25, 98, 124, 0.3), inset 0 0 18px rgba(77, 199, 234, 0.14);
+  filter: brightness(1.02);
+}
+
+#mode-cards .mode-name {
+  margin: 0 0 5px;
+  color: #343b3e;
+  font-family: var(--serif);
+  font-size: clamp(25px, 2.1vw, 35px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+  line-height: 1;
+}
+
+#mode-cards .mode-desc {
+  max-width: 92%;
+  color: var(--lobby-ink-soft);
+  font-size: clamp(11px, 0.92vw, 14px);
+  line-height: 1.45;
+}
+
+#mode-cards .mode-card.guest-locked {
+  cursor: not-allowed;
+  opacity: 0.78;
+  filter: grayscale(0.3);
+  pointer-events: none;
+}
+
+#mode-cards .mode-card.guest-locked::after {
+  content: "ACCOUNT REQUIRED // 游客锁定";
+  color: #92775a;
+}
+
+#mode-cards .mode-card.guest-locked .mode-name,
+#mode-cards .mode-card.guest-locked .mode-desc { opacity: 0.55; }
+
+#lobby-tools {
+  grid-area: 3 / 2;
+  z-index: 5;
+  display: flex;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 10px;
+  padding: 0 32px 16px 0;
+}
+
+#lobby-history,
+#lobby-settings {
+  width: 100%;
+  min-height: clamp(74px, 9vh, 92px);
+  padding: 14px 50px 18px 74px;
+  text-align: left;
+  font-family: var(--serif);
+  font-size: clamp(23px, 2vw, 33px);
+  font-weight: 800;
+  letter-spacing: 0.08em;
+}
+
+#lobby-icon-stack {
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+}
+
+#lobby-help {
+  display: grid;
+  place-items: center;
+  width: 52px;
+  height: 52px;
+  padding: 0;
+  border: 2px solid #2b80a1;
+  border-radius: 50%;
+  background: radial-gradient(circle at 35% 28%, #faffff, #93d8ee 62%, #3198c3);
+  color: #fff;
+  box-shadow: 0 4px 8px rgba(30, 91, 116, 0.28), inset 0 0 0 3px rgba(255,255,255,0.66);
+  font-size: 28px;
+  font-weight: 900;
+  text-shadow: 0 1px 2px #356b80;
+}
+
+#lobby-help:hover,
+#lobby-help:focus-visible,
+#lobby-topup:hover,
+#lobby-topup:focus-visible {
+  outline: 2px solid rgba(255,255,255,0.9);
+  outline-offset: 2px;
+  filter: brightness(1.08);
+}
+
+#lobby-dialog {
+  position: relative;
+  max-width: 560px;
+  width: calc(100% - 32px);
+  max-height: 84dvh;
+  overflow: auto;
+  padding: 30px;
+  color: var(--lobby-ink);
+  border: 2px solid #4c707e;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, rgba(71, 158, 188, 0.035) 10px 11px),
+    rgba(250, 251, 247, 0.98);
+  box-shadow: 0 18px 50px rgba(17, 48, 61, 0.36), inset 0 0 0 3px rgba(255,255,255,0.9);
+}
+
+#lobby-dialog::backdrop {
+  background: rgba(19, 49, 61, 0.55);
+  backdrop-filter: blur(4px);
+}
+
+#lobby-dialog h2 {
+  margin: 0 42px 22px 0;
+  color: #29434e;
+  font-family: var(--serif);
+  font-size: 27px;
+  letter-spacing: 0.12em;
+}
+
+#lobby-dialog h2::after {
+  content: "MY ROOM MENU";
+  display: block;
+  margin-top: 5px;
+  color: var(--lobby-blue-deep);
+  font: 700 8px/1 var(--sans);
+  letter-spacing: 0.5em;
+}
+
+#lobby-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #6d8a95;
+  border-radius: 50%;
+  background: linear-gradient(#fff, #d9edf3);
+  color: #426775;
+  font-size: 24px;
+}
+
+#lobby-dialog-content { color: #41545c; line-height: 1.8; }
+#lobby-dialog #identity-strip { display: flex; }
+#lobby-dialog #fx-panel { margin: 0; color: var(--lobby-ink); }
+#lobby-dialog #mode-reset { margin-top: 16px; color: #596f78; border-color: #8ba4ae; }
+.lobby-record { padding: 12px 0; border-bottom: 1px solid rgba(76,112,126,0.22); white-space: pre-line; }
+
+@media (max-width: 900px) {
+  #mode-inner {
+    grid-template-columns: 42% 58%;
+    grid-template-rows: 92px minmax(0, 1fr) 72px;
+  }
+  #lobby-account { padding: 12px 0 0 10px; }
+  #lobby-wallet { display: none; }
+  #lobby-identity { min-width: 132px; max-width: 94%; min-height: 46px; font-size: 14px; }
+  #lobby-brand { padding: 14px 18px 6px; }
+  #lobby-brand #game-sub { display: none; }
+  #mode-inner #avatar-preview { transform: scale(1.05); }
+  #mode-inner #mode-cards { left: -2vw; width: 94%; gap: 16px; }
+  #mode-cards .mode-card,
+  #lobby-history,
+  #lobby-settings { min-height: 76px; padding: 12px 24px 18px 48px; }
+  #mode-cards .mode-name { font-size: 24px; }
+  #mode-cards .mode-desc { font-size: 11px; }
+  #lobby-tools { padding: 0 16px 12px 0; }
+  #lobby-history, #lobby-settings { width: 100%; font-size: 22px; }
+  #lobby-help { width: 46px; height: 46px; font-size: 24px; }
+}
+
+@media (max-width: 620px) {
+  #mode-screen { overflow-y: auto; }
+  #mode-inner {
+    grid-template-columns: 44% 56%;
+    grid-template-rows: 74px minmax(420px, 1fr) auto;
+    min-height: max(100dvh, 560px);
+  }
+  #lobby-account { padding: 10px 0 0 8px; }
+  #lobby-identity { min-width: 0; width: 94%; min-height: 42px; padding: 6px 10px 6px 32px; font-size: 12px; }
+  #lobby-identity::before { left: 12px; font-size: 14px; }
+  #lobby-brand { padding: 12px 10px 4px; }
+  #lobby-brand #game-title { font-size: clamp(24px, 7.5vw, 34px); letter-spacing: 0.05em; }
+  #mode-inner #avatar-preview { inset: 15% auto 0 -30%; width: 88vw; height: 85%; transform: none; }
+  #mode-inner #mode-cards { left: 0; justify-content: flex-start; width: 96%; gap: 9px; padding: 15px 8px 8px 0; }
+  #mode-cards .mode-card,
+  #lobby-history,
+  #lobby-settings { min-height: 91px; padding: 14px 12px 18px 35px; }
+  #mode-cards .mode-name { font-size: 21px; }
+  #mode-cards .mode-desc { max-width: 100%; font-size: 10px; line-height: 1.45; }
+  #mode-cards .mode-card::before { left: 23px; right: 12px; }
+  #mode-cards .mode-card::after { font-size: 7px; letter-spacing: 0.2em; }
+  #lobby-tools { grid-area: 3 / 1 / 4 / 3; padding: 8px 10px 12px; }
+  #lobby-history, #lobby-settings { font-size: 19px; }
+  #mode-inner::after { display: none; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  #mode-cards .mode-card,
+  #lobby-history,
+  #lobby-settings { transition: none; }
+}

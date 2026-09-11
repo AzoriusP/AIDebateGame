@@ -1,0 +1,147 @@
+/* 立绘演出层
+   character-performance.js 每帧产出 7 个抽象参数，characters.js 把它们写成下面的
+   自定义属性，这里只负责组合成一条 transform（纯合成属性，不触发 layout）。
+   幅度增益全部是变量，美术/演出可在具体容器上覆盖，不用改 JS。 */
+.character-view {
+  /* 参数默认态（JS 未接手时等价于静止） */
+  --perf-breath: 0;
+  --perf-mouth: 0;
+  --perf-objection: 0;
+  --perf-body-angle: 0;
+  --perf-eye-open: 1;
+  --perf-brow: 0;
+  --perf-mouth-form: 0;
+  /* 幅度增益 */
+  --perf-breath-lift: -2.4%;
+  --perf-breath-scale: 0.026;
+  --perf-mouth-lift: -0.5%;
+  --perf-mouth-scale: 0.022;
+  --perf-objection-x: 3.4%;
+  --perf-objection-scale: 0.045;
+  --perf-angle-gain: 1.5;
+  --perf-objection-angle-gain: 1.6;
+}
+.character-view { position: relative; overflow: hidden; }
+
+#player-avatar.character-view {
+  /* 取景完全交给 live2d 运行时（model.ts 的 fit/draw 做 contain 适配），
+     CSS 不再做任何位移，否则会叠出一个悬在卡内的硬切线。 */
+  overflow: visible;
+  clip-path: none;
+}
+#player-side.weak-hit-overflow {
+  overflow: visible;
+  /* 手臂要压过中栏聊天文字：#center/#dialogue 在 DOM 里靠后，同层时后画的在上。
+     #stage 是 flex 容器，直接给 flex 子项上 z-index 即可（远低于模态层 50+）。 */
+  z-index: 2;
+}
+#player-side.weak-hit-overflow #player-avatar {
+  overflow: visible;
+}
+#player-avatar.weak-hit-overflow.character-view[data-renderer="live2d"] #live2d-runtime-root {
+  transform: scale(1.05);
+  transform-origin: center bottom;
+}
+/* 关键：只放开 overflow 是不够的 —— WebGL 画布位图之外没有像素，
+   「异议」指向的手臂在常规取景里本来就被相机留在画布外。
+   溢出窗口期间把画布本体向右（指向对手的方向）加宽，运行时检测到
+   画布 > stage 后会锁住常规机位、把多出来的宽度全部变成可见面积。
+   width/height 必须 !important：ensureLive2DRoot 在画布上写了内联的
+   width:100%/height:100%，内联样式压过普通选择器。 */
+#player-avatar.weak-hit-overflow.character-view[data-renderer="live2d"] #live2d-character-canvas {
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 180% !important;
+  height: 100% !important;
+}
+
+.character-view #live2d-character-canvas {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+.character-view .character-portrait {
+  display: block; width: 100%; height: 100%; object-fit: contain;
+  object-position: center bottom;
+  position: relative; z-index: 1;
+  transform-origin: 50% 100%;
+  transform:
+    translate3d(
+      calc(var(--perf-objection) * var(--perf-objection-x)),
+      calc(var(--perf-breath) * var(--perf-breath-lift) + var(--perf-mouth) * var(--perf-mouth-lift)),
+      0
+    )
+    rotate(calc((var(--perf-body-angle) * var(--perf-angle-gain)
+      + var(--perf-objection) * var(--perf-body-angle) * var(--perf-objection-angle-gain)) * 1deg))
+    scale(
+      calc(1 + var(--perf-breath) * var(--perf-breath-scale) + var(--perf-objection) * var(--perf-objection-scale)),
+      calc(1 + var(--perf-breath) * var(--perf-breath-scale) * 0.55 + var(--perf-mouth) * var(--perf-mouth-scale))
+    );
+}
+/* 只有真的在跑帧的角色才提升合成层 */
+.character-view[data-perf="on"] .character-portrait { will-change: transform; }
+/* 演出关闭 / 暂停 / 不可见 / Live2D 接管时钉回静止 */
+.character-view[data-perf="off"] .character-portrait { transform: none; will-change: auto; }
+.character-view .character-portrait[hidden] { display: none; }
+.character-view[data-asset-status="loading"] {
+  background-image:
+    radial-gradient(circle at center, rgba(255,255,255,0.82), transparent 34%),
+    repeating-linear-gradient(135deg, rgba(45,180,223,0.035) 0 8px, transparent 8px 16px);
+}
+.character-view[data-asset-status="loading"]::before {
+  content: "";
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: 50%;
+  width: 34px;
+  height: 34px;
+  margin: -17px 0 0 -17px;
+  border: 2px solid rgba(45,180,223,0.18);
+  border-top-color: #2db4df;
+  border-radius: 50%;
+  animation: character-loading 0.85s linear infinite;
+}
+.character-view[data-asset-status="loading"]::after {
+  content: "CHARACTER LINK";
+  position: absolute;
+  z-index: 3;
+  left: 50%;
+  top: calc(50% + 28px);
+  transform: translateX(-50%);
+  color: rgba(22,126,158,0.62);
+  font-size: 8px;
+  font-weight: 700;
+  letter-spacing: 0.3em;
+  white-space: nowrap;
+}
+@keyframes character-loading { to { transform: rotate(360deg); } }
+.character-view[data-asset-status="missing"]::after {
+  content: "形象暂不可用"; position: absolute; inset: 0;
+  display: grid; place-items: center; color: #c8cce0; font-size: 13px;
+}
+
+.character-view #live2d-runtime-root {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  z-index: 0;
+  display: none;
+  pointer-events: none;
+}
+
+#player-avatar.character-view #live2d-character-canvas {
+  transform: none;
+}
+
+.character-view[data-renderer="live2d"] #live2d-runtime-root { display: block; }
+.character-view[data-renderer="live2d"] .character-portrait { display: none; transform: none; }
+.character-view[data-renderer="live2d"] { z-index: 0; }
+
+/* 系统级减少动态效果：不管 JS 状态如何，立绘都不位移 */
+@media (prefers-reduced-motion: reduce) {
+  .character-view .character-portrait { transform: none; }
+  .character-view[data-asset-status="loading"]::before { animation: none; }
+}

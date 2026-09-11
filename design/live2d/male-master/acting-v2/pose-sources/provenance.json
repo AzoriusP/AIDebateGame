@@ -1,0 +1,59 @@
+[
+  {
+    "name": "Neutral",
+    "source": "design/art-output/live2d-source/male-master/acting-v2/klein-neutral-02_00002_.png",
+    "source_sha256": "2efe75f3b59a922d13e09000f136a5995047878eaffd2896e545bde9b0c624b5",
+    "translation_xy": [
+      216,
+      0
+    ],
+    "scale": 1,
+    "output_sha256": "e13097baf038effba3e276eb0c0c15b62655d84f5256e6391ad3b570c721444b",
+    "max_alpha_roundtrip_correction": 1,
+    "max_rgb_roundtrip_delta": 0,
+    "bounds": [
+      531,
+      65,
+      1180,
+      1536
+    ]
+  },
+  {
+    "name": "Lean",
+    "source": "design/art-output/live2d-source/male-master/acting-v2/klein-lean-02_00002_.png",
+    "source_sha256": "49750ba3ac2de4adb976c34c74db5f652a7b34cc38f1f996f1b2b7a265de522e",
+    "translation_xy": [
+      222,
+      0
+    ],
+    "scale": 1,
+    "output_sha256": "c3e9d597d721549ff7a9613b2f1278ee157257a5a4dda9705c8137a5ecd3be01",
+    "max_alpha_roundtrip_correction": 1,
+    "max_rgb_roundtrip_delta": 0,
+    "bounds": [
+      503,
+      89,
+      1253,
+      1536
+    ]
+  },
+  {
+    "name": "Point",
+    "source": "design/art-output/live2d-source/male-master/acting-v2/klein-point-04_00002_.png",
+    "source_sha256": "a90a75c6375c2d567b98e3adcdb933277ca56dea41d4d4be4a627e1660774522",
+    "translation_xy": [
+      355,
+      0
+    ],
+    "scale": 1,
+    "output_sha256": "e34d5a69d969fed53fe045363c7a1ec1a96ea2a8f8b9f90b6b5e035d1fa570e6",
+    "max_alpha_roundtrip_correction": 1,
+    "max_rgb_roundtrip_delta": 0,
+    "bounds": [
+      601,
+      56,
+      1787,
+      1536
+    ]
+  }
+]
