@@ -1,0 +1,72 @@
+[
+ {
+  "tag": "hy4 默认(不传thinking)",
+  "model": "hy4-preview",
+  "seconds": 59.1,
+  "prompt_tokens": 91,
+  "out_tokens": 1200,
+  "reasoning_tokens": 1200,
+  "body_chars": 0,
+  "body": ""
+ },
+ {
+  "tag": "hy4 thinking.disabled",
+  "model": "hy4-preview",
+  "seconds": 3.8,
+  "prompt_tokens": 94,
+  "out_tokens": 40,
+  "reasoning_tokens": 0,
+  "body_chars": 52,
+  "body": "自私？你爸妈养你到大就盼抱孙子！\n不结婚不生娃，老了病了连端水的都没！\n别拿选择当借口，就是太只顾自己！"
+ },
+ {
+  "tag": "hy4 thinking.enabled",
+  "model": "hy4-preview",
+  "seconds": 110.8,
+  "prompt_tokens": 91,
+  "out_tokens": 2400,
+  "reasoning_tokens": 2400,
+  "body_chars": 0,
+  "body": ""
+ },
+ {
+  "tag": "hy4 enable_thinking=False",
+  "model": "hy4-preview",
+  "seconds": 59.4,
+  "prompt_tokens": 91,
+  "out_tokens": 1200,
+  "reasoning_tokens": 1200,
+  "body_chars": 0,
+  "body": ""
+ },
+ {
+  "tag": "hy4 judge disabled",
+  "model": "hy4-preview",
+  "seconds": 1.8,
+  "prompt_tokens": 90,
+  "out_tokens": 22,
+  "reasoning_tokens": 0,
+  "body_chars": 49,
+  "body": "{\n  \"dimension\": \"EVIDENCE\",\n  \"strength\": \"L2\"\n}"
+ },
+ {
+  "tag": "glm-5.3-flash effort=low",
+  "model": "glm-5.3-flash",
+  "seconds": 1.4,
+  "prompt_tokens": 76,
+  "out_tokens": 29,
+  "reasoning_tokens": 0,
+  "body_chars": 38,
+  "body": "哎哟，你这话说的！我一个人拉扯孩子容易吗？人老了连个端水的都没有，那才叫惨！"
+ },
+ {
+  "tag": "glm-5.3-flash effort=high",
+  "model": "glm-5.3-flash",
+  "seconds": 1.8,
+  "prompt_tokens": 76,
+  "out_tokens": 76,
+  "reasoning_tokens": 40,
+  "body_chars": 50,
+  "body": "哎哟你这孩子话说的！你一个人逍遥了，你爸妈急白头发谁管？等你老了躺床上没人端水，就知道自私不自私了！"
+ }
+]

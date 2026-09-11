@@ -1,0 +1,1005 @@
+{
+  "L1_A": {
+    "topics": [
+      {
+        "id": "L1_TOPIC_FAMILY",
+        "weight": 1.35,
+        "filters": {
+          "domains": ["家庭", "养生"],
+          "preferred_dims": ["EMOTION", "IDENTITY"],
+          "banned_domains": ["政治", "群体性", "宗教", "涉外"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L1_TOPIC_CONSUMER",
+        "weight": 1.15,
+        "filters": {
+          "domains": ["消费", "家庭"],
+          "preferred_dims": ["IDENTITY", "UTILITY", "EVIDENCE"],
+          "banned_domains": ["政治", "群体性", "宗教", "涉外"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L1_TOPIC_HEALTH",
+        "weight": 0.85,
+        "filters": {
+          "domains": ["养生", "家庭"],
+          "preferred_dims": ["EMOTION", "LOGIC"],
+          "banned_patterns": ["具体机构名", "精确数字", "具体日期"],
+          "max_per_turn": 2
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "L1A-C01",
+        "gist": "我邻居刘婶子第一次给你儿子看病，听说医院贵，就先在家里做了七天偏方，后来反而拖到发高烧，折腾了半个月。",
+        "details": [
+          "那回她起初死撑着说“别着急，先熬一熬就好”。",
+          "后来我直接把药拿来，结果那孩子才真的稳住了。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "刘婶子"
+      },
+      {
+        "id": "L1A-C02",
+        "gist": "我儿子当年换工作去南方，小区里人都说“外面一万多压力”，他坚持每个月发一个视频给我，我也每周去楼下听他汇报。",
+        "details": [
+          "年轻人出去闯，心里是替他担心更多。",
+          "我不管别的先把‘怎么支撑住自己’这件事讲明白。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["open", "emote"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "儿子"
+      },
+      {
+        "id": "L1A-C03",
+        "gist": "我在社区开了几次‘省吃俭用’讲座，最省不了的是嘴硬，最贵的是人情往来——给邻居送点面子，关系就没那么累。",
+        "details": [
+          "大家都省着花，但过节真不容易一个人扛。",
+          "钱省下了，关系补上了，心里反而更舒坦。"
+        ],
+        "dim": "UTILITY",
+        "stance": "both",
+        "beats": ["argue", "patch"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "社区"
+      },
+      {
+        "id": "L1A-C04",
+        "gist": "广场舞队里有个小赵，平时说一大堆养生道理，结果每年都去买新拖鞋，鞋带松了连回场都不利索。",
+        "details": [
+          "她越讲保健越乱买，最后比谁更累。",
+          "我跟着提醒她：先别逞强，慢慢来。"
+        ],
+        "dim": "EMOTION",
+        "stance": "both",
+        "beats": ["hook", "rebut"],
+        "deep": false,
+        "source": "secondhand",
+        "entity": "小赵"
+      },
+      {
+        "id": "L1A-C05",
+        "gist": "老伴去世后，街坊邻居每次说不说得有点意思就行，关键是‘你还在这儿’这句话，比再便宜再时髦更暖心。",
+        "details": [
+          "年轻人不懂，其实人最怕的是自己被丢在一边。",
+          "我也经常对你这代人说，‘钱不一定救得了人，但关系能先撑住人。’"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["emote", "patch"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "老伴"
+      },
+      {
+        "id": "L1A-C06",
+        "gist": "前两年隔壁大娘买了新牙机，大家说一万块很贵，我说牙齿不只是外观，是健康线，贵点也要买得实在。",
+        "details": [
+          "她后来笑着说比当初那次小手术轻松多了。",
+          "花得不冤，就别总拿‘省’当借口。"
+        ],
+        "dim": "UTILITY",
+        "stance": "both",
+        "beats": ["argue", "argue"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "大娘"
+      },
+      {
+        "id": "L1A-C07",
+        "gist": "我认识一对夫妻，年轻时总把每次聚会都当成展示，后来住得不近也更容易翻脸，后来我劝他们先把‘预算’和‘时间’说清。",
+        "details": [
+          "他们后来每次聚会都少了比较，多了真心。",
+          "人家不是没钱，而是‘想面子’的优先级乱了。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "patch"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "那对夫妻"
+      },
+      {
+        "id": "L1A-C08",
+        "gist": "我弟媳那会儿做了个保健套餐，天天说很贵，我一听直接让她先减减量，先测一测身体再说。",
+        "details": [
+          "她说得很配合，但心里不舒服就是‘丢面子’。",
+          "我就跟她说，先把身体放在第一位，面子后头也能补。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["emote", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "弟媳"
+      },
+      {
+        "id": "L1A-C09",
+        "gist": "你年轻时我也这样，年轻人听不进一番话，是因为觉得‘老一辈只会说教’；但你一到门槛上，才发现我那十年在你年纪都没想到的苦。",
+        "details": [
+          "我讲出来也不想拿苦当资本。",
+          "就怕你把教训当大道理，结果越走越远。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["emote", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "年轻人"
+      },
+      {
+        "id": "L1A-C10",
+        "gist": "我们小区物业前两年加了门禁，前阵子有人花大价钱买了很贵的门牌照明，结果第一周就坏，反倒普通那套更耐用。",
+        "details": [
+          "不是我反对花钱，是花钱要分场合分层次。",
+          "‘看起来像样’和‘用得起’不冲突，但不能混一谈。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": false,
+        "source": "hearsay",
+        "entity": "小区物业"
+      },
+      {
+        "id": "L1A-C11",
+        "gist": "我同居的一个阿姨每次逢年过节总带新东西秀一圈，后来家里人说她是为了争面子，但她自己也很难受。",
+        "details": [
+          "她不是不想过得好，是不甘心‘被看低’。",
+          "我劝她把‘看起来’和‘被爱’分开想。"
+        ],
+        "dim": "EMOTION",
+        "stance": "both",
+        "beats": ["emote", "hook"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "阿姨"
+      },
+      {
+        "id": "L1A-C12",
+        "gist": "我听懂了一个道理：不是花钱不行，而是你要先让花出去的钱能回头给生活添底气，不然看起来热闹，实际上是透支。",
+        "details": [
+          "年轻人总想快，但底气这件事慢慢累。",
+          "这点你要先记住，省与不省都别极端。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["argue", "patch"],
+        "deep": true,
+        "source": "public"
+      }
+    ]
+  },
+  "L2_A": {
+    "topics": [
+      {
+        "id": "L2_TOPIC_WORKPLACE",
+        "weight": 1.5,
+        "filters": {
+          "domains": ["职场", "理财", "消费"],
+          "preferred_dims": ["UTILITY", "AUTHORITY"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L2_TOPIC_CLAIM_CONTROL",
+        "weight": 1.2,
+        "filters": {
+          "domains": ["职场", "理财"],
+          "preferred_dims": ["LOGIC", "EVIDENCE"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L2_TOPIC_IMAGE",
+        "weight": 1.1,
+        "filters": {
+          "domains": ["消费"],
+          "preferred_dims": ["IDENTITY", "UTILITY"],
+          "banned_patterns": ["精确机构名", "具体报告数字", "具体日期"],
+          "max_per_turn": 2
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "L2A-C01",
+        "gist": "我手下一个销售主管周建明，为签一个两百万的单子自己刷卡买了块两万八的浪琴来撑场面，甲方项目经理就认可这个，单子成了，提成够回本——这叫投资，不叫乱花。",
+        "details": [
+          "那次签单后，周建明也不敢抬头说价格，我只是在后面帮他稳住了节奏。",
+          "那单下来后，项目组那边对他态度明显变了，后续合作更顺。"
+        ],
+        "dim": "UTILITY",
+        "stance": "支持",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "周建明"
+      },
+      {
+        "id": "L2A-C02",
+        "gist": "做建材的客户王总，先前开十几万的国产车去谈生意，被对方看车下菜碟，报价被压了十五个百分点，后来换了辆四十多万的奥迪A6，之后同一个单子多签了不少。",
+        "details": [
+          "最初那次见面后，对方说‘人都看你开着什么也会先打标签’，我当时心里有点刺。",
+          "后来我建议他把形象先立住，谈判空间真的立刻不一样了。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "支持",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "王总"
+      },
+      {
+        "id": "L2A-C03",
+        "gist": "前公司的戴总，干销售三十年，头回见客户就撂下一句——人家三十秒看的不是你会什么，是你穿什么。",
+        "details": [
+          "那句话在一场提成会上反复出现，被人拿来当‘现场判断’的标准。",
+          "他后来还补过一句：你不先说清你是谁，别人先把你放在第一层次再听你讲。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "支持",
+        "beats": ["open", "argue", "rebut"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "戴总"
+      },
+      {
+        "id": "L2A-C04",
+        "gist": "大学同学孙磊现在做私募，聚会时他总是那身定制西装，别人刚聊起来，他一句话就能定调——场面就是这么现实。",
+        "details": [
+          "孙磊会先不谈净值，先把坐位和第一印象握住，后续反而更容易接近结论。",
+          "有一次见他朋友，开场十分钟里他都在讲‘先给对方一种安心感’。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "支持",
+        "beats": ["emote", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "孙磊"
+      },
+      {
+        "id": "L2A-C05",
+        "gist": "我自己刚工作那会儿省钱，穿地摊衬衫去见客户，被前台晾在会客室等了一个多小时；后来换了身像样的西装，对方起身跟我握手。",
+        "details": [
+          "那次我连名片都没被及时接过，只能等在门口，时间和自尊都被压了一下。",
+          "换衣后的那次才知道对方对我看法彻底变了，后面合作也顺了许多。"
+        ],
+        "dim": "EMOTION",
+        "stance": "支持",
+        "beats": ["open", "emote"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "我"
+      },
+      {
+        "id": "L2A-C06",
+        "gist": "做外贸的女客户张丽，公司里都管她叫 Lisa，她说包就是名片，见外商背个像样的包后订单就来了。",
+        "details": [
+          "她后来说起竞争对手时，先是看对方外表和出场节奏。",
+          "后来几单大货都给了她熟识的那组供应商，印象分太关键了。"
+        ],
+        "dim": "UTILITY",
+        "stance": "支持",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "张丽"
+      },
+      {
+        "id": "L2A-C07",
+        "gist": "陪老板去投标，七家单位里穿得最讲究那家老板最后中了，不是说衣服决定中标，而是人家从穿着就能看出他赔得起，稳得住。",
+        "details": [
+          "那家人一上来就很清楚自己的边界和预算，和我们前期沟通反而更顺。",
+          "老板后来跟我说：第一眼看不对，后面再谈条款都容易被问心态。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "支持",
+        "beats": ["rebut", "argue"],
+        "deep": false,
+        "source": "firsthand",
+        "entity": "老板"
+      },
+      {
+        "id": "L2A-C08",
+        "gist": "我爸退休后儿女给了我一件绣花羊绒衫，我一开始嫌贵，后来去老同事家没穿上反而被误会‘随便过日子’。",
+        "details": [
+          "那天回来以后我闷了三天，不是为了衣服，是为了那份被放小了的感觉。",
+          "后来我再也不拿‘我很俭’去换别人对你的判断。"
+        ],
+        "dim": "EMOTION",
+        "stance": "支持",
+        "beats": ["emote", "patch"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "我爸"
+      },
+      {
+        "id": "L2A-C09",
+        "gist": "我一张过期的健身卡认是浪费，但衣服和表是天天在用，花钱得分开看。",
+        "details": [
+          "那张卡我后来就不续了，但自己的一套衣鞋搭配一直在用，场景里更省心。",
+          "我自己也常跟人说：省钱不等于所有东西一起省。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "支持",
+        "beats": ["patch", "argue"],
+        "deep": false,
+        "source": "firsthand",
+        "entity": "我"
+      },
+      {
+        "id": "L2A-C10",
+        "gist": "我一猎头朋友说，同样的简历，仪表好的候选人面试通过率明显高，这不是我一个人的臆想，而是客户直觉。",
+        "details": [
+          "很多客户说第一次看资料之前，第一眼给你的第一印象决定了他们是否继续看。",
+          "也不是每个人都这样，但‘看起来专业’这个门槛经常先过。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "支持",
+        "beats": ["rebut", "hook"],
+        "deep": false,
+        "source": "hearsay",
+        "entity": "猎头朋友"
+      },
+      {
+        "id": "L2A-C11",
+        "gist": "前同事陈国栋总觉得花在形象上的钱是浪费，十年了还在原地，别人都记不住他的名字——代价不只是报销单。",
+        "details": [
+          "那位同事总把‘低调’当借口，不愿意在公共场景里投入，很多机会最后没抓住。",
+          "这并不意味着不讲理，只是每个人要分清代价和回报。"
+        ],
+        "dim": "UTILITY",
+        "stance": "支持",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "陈国栋"
+      },
+      {
+        "id": "L2A-C12",
+        "gist": "离婚那年我手头紧，可每月还是留两千块捯饬自己——别因为日子难受就让自己看起来像一直在受委屈。",
+        "details": [
+          "那段时间我是真的卡，但人前人后尽量保持稳定。",
+          "后来我越想越对：外表稳定不是虚荣，是给自己争一口呼吸。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "支持",
+        "beats": ["patch", "emote"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "我"
+      }
+    ]
+  },
+  "L3_A": {
+    "topics": [
+      {
+        "id": "L3_TOPIC_NET",
+        "weight": 1.4,
+        "filters": {
+          "domains": ["科技", "网络", "社会"],
+          "preferred_dims": ["EMOTION", "LOGIC"],
+          "max_per_turn": 2,
+          "required_style": ["反问", "金句"]
+        }
+      },
+      {
+        "id": "L3_TOPIC_SOCIAL",
+        "weight": 1.2,
+        "filters": {
+          "domains": ["社会"],
+          "preferred_dims": ["LOGIC", "AUTHORITY"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L3_TOPIC_MONEY",
+        "weight": 1.0,
+        "filters": {
+          "domains": ["科技", "消费"],
+          "preferred_dims": ["EVIDENCE", "UTILITY"],
+          "banned_patterns": ["精确机构名", "具体报告数字", "可核查细节"],
+          "max_per_turn": 2
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "L3A-C01",
+        "gist": "我上周看了一个账号，靠发‘你以为你很懂’这种提问，涨粉一夜翻倍，平台不给你一丝透明，先给你喂定势再收你注意力。",
+        "details": [
+          "你以为是算法在服务用户，很多时候它是在放大那种容易上头的句子。",
+          "这不是阴谋，是节奏工程，懂的人都在赶着写同样套路。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "账号"
+      },
+      {
+        "id": "L3A-C02",
+        "gist": "我直播间有个粉丝说‘看个课就能翻身’，后来半年后还是给同一家店打工，但他越说越激烈，越活得像自己在直播里。",
+        "details": [
+          "他每次提到‘一夜暴富’都很兴奋，其实最先做的是借着热度刷存在感。",
+          "我不是鄙视他，我只是说这就是‘先给你希望，再收你时间。’"
+        ],
+        "dim": "EMOTION",
+        "stance": "both",
+        "beats": ["emote", "rebut"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "粉丝"
+      },
+      {
+        "id": "L3A-C03",
+        "gist": "我在一次公开点评里说过，最能赚钱的不是观点，是观点背后的情绪钩子，先把人拉进分裂再收割参与感。",
+        "details": [
+          "你骂一句、夸一句，都会让他停在评论区更久。",
+          "内容本身很快凉，情绪才是长线资产。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["argue", "open"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "公开点评"
+      },
+      {
+        "id": "L3A-C04",
+        "gist": "有次我给一个节目做‘反向拆解’，对手放一个看起来很强的品牌故事，观众被标题骗到先入为主，结论我等他自己说出来。",
+        "details": [
+          "等情绪起来后，人很难再听数字，只记得你最先刻的情绪。",
+          "这就是我说的‘先定锚，再提观点’。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["hook", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "对手"
+      },
+      {
+        "id": "L3A-C05",
+        "gist": "我身边有个创业号主，刚火的时候全靠夸张标题，后来广告主只接高单价合作，不接低频内容，他开始把‘真相’都给配音讲了。",
+        "details": [
+          "我跟他说，‘你不是在讲道理，是在替平台找下个热词。’",
+          "他没生气，可能是被戳到痛点。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "创业号主"
+      },
+      {
+        "id": "L3A-C06",
+        "gist": "前同事小魏做短视频前一年很认真，后来发现‘情绪共鸣’比‘专业正确’更能上榜，于是观点全都往对抗方向改。",
+        "details": [
+          "他说自己没变，平台逼着他变，越说越像剧本。",
+          "我还记得他在后台说，‘我只想把自己留住，结果把自己做没了。’"
+        ],
+        "dim": "EMOTION",
+        "stance": "both",
+        "beats": ["emote", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "小魏"
+      },
+      {
+        "id": "L3A-C07",
+        "gist": "一个同行发了‘数据型’标题，评论区全是反问，我顺手看了三分钟就知道他在重复同一逻辑，只是换了三种语气。",
+        "details": [
+          "这类内容最怕的是观众以为自己在发现新角度。",
+          "其实是旧套路，换了包装。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "hook"],
+        "deep": false,
+        "source": "hearsay",
+        "entity": "同行"
+      },
+      {
+        "id": "L3A-C08",
+        "gist": "我一次做评论时故意站反方，故意把对面一句一句放大，结果他越想辩越像把话权交给我。",
+        "details": [
+          "不直接否定，先让他自己把结论背书给自己。",
+          "这招老，但只要节奏稳，效果还在。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "对手"
+      },
+      {
+        "id": "L3A-C09",
+        "gist": "我直播间见过最经典的一句是‘懂的都懂’，它很烂，但特别会拉人心，因为听的人不用负责思考。",
+        "details": [
+          "你一听就知道他要你点头，不让你想。",
+          "我会把它拆掉：懂不是口号，懂了就要承认代价。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "hearsay",
+        "entity": "直播间"
+      },
+      {
+        "id": "L3A-C10",
+        "gist": "我朋友小何开了一个‘反诈’栏目，前面热搜靠的是恐慌，我劝他别总吓人，结果他一边涨粉一边越靠近红线。",
+        "details": [
+          "流量是温度，温度太高就会烤伤观点。",
+          "人总爱‘先害怕后信任’，可害怕是最容易被操作的情绪。"
+        ],
+        "dim": "EMOTION",
+        "stance": "both",
+        "beats": ["emote", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "小何"
+      },
+      {
+        "id": "L3A-C11",
+        "gist": "我见过很多‘真相主播’，最初是分享案例，后面变成替品牌做情绪站岗，评论区会突然温柔也会突然咄咄逼人。",
+        "details": [
+          "你别管他是不是故意，钱在前面他就更有压力。",
+          "这条线跑偏了，就变成‘用焦虑换留存’。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["argue", "patch"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "真相主播"
+      },
+      {
+        "id": "L3A-C12",
+        "gist": "有一次我被观众喷，问我是不是‘故意带节奏’，我没有反击，只把流程拆给他看，结果弹幕里先静默。",
+        "details": [
+          "静默不是认输，是你第一次让人停下情绪去验算。",
+          "我不喜欢胜负感，喜欢人先想一秒。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["patch", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "观众"
+      }
+    ]
+  },
+  "L4_A": {
+    "topics": [
+      {
+        "id": "L4_TOPIC_LAW",
+        "weight": 1.6,
+        "filters": {
+          "domains": ["法律", "社会", "教育"],
+          "preferred_dims": ["EVIDENCE", "LOGIC", "AUTHORITY"],
+          "max_per_turn": 2,
+          "required_style": ["严谨", "条款"]
+        }
+      },
+      {
+        "id": "L4_TOPIC_BIZ",
+        "weight": 1.2,
+        "filters": {
+          "domains": ["社会", "职场"],
+          "preferred_dims": ["LOGIC", "AUTHORITY"],
+          "max_per_turn": 2
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "L4A-C01",
+        "gist": "我第一次接手一个邻里矛盾案，双方都说‘都能理解对方’，但没有一个人把证据保留下来，我就先按‘程序’问清。",
+        "details": [
+          "先把邮件、通话记录、时间线摆清，情绪会自然掉一截。",
+          "不急着站队，先把事实落在纸上。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "邻里矛盾案"
+      },
+      {
+        "id": "L4A-C02",
+        "gist": "有个合伙纠纷案里，合同写了‘先行通知’一条，大家以为没用，结果法庭按这条把一方支开了。",
+        "details": [
+          "一句看似小字的条款，经常决定输赢。",
+          "你不看全款项结构，就永远被一句‘常识’带偏。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "hook"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "合伙案"
+      },
+      {
+        "id": "L4A-C03",
+        "gist": "我在法庭上抓过一个‘我都说过’口供，结果对方临场改说法，最后那个人话里前后自相矛盾的点刚好卡住。",
+        "details": [
+          "我让法官标记了三处时间差异，庭上立刻安静了。",
+          "情绪先来一阵，但事实一拼，观点就会散场。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "对方"
+      },
+      {
+        "id": "L4A-C04",
+        "gist": "我见过客户先说‘关系好’，结果合同里没约定交付日期，最终只能靠我补证据、补邮件，才把争议拆开。",
+        "details": [
+          "关系是补充，不是主项。",
+          "法律上，口头保证和书面条款永远不一样。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "argue"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "客户"
+      },
+      {
+        "id": "L4A-C05",
+        "gist": "一次劳动仲裁里，我用了一页时间线图，原本一方只想打官司，后来反倒用协商方式把赔偿比例改了。",
+        "details": [
+          "你不给人留台阶，争执会无限放大；但给了程序，人会回到现实。",
+          "很多案子不是赢不赢，是你有没有把‘边界’说清。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["patch", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "仲裁案"
+      },
+      {
+        "id": "L4A-C06",
+        "gist": "我教过一位企业法务，天天喊‘都按规范来’，结果第一次开会才发现她把最关键一条款删了注释。",
+        "details": [
+          "注释里常写着‘谁负责到什么时间’。",
+          "细节删掉了，责任就会模糊，争议就会冒头。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "企业法务"
+      },
+      {
+        "id": "L4A-C07",
+        "gist": "有一个买卖合同案里，买方主张环境突变，卖方拿‘口头承诺’抗辩，我只问了两句：有没有记录，有无确认，有无签收。",
+        "details": [
+          "三问一答后，主张逐渐收口。",
+          "我从不怕复杂，只要流程没跳步。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "买卖合同"
+      },
+      {
+        "id": "L4A-C08",
+        "gist": "有个学生想做‘公益诉讼类’项目，想抄一个模板就上手，结果把举证标准理解错了。",
+        "details": [
+          "我让他先停掉开题，先写‘证据边界清单’。",
+          "你以为复杂的是道理，真的复杂是标准。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["open", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "学生"
+      },
+      {
+        "id": "L4A-C09",
+        "gist": "在一个家访纠纷里，双方都想赢，但都把一句‘你们随便说’当成了可执行承诺，这类话在法律上几乎没分量。",
+        "details": [
+          "我强调三次：口头承诺是起点，不是终局。",
+          "有底线才有恢复，不有底线才乱。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["patch", "emote"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "家访"
+      },
+      {
+        "id": "L4A-C10",
+        "gist": "我以前接到一单媒体侵权咨询，看似赔偿金额不高，但传播速度快，证据留存才是关键。",
+        "details": [
+          "截图、发布时间、平台回执三件事齐了，后续就好打。",
+          "你不懂程序，以为对错够用，实际上程序决定证据能不能活。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "媒体咨询"
+      },
+      {
+        "id": "L4A-C11",
+        "gist": "有个公司想把责任推给‘不可抗力’，结果文件里连一次书面催告都没有，我建议直接放弃拖延辩解。",
+        "details": [
+          "拖延不是免责，反而是新问题的起点。",
+          "在法庭上，证据链会把情绪打散。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "hearsay",
+        "entity": "公司"
+      },
+      {
+        "id": "L4A-C12",
+        "gist": "我在一次公益讲座里说，最容易败诉的不是对方法律无知，而是把‘知道怎么辩’当成‘知道怎么赢’。",
+        "details": [
+          "赢是结果，辩不是为了炫耀逻辑，而是把关系和证据都摆正。",
+          "你以为会赢的心态越强，结果越容易越线。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["open", "patch"],
+        "deep": false,
+        "source": "public"
+      }
+    ]
+  },
+  "L5_A": {
+    "topics": [
+      {
+        "id": "L5_TOPIC_PHILOSOPHY",
+        "weight": 1.6,
+        "filters": {
+          "domains": ["科技", "哲学", "教育"],
+          "preferred_dims": ["LOGIC", "EVIDENCE", "AUTHORITY"],
+          "max_per_turn": 2,
+          "required_style": ["从某种意义上说", "本质上"]
+        }
+      },
+      {
+        "id": "L5_TOPIC_VALUE",
+        "weight": 1.25,
+        "filters": {
+          "domains": ["教育", "社会"],
+          "preferred_dims": ["LOGIC", "IDENTITY"],
+          "max_per_turn": 2
+        }
+      },
+      {
+        "id": "L5_TOPIC_TECHNOLOGY",
+        "weight": 1.05,
+        "filters": {
+          "domains": ["科技"],
+          "preferred_dims": ["LOGIC", "EVIDENCE"],
+          "banned_patterns": ["极端口号", "单一价值判断", "未经验证数字"],
+          "max_per_turn": 2
+        }
+      }
+    ],
+    "entries": [
+      {
+        "id": "L5A-C01",
+        "gist": "我上课时常说，概念一旦离开语境就变成口号，‘有用’和‘合理’常常被人故意混成一件事。",
+        "details": [
+          "这个区分是我让学生第一次做论文才会明白的。",
+          "你要先问：这是不是好用，还是只是听起来对。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["open", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "学生"
+      },
+      {
+        "id": "L5A-C02",
+        "gist": "一个青年同学问我‘价值先天还是后天’，我让他先写一页反例，结果他比答题快快慢慢慢才承认自己在下定义。",
+        "details": [
+          "他最初总想找一句最终结论，我让他先列反方。",
+          "当反例足够扎实，论点才值得拿出去。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "青年同学"
+      },
+      {
+        "id": "L5A-C03",
+        "gist": "我参加过一场公开讲座，提问说‘人生该不该讲效率’，我没急着下结论，而是先让他定义‘效率’这几个字。",
+        "details": [
+          "定义清楚后，大多数人会退后一步，意识到自己在用别人的定义。",
+          "不是拒绝效率，是先给它一个边界。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["open", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "讲座"
+      },
+      {
+        "id": "L5A-C04",
+        "gist": "我看过一个企业培训，讲师把‘理性消费’说成只有一种答案，结果全场以为自己赢了人生，结果讨论没了。",
+        "details": [
+          "我在白板上画了三条线，结果他自己先把前两个标准推翻。",
+          "理论和现实要接轨，不是单向灌输。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["rebut", "patch"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "讲师"
+      },
+      {
+        "id": "L5A-C05",
+        "gist": "有同事老是问我‘AI会不会把人变得更傻’，我先问他：你拿它做判断还是拿它当工具。",
+        "details": [
+          "如果判断权交给它，工具很快会变成借口。",
+          "你看见它的答案，很重要的是你保留自己的判断顺序。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "rebut"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "同事"
+      },
+      {
+        "id": "L5A-C06",
+        "gist": "我给一组学生讲‘反身性’，讲到最后他们都开始把自己代入，原来最难的是承认观点也有边界。",
+        "details": [
+          "边界不是退缩，是避免过度自信。",
+          "思想更稳，是因为你知道哪里该停。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["argue", "patch"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "学生"
+      },
+      {
+        "id": "L5A-C07",
+        "gist": "我在一次法理研讨里听到‘事实决定一切’，我只回了句：事实也需要语境，否则就会被拿来压人。",
+        "details": [
+          "这句话不是玩学术，讨论里很实用。",
+          "你认准事实，也要认准它出现的前提。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "open"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "法理研讨"
+      },
+      {
+        "id": "L5A-C08",
+        "gist": "我见过一个学生写论文，把‘自律’当万能词，最后老师只改了‘定义不清’三个字。",
+        "details": [
+          "他以为加一句名言就算有料。",
+          "我让他先拿反例再回头修词。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["emote", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "学生"
+      },
+      {
+        "id": "L5A-C09",
+        "gist": "我教过一批学生做政策分析，最容易翻车的不是观点错，是证据链断了却还敢下大结论。",
+        "details": [
+          "我让他们把每个‘看上去像事实’的句子，都改成可验证的论断。",
+          "这一步慢，后面才快，不然答辩会全靠情绪。"
+        ],
+        "dim": "EVIDENCE",
+        "stance": "both",
+        "beats": ["patch", "argue"],
+        "deep": true,
+        "source": "firsthand",
+        "entity": "学生"
+      },
+      {
+        "id": "L5A-C10",
+        "gist": "一位同门很擅长演讲，但每次都用‘这是铁律’下结论，听着像自信，实则容易失误。",
+        "details": [
+          "我提醒他把‘铁律’后面的例外也写上。",
+          "把绝对句变成条件句，讨论才不会失控。"
+        ],
+        "dim": "IDENTITY",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "secondhand",
+        "entity": "同门"
+      },
+      {
+        "id": "L5A-C11",
+        "gist": "我听到一些课程把‘情绪和理性二选一’拿来做方法论，我都笑着说：人本身不是二分，结论才需要分。",
+        "details": [
+          "把感性丢掉是幼稚，放任它做决定更幼稚。",
+          "真正的训练，是把它们放在同一页。"
+        ],
+        "dim": "LOGIC",
+        "stance": "both",
+        "beats": ["rebut", "argue"],
+        "deep": true,
+        "source": "hearsay",
+        "entity": "课程"
+      },
+      {
+        "id": "L5A-C12",
+        "gist": "我不把自己看成‘给结论的人’，更像把关系和前提先摆平的人，从某种意义上说，辩论先是伦理，再是观点。",
+        "details": [
+          "观点可以赢人，关系才决定你赢不赢得住自己。",
+          "这个顺序错了，后面再圆满都只是暂时。"
+        ],
+        "dim": "AUTHORITY",
+        "stance": "both",
+        "beats": ["open", "patch"],
+        "deep": false,
+        "source": "firsthand",
+        "entity": "辩论"
+      }
+    ]
+  }
+}

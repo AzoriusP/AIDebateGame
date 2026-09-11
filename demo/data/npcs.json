@@ -4,6 +4,8 @@
     "name": "王阿姨",
     "tier": 1,
     "persona": "市井热心的退休王阿姨",
+    "age": 62,
+    "gender": "女",
     "background": "退休前在街道办工作，爱操心邻里事，对'现在年轻人'有一套自己的看法，嘴硬心软",
     "dimensions": {
       "LOGIC": 2,
@@ -52,6 +54,8 @@
     "name": "林经理",
     "tier": 2,
     "persona": "精明的部门经理",
+    "age": 41,
+    "gender": "男",
     "background": "外企干了十五年，说话滴水不漏，凡事讲利益和规矩，最烦'不切实际'的想法",
     "dimensions": {
       "LOGIC": 6,
@@ -99,6 +103,8 @@
     "name": "陈博主",
     "tier": 3,
     "persona": "百万粉丝的自媒体博主",
+    "age": 29,
+    "gender": "男",
     "background": "靠带节奏起家，能言善辩，金句频出，最会煽动情绪和偷换概念",
     "dimensions": {
       "LOGIC": 8,
@@ -146,6 +152,8 @@
     "name": "赵律师",
     "tier": 4,
     "persona": "从业二十年的资深律师",
+    "age": 48,
+    "gender": "男",
     "background": "法庭常胜将军，逻辑严密，证据为王，句句有出处，最擅长抓逻辑漏洞",
     "dimensions": {
       "LOGIC": 9,
@@ -194,6 +202,8 @@
     "name": "陆教授",
     "tier": 5,
     "persona": "哲学系教授",
+    "age": 66,
+    "gender": "男",
     "background": "著作等身的哲学教授，逻辑缜密，博古通今，情绪几乎不起波澜，几乎无懈可击",
     "dimensions": {
       "LOGIC": 9,

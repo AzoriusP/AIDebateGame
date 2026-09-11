@@ -764,6 +764,7 @@ input:focus-visible,
 .msg.sys { color: #71838b; background: transparent; box-shadow: none; }
 .msg.sys.weak-hit { color: #9b711f; }
 .msg.sys.strong-hit { color: #a95249; }
+.msg.sys.thinking { color: #b06b31; font-weight: 600; }
 .msg.hint { color: #785c2c; border-color: rgba(181,144,79,0.42); background: rgba(250,242,220,0.94); }
 .msg.hint .who { color: #9a7229; }
 

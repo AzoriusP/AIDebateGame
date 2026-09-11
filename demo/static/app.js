@@ -21,12 +21,29 @@ const DIM_LABELS = {
   LOGIC: "逻辑", EVIDENCE: "证据", EMOTION: "情感",
   UTILITY: "利益", IDENTITY: "认同", AUTHORITY: "权威",
 };
+const HINTS_PER_MATCH = 3;
+const HINT_AD_BONUS_PER_MATCH = 2;
 const NPC_EMOJI = { "得意": "😏", "从容": "😌", "动摇": "😰", "被说服": "😳" };
 const PLAYER_EMOJI = { "从容": "😄", "紧张": "😟", "焦虑": "😰", "绝望": "😱" };
+const SPEECH_TIMING_DEFAULTS = { npcSpeakMs: 2000 };
+const SPEECH_TIMING_KEY = "bianyi_speech_timing";
+let speechTiming = readSettings(SPEECH_TIMING_KEY, SPEECH_TIMING_DEFAULTS);
+function getNpcSpeakDurationMs() {
+  const raw = Number(speechTiming?.npcSpeakMs);
+  const clamped = Number.isFinite(raw) ? raw : SPEECH_TIMING_DEFAULTS.npcSpeakMs;
+  return Math.max(300, Math.min(10000, clamped));
+}
+function setNpcSpeakDurationMs(ms) {
+  const clamped = Math.max(300, Math.min(10000, Math.round(Number(ms) || SPEECH_TIMING_DEFAULTS.npcSpeakMs)));
+  speechTiming = { ...speechTiming, npcSpeakMs: clamped };
+  savePreference(SPEECH_TIMING_KEY, JSON.stringify(speechTiming));
+}
 
 let state = {
   sid: null, topic: null, dimensions: {}, confidence: 100,
   token: 0, quota: 400, busy: false, npcName: "对手", tier: 1,
+  hintsLeft: HINTS_PER_MATCH,
+  hintAdLeft: HINT_AD_BONUS_PER_MATCH,
   npcId: "", stance: "反对",
   npcWeakness: [], npcTags: [],
   muted: readPreference("bianyi_muted", "0") === "1",
@@ -448,6 +465,62 @@ let roundVersion = 0;
 let screenVersion = 0;
 let activeRound = false;
 let pendingTimeout = false;
+let npcThinkingMessage = null;
+
+function isHintAvailable() {
+  return activeRound && state.sid && !state.busy && !resultLocked && state.hintsLeft > 0;
+}
+
+function isHintAdAvailable() {
+  return activeRound && state.sid && !state.busy && !resultLocked && state.hintsLeft <= 0 && state.hintAdLeft > 0;
+}
+
+function updateHintButton() {
+  const btn = $("#hint");
+  if (!btn) return;
+  if (!activeRound || !state.sid) {
+    btn.disabled = true;
+    btn.classList.remove("is-loading");
+    btn.textContent = "💡 提示";
+    return;
+  }
+  if (state.hintsLeft > 0) {
+    btn.disabled = state.busy;
+    btn.classList.remove("is-loading");
+    btn.textContent = `💡 提示 (${state.hintsLeft})`;
+    return;
+  }
+  if (state.hintAdLeft > 0) {
+    btn.disabled = state.busy;
+    btn.classList.remove("is-loading");
+    btn.textContent = "广告+1";
+    return;
+  }
+  btn.disabled = true;
+  btn.classList.remove("is-loading");
+  btn.textContent = "💡 提示（已用尽）";
+}
+
+function resetMatchHints() {
+  state.hintsLeft = HINTS_PER_MATCH;
+  state.hintAdLeft = HINT_AD_BONUS_PER_MATCH;
+}
+
+async function simulateWatchHintAd() {
+  const btn = $("#hint");
+  if (!btn) return;
+  btn.disabled = true;
+  btn.classList.add("is-loading");
+  btn.textContent = "加载广告中…";
+  try {
+    await new Promise((resolve) => setTimeout(resolve, 800));
+    state.hintAdLeft = Math.max(0, state.hintAdLeft - 1);
+    state.hintsLeft = Math.min(HINTS_PER_MATCH + HINT_AD_BONUS_PER_MATCH, state.hintsLeft + 1);
+    addMsg("sys", "广告观看完成，提示次数+1。");
+  } finally {
+    updateHintButton();
+  }
+}
 
 /* ---------------- 角色显示：统一控制器管理立绘与后续模型 ---------------- */
 function toggleEmojiBadge(side, degraded) {
@@ -528,6 +601,37 @@ function playImpact(hard) {
    kill switch：/api/status 上报 tts.ready=false（config 关闭 / 依赖缺失 / 连挂 2 次）
    → 隐藏 🔊 入口、不再请求语音。代码保留，功能下线。 */
 let voice = { ready: false, broken: false, audio: null, failStreak: 0, request: 0, abort: null, objectUrl: null };
+let npcSpeakTimer = null;
+let npcSpeakToken = 0;
+
+function stopNpcSpeech() {
+  if (npcSpeakTimer) {
+    clearTimeout(npcSpeakTimer);
+    npcSpeakTimer = null;
+  }
+  characterViews.npc?.setSpeaking(false);
+}
+
+function startNpcSpeech() {
+  stopNpcSpeech();
+  const token = ++npcSpeakToken;
+  characterViews.npc?.setSpeaking(true);
+  npcSpeakTimer = setTimeout(() => {
+    if (token !== npcSpeakToken) return;
+    characterViews.npc?.setSpeaking(false);
+  }, getNpcSpeakDurationMs());
+}
+
+function stopNpcAudio() {
+  if (voice.audio) {
+    try { voice.audio.pause(); } catch (_) {}
+    voice.audio = null;
+  }
+  if (voice.objectUrl) {
+    try { URL.revokeObjectURL(voice.objectUrl); } catch (_) {}
+    voice.objectUrl = null;
+  }
+}
 
 async function initTts() {
   try {
@@ -552,13 +656,8 @@ function stopVoice() {
   voice.request++;
   voice.abort?.abort();
   voice.abort = null;
-  if (voice.audio) {
-    try { voice.audio.pause(); } catch (e) {}
-    voice.audio = null;
-  }
-  if (voice.objectUrl) URL.revokeObjectURL(voice.objectUrl);
-  voice.objectUrl = null;
-  characterViews.npc?.setSpeaking(false);
+  stopNpcAudio();
+  stopNpcSpeech();
 }
 
 async function speak(text, npcId) {
@@ -578,9 +677,15 @@ async function speak(text, npcId) {
     voice.objectUrl = URL.createObjectURL(blob);
     const a = new Audio(voice.objectUrl);
     voice.audio = a;
-    a.addEventListener("playing", () => { if (voice.audio === a) characterViews.npc?.setSpeaking(true); });
-    a.addEventListener("ended", () => { if (voice.audio === a) stopVoice(); });
-    a.addEventListener("error", () => { if (voice.audio === a) stopVoice(); });
+    a.addEventListener("playing", () => { if (voice.audio === a) startNpcSpeech(); });
+    a.addEventListener("ended", () => {
+      if (voice.audio !== a) return;
+      stopNpcAudio();
+    });
+    a.addEventListener("error", () => {
+      if (voice.audio !== a) return;
+      stopNpcAudio();
+    });
     a.play().catch(() => { if (voice.audio === a) stopVoice(); });
     voice.failStreak = 0;
   } catch (e) {
@@ -760,6 +865,27 @@ function setLastSysMsg(text, cls) {
   last.textContent = text;
 }
 
+function showNpcThinking(version = roundVersion) {
+  if (version !== roundVersion || !activeRound) return;
+  if (!npcThinkingMessage || !npcThinkingMessage.isConnected) {
+    const msg = document.createElement("div");
+    msg.className = "msg sys thinking";
+    msg.textContent = "NPC 正在思考… 续句话术中";
+    $("#dialogue").appendChild(msg);
+    $("#dialogue").scrollTop = $("#dialogue").scrollHeight;
+    npcThinkingMessage = msg;
+  }
+  return npcThinkingMessage;
+}
+
+function hideNpcThinking(version = roundVersion) {
+  if (version !== roundVersion) return;
+  if (npcThinkingMessage && npcThinkingMessage.parentElement) {
+    npcThinkingMessage.remove();
+  }
+  npcThinkingMessage = null;
+}
+
 let weakHitOverflowTimer = null;
 
 function clearWeakHitOverflow() {
@@ -786,6 +912,7 @@ function startWeakHitOverflowWindow(durationMs = 1000) {
 
 function addMsgNpc(text, tag, version = roundVersion) {
   text = String(text || "");
+  startNpcSpeech();
   characterViews.npc?.setSpeaking(true);
   const div = document.createElement("div");
   div.className = "msg npc";
@@ -813,7 +940,6 @@ function addMsgNpc(text, tag, version = roundVersion) {
       if (i % 4 === 0 || i >= text.length) $("#dialogue").scrollTop = $("#dialogue").scrollHeight;
       if (i < text.length) setTimeout(step, speed);
       else {
-        if (!voice.audio || voice.audio.paused) characterViews.npc?.setSpeaking(false);
         resolve();
       }
     };
@@ -824,18 +950,30 @@ function addMsgNpc(text, tag, version = roundVersion) {
 /* 空回复兜底：垫话已经显示，这里向服务端续拉 NPC 真正的回复。
    最多续拉 3 次，避免模型持续吐空导致死循环刷请求。 */
 async function pullPendingReply(sid, version, maxTry = 3) {
+  let thinkShown = false;
   for (let i = 0; i < maxTry; i++) {
     if (version !== roundVersion || !activeRound) return "";
     try {
       const d = await api("/api/message_retry", { sid });
       if (version !== roundVersion || !activeRound) return "";
-      if (!d.pending) return d.npc_reply || "";
-      // 还是垫话：把它也接上，继续拉
-      if (d.npc_reply) await appendToLastNpc(d.npc_reply, version);
+      if (!d.pending) {
+        hideNpcThinking(version);
+        return d.npc_reply || "";
+      }
+      if (d.npc_reply) {
+        if (!thinkShown) {
+          thinkShown = true;
+          showNpcThinking(version);
+        }
+        // 续拉垫话要分开发言，保留“多句”表现感。
+        await addMsgNpc(d.npc_reply, "思考中", version);
+      }
     } catch (_) {
+      hideNpcThinking(version);
       return "";
     }
   }
+  hideNpcThinking(version);
   return "";
 }
 
@@ -843,6 +981,7 @@ async function pullPendingReply(sid, version, maxTry = 3) {
 function appendToLastNpc(text, version = roundVersion) {
   text = String(text || "");
   if (!text) return Promise.resolve();
+  startNpcSpeech();
   const msgs = document.querySelectorAll(".msg.npc");
   const last = msgs[msgs.length - 1];
   if (!last) return addMsgNpc(text, "", version);
@@ -858,7 +997,6 @@ function appendToLastNpc(text, version = roundVersion) {
       if (i % 4 === 0 || i >= text.length) $("#dialogue").scrollTop = $("#dialogue").scrollHeight;
       if (i < text.length) setTimeout(step, speed);
       else {
-        if (!voice.audio || voice.audio.paused) characterViews.npc?.setSpeaking(false);
         resolve();
       }
     };
@@ -999,6 +1137,9 @@ function rememberActiveMatch(sid) {
 function forgetActiveMatch() {
   clearWeakHitOverflow();
   try { localStorage.removeItem(ACTIVE_MATCH_KEY); } catch (_) {}
+  state.hintsLeft = 0;
+  state.hintAdLeft = 0;
+  updateHintButton();
 }
 
 async function recoverAbandonedMatch() {
@@ -1172,6 +1313,8 @@ function showMode({ bootstrapTransition = false } = {}) {
   pendingTimeout = false;
   state.sid = null;
   state.busy = false;
+  resetMatchHints();
+  updateHintButton();
   $("#send").disabled = true;
   $("#stance-back").disabled = false;
   $("#stance-reroll").disabled = false;
@@ -1415,6 +1558,7 @@ async function newGame(tier, stance, topicId) {
   clearWeakHitOverflow();
   const version = ++roundVersion;
   screenVersion++;
+  resetMatchHints();
   activeRound = false;
   state.sid = null;
   stopVoice();
@@ -1429,8 +1573,8 @@ async function newGame(tier, stance, topicId) {
   state.busy = true;
   $("#stance-back").disabled = true;
   $("#stance-reroll").disabled = true;
-  if (btn) { btn.disabled = true; btn.textContent = "安排对手入场…"; }
-  if (promptEl) promptEl.textContent = "正在安排对手入场，请稍候…";
+  if (btn) { btn.disabled = true; btn.textContent = "对手准备中…"; }
+  if (promptEl) promptEl.textContent = "对手正在准备开场立论，请稍候…";
   try {
     clearInterval(timerInterval);
     resultLocked = false;
@@ -1468,6 +1612,7 @@ async function newGame(tier, stance, topicId) {
     state.npcTags = d.npc.tags || [];
     renderStanceChips();
     activeRound = true;
+    updateHintButton();
     startTimer(d.time_limit_s || 480);
 
     // 系列赛横幅
@@ -1505,6 +1650,7 @@ async function newGame(tier, stance, topicId) {
       characterViews.player?.setSpeaking(false);
       characterViews.player?.endStatement?.();
       state.busy = false;
+      updateHintButton();
       $("#send").disabled = !activeRound;
       $("#stance-back").disabled = false;
       $("#stance-reroll").disabled = false;
@@ -1562,11 +1708,14 @@ async function send() {
     characterViews.player?.setSpeaking(false);
     speak(d.npc_reply, state.npcId);
     await addMsgNpc(d.npc_reply, beatTag, version);
+    hideNpcThinking(version);
     if (version !== roundVersion || !activeRound) return;
-    // 空回复兜底：本轮给的是"思考垫话"，后台继续拉真正回复，拿到后接在同一气泡里
+    // 空回复兜底：本轮给的是"思考垫话"，后台继续拉真正回复，每句按独立气泡展示
     if (d.pending) {
       const merged = await pullPendingReply(state.sid, version);
-      if (merged) await appendToLastNpc(merged, version);
+      if (merged) {
+        await addMsgNpc(merged, "", version);
+      }
     }
     if (version !== roundVersion || !activeRound) return;
     if (finished) {
@@ -1579,6 +1728,7 @@ async function send() {
     setLastSysMsg("出错了：" + e.message);
   } finally {
     if (version === roundVersion) {
+      hideNpcThinking(version);
       characterViews.player?.setSpeaking(false);
       characterViews.player?.endStatement?.();
       state.busy = false;
@@ -1592,16 +1742,23 @@ async function send() {
 async function askHint() {
   if (!state.sid || state.busy || !activeRound) return;
   const version = roundVersion;
+  if (state.hintsLeft <= 0) {
+    if (state.hintAdLeft <= 0) return;
+    await simulateWatchHintAd();
+    return;
+  }
   try {
     const d = await api("/api/hint", { sid: state.sid });
     if (version !== roundVersion || !activeRound) return;
     if (d.hint) {
+      state.hintsLeft = Math.max(0, state.hintsLeft - 1);
       const div = document.createElement("div");
       div.className = "msg hint";
       div.innerHTML = `<div class="who">💡 教练提示</div>${esc(d.hint)}`;
       $("#dialogue").appendChild(div);
       $("#dialogue").scrollTop = $("#dialogue").scrollHeight;
     }
+    updateHintButton();
   } catch (e) {
     if (version !== roundVersion || !activeRound) return;
     addMsg("sys", "出错了：" + e.message);
@@ -1662,6 +1819,7 @@ function openResult({ win, title, sub, retrospect, status = "" }) {
   resultLocked = true;
   activeRound = false;
   pendingTimeout = false;
+  updateHintButton();
   $("#send").disabled = true;
   stopMic();
   clearObjection();
@@ -1879,6 +2037,8 @@ function syncFxUI() {
   if (m) m.classList.toggle("on", fx.flash);
   if (s) s.classList.toggle("on", fx.shake);
   if (motion) motion.classList.toggle("on", fx.motion);
+  const speakingDuration = $("#fx-npc-speaking-ms");
+  if (speakingDuration) speakingDuration.value = String(getNpcSpeakDurationMs());
   const note = $("#fx-note");
   if (note) note.textContent = _reducedMotion
     ? "系统已开启「减少动态效果」，角色动态、震动与粒子暂停。"
@@ -1905,6 +2065,17 @@ if (_fxMotion) _fxMotion.addEventListener("click", () => {
   savePreference("bianyi_fx", JSON.stringify(fx));
   syncFxUI(); applyFx();
 });
+const _fxNpcSpeakMs = $("#fx-npc-speaking-ms");
+if (_fxNpcSpeakMs) {
+  const onSpeechDurationChange = () => {
+    const next = Number(_fxNpcSpeakMs.value);
+    if (!Number.isFinite(next)) return;
+    setNpcSpeakDurationMs(next);
+    syncFxUI();
+  };
+  _fxNpcSpeakMs.addEventListener("change", onSpeechDurationChange);
+  _fxNpcSpeakMs.addEventListener("blur", onSpeechDurationChange);
+}
 motionPreference?.addEventListener?.("change", (event) => {
   _reducedMotion = event.matches;
   applyFx(); syncFxUI();

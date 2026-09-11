@@ -1,0 +1,42 @@
+[
+ {
+  "tag": "hy4 judge thinking.enabled",
+  "model": "hy4-preview",
+  "seconds": 94.9,
+  "prompt_tokens": 87,
+  "out_tokens": 2400,
+  "reasoning_tokens": 2400,
+  "body_chars": 0,
+  "body": ""
+ },
+ {
+  "tag": "hy4 judge thinking.disabled",
+  "model": "hy4-preview",
+  "seconds": 2.0,
+  "prompt_tokens": 90,
+  "out_tokens": 21,
+  "reasoning_tokens": 0,
+  "body_chars": 49,
+  "body": "{\n  \"dimension\": \"EVIDENCE\",\n  \"strength\": \"L2\"\n}"
+ },
+ {
+  "tag": "glm judge effort=low",
+  "model": "glm-5.3-flash",
+  "seconds": 1.1,
+  "prompt_tokens": 75,
+  "out_tokens": 19,
+  "reasoning_tokens": 3,
+  "body_chars": 37,
+  "body": "{\"dimension\": \"EVIDENCE\", \"level\": 2}"
+ },
+ {
+  "tag": "glm judge effort=high",
+  "model": "glm-5.3-flash",
+  "seconds": 1.1,
+  "prompt_tokens": 75,
+  "out_tokens": 29,
+  "reasoning_tokens": 8,
+  "body_chars": 55,
+  "body": "```json\n{\"dimension\": \"EVIDENCE\", \"strength\": \"L2\"}\n```"
+ }
+]

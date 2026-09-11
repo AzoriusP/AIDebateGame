@@ -176,6 +176,7 @@ button { font-family: inherit; cursor: pointer; }
 .msg.sys { align-self: center; color: var(--text-mute); background: transparent; border: none; clip-path: none; font-size: 12px; font-style: italic; }
 .msg.sys.weak-hit { color: var(--gold-bright); font-weight: 600; }
 .msg.sys.strong-hit { color: var(--npc-orange); }
+.msg.sys.thinking { color: var(--npc); font-weight: 600; }
 .msg.hint { align-self: center; max-width: 86%; background: rgba(245,192,78,0.06); border-color: rgba(245,192,78,0.4); color: var(--gold-bright); }
 .msg.hint .who { color: var(--gold); }
 
@@ -210,7 +211,23 @@ button { font-family: inherit; cursor: pointer; }
 #input-row button:hover:not(:disabled) { border-color: var(--gold); color: var(--gold); }
 #input-row button:disabled { opacity: 0.5; cursor: not-allowed; }
 #send { color: var(--gold); border-color: var(--gold); font-weight: 600; }
-#hint { color: var(--gold); border-color: rgba(245,192,78,0.4); }
+#hint { color: var(--gold); border-color: rgba(245,192,78,0.4); min-width: 76px; }
+#hint.is-loading {
+  color: rgba(245,192,78,0.9);
+}
+#hint.is-loading::after {
+  content: "";
+  width: 12px;
+  height: 12px;
+  margin-left: 7px;
+  border: 2px solid rgba(245,192,78,0.35);
+  border-top-color: rgba(245,192,78,1);
+  border-radius: 50%;
+  display: inline-block;
+  vertical-align: middle;
+  animation: hint-loader 0.7s linear infinite;
+}
+@keyframes hint-loader { to { transform: rotate(360deg); } }
 #mic { font-size: 16px; line-height: 1; }
 #mic.rec { color: #fff; background: var(--red); border-color: var(--red); animation: blink 1s infinite; }
 @keyframes blink { 50% { opacity: 0.6; } }

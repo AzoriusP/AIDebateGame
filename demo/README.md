@@ -17,7 +17,8 @@ AI 原生辩论游戏。用文字说服 AI NPC，把 TA 的「自信度」说到
 | `llm_mode` | `ollama`（本地）/ `openai`（云端 API）/ `mock`（规则模拟，无需模型） |
 | `ollama_base` | Ollama 地址，默认 `http://localhost:11434` |
 | `model` | 本地模型名，默认 `qwen3.5:latest` |
-| `llm_opening` | 开局开场白是否用 LLM 现场生成。默认 `false` = 本地模板秒开（0 延迟，推荐）；置 `true` 则开局同步等一次 LLM 推理（会更慢，仅在已预热模型/云端 API 时建议） |
+| `llm_opening` | NPC 开场白（一辩立论陈词）是否用 LLM 现场生成。**当前默认 `true`**：每次开局都换个说法（避免每局开场一模一样）。置 `false` 则退回本地模板秒开（0 延迟）。**任一情况下失败都会自动降级为模板，不会废局** |
+| `npc_opening_max_tokens` | 开场立论输出上限，默认 `400`（比普通回合小，防止开场写成小作文） |
 | `keep_alive` | Ollama 模型常驻时长，默认 `30m`。防止每局反复把模型 load 进显存（冷加载是开局卡顿主因） |
 | `openai_base` / `openai_api_key` / `openai_model` | 云端 API 配置（OpenAI 兼容通用） |
 | `tts.enabled` | 语音总开关。`false` = 关闭且前端隐藏 🔊（kill switch，代码保留）。**当前默认 `false`**：edge-tts 免费神经音听感不达标，暂下线，等换成云端语音大模型再开 |

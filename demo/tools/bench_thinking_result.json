@@ -1,0 +1,122 @@
+[
+ {
+  "task": "judge",
+  "think": false,
+  "prompt_tokens": 813,
+  "output_tokens": 20,
+  "think_chars": 0,
+  "content_chars": 58,
+  "seconds": 0.59,
+  "content": "{\"dimension\":\"EVIDENCE\",\"strength\":\"L3\",\"confidence\":0.95}"
+ },
+ {
+  "task": "judge",
+  "think": true,
+  "prompt_tokens": 811,
+  "output_tokens": 427,
+  "think_chars": 679,
+  "content_chars": 58,
+  "seconds": 4.02,
+  "content": "{\"dimension\":\"EVIDENCE\",\"strength\":\"L3\",\"confidence\":0.85}"
+ },
+ {
+  "task": "npc",
+  "think": false,
+  "prompt_tokens": 1650,
+  "output_tokens": 53,
+  "think_chars": 0,
+  "content_chars": 70,
+  "seconds": 0.77,
+  "content": "你说得轻巧，可你见过谁家孩子拖到三十还啃老吗？我跟你讲真话，早成家早顾家，这日子才稳当。你只想着自己痛快，把父母的心事全扔一边，这就是自私！"
+ },
+ {
+  "task": "npc",
+  "think": true,
+  "prompt_tokens": 1648,
+  "output_tokens": 4000,
+  "think_chars": 9416,
+  "content_chars": 0,
+  "seconds": 36.51,
+  "content": ""
+ },
+ {
+  "task": "judge",
+  "think": false,
+  "prompt_tokens": 806,
+  "output_tokens": 19,
+  "think_chars": 0,
+  "content_chars": 57,
+  "seconds": 0.62,
+  "content": "{\"dimension\":\"EMOTION\",\"strength\":\"L2\",\"confidence\":0.85}"
+ },
+ {
+  "task": "judge",
+  "think": true,
+  "prompt_tokens": 804,
+  "output_tokens": 3424,
+  "think_chars": 13083,
+  "content_chars": 57,
+  "seconds": 31.21,
+  "content": "{\"dimension\":\"EMOTION\",\"strength\":\"L2\",\"confidence\":0.85}"
+ },
+ {
+  "task": "npc",
+  "think": false,
+  "prompt_tokens": 2034,
+  "output_tokens": 58,
+  "think_chars": 0,
+  "content_chars": 79,
+  "seconds": 1.18,
+  "content": "哎呀，你这就急了！谁让你我出钱了，那是你家婆家的事。\n我跟你说，当年咱们这帮人，没几套房也拖家带口了，日子照样过。\n现在就是怕吃苦受累，才不想生，这才是自私！"
+ },
+ {
+  "task": "npc",
+  "think": true,
+  "prompt_tokens": 2032,
+  "output_tokens": 4000,
+  "think_chars": 11126,
+  "content_chars": 0,
+  "seconds": 36.93,
+  "content": ""
+ },
+ {
+  "task": "judge",
+  "think": false,
+  "prompt_tokens": 803,
+  "output_tokens": 23,
+  "think_chars": 0,
+  "content_chars": 59,
+  "seconds": 0.64,
+  "content": "{\"dimension\": \"NULL\", \"strength\": \"L0\", \"confidence\": 0.95}"
+ },
+ {
+  "task": "judge",
+  "think": true,
+  "prompt_tokens": 801,
+  "output_tokens": 1519,
+  "think_chars": 5589,
+  "content_chars": 58,
+  "seconds": 13.89,
+  "content": "{\"dimension\": \"NULL\", \"strength\": \"L0\", \"confidence\": 0.9}"
+ },
+ {
+  "task": "npc",
+  "think": false,
+  "prompt_tokens": 2028,
+  "output_tokens": 63,
+  "think_chars": 0,
+  "content_chars": 87,
+  "seconds": 1.05,
+  "content": "哼，房价涨再高，房子也是给人住的，不是让人供着的！\n我跟你讲，当年没房住怎么生娃？现在年轻人就是怕吃苦，想等着天上掉馅饼。\n你算盘打得精，可孩子耽误不起啊，赶紧劝他们成家吧！"
+ },
+ {
+  "task": "npc",
+  "think": true,
+  "prompt_tokens": 2026,
+  "output_tokens": 4000,
+  "think_chars": 11714,
+  "content_chars": 0,
+  "seconds": 36.73,
+  "content": ""
+ }
+]
