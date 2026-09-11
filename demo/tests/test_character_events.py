@@ -187,6 +187,26 @@ class CharacterEventTests(unittest.TestCase):
         self.assertEqual(repeated["result"], "LOSE_EXIT")
         self.assertEqual(accounts["exit-player"]["account_token"], 203)
 
+    def test_all_llm_candidates_make_match_invalid_and_refund_reservation(self):
+        accounts = {"llm-player": {
+            "account_id": "llm-player", "account_token": 500, "callback_secret": "secret",
+            "events": [], "callback_ids": [], "registered": True,
+        }}
+        with mock.patch.object(server, "_ACCOUNT_STATE", accounts), \
+                mock.patch.object(server, "LLM_MODE", "openai"), \
+                mock.patch.object(server, "LLM_ENDPOINTS", [{"provider": "openai", "model": "A"},
+                                                               {"provider": "openai", "model": "B"}]), \
+                mock.patch.object(server, "_chat_once", side_effect=RuntimeError("offline")), \
+                mock.patch.object(server, "LLM_ATTEMPT_TIMEOUT", 1), \
+                mock.patch.object(server, "LLM_TOTAL_TIMEOUT", 2):
+            created = server.new_session(tier=1, npc_id="L1_A",
+                                         player_ctx={"mode": "account", "account_id": "llm-player"})
+            response = server.process_message(created["sid"], "请看证据。")
+        self.assertEqual(response["next"]["status"], "INVALID_LLM")
+        self.assertTrue(response["connection_error"])
+        self.assertEqual(response["account_settlement"]["delta"], 420)
+        self.assertEqual(accounts["llm-player"]["account_token"], 500)
+
     def test_surrender_route_returns_the_server_result(self):
         sid, state = self.session(memory_on=False)
         # Exercise HTTP dispatch without opening a socket or starting a server.

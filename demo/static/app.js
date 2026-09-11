@@ -1289,6 +1289,8 @@ async function enterMainWithLoading({ beforeAssets = null } = {}) {
 /* ---------------- 模式选择 ---------------- */
 const TIER_COLORS = { 1: "#639922", 2: "#BA7517", 3: "#EF9F27", 4: "#D85A30", 5: "#FF3B4E" };
 const TIER_LABELS = { 1: "街头大妈", 2: "精明白领", 3: "意见领袖", 4: "资深辩手", 5: "辩论专家" };
+const isGuest = () => identity?.mode !== "account";
+const shouldShowFights = () => !isGuest();
 
 async function loadTiers(mode = "ladder") {
   if (mode === "free") {
@@ -1308,7 +1310,7 @@ async function loadTiers(mode = "ladder") {
     const unlockHint = mode === "free" ? requirePermissionMessage("free_mode", "自由切磋") : "";
     const card = document.createElement("div");
     card.className = "tier-card" + (t.unlocked ? "" : " locked");
-    const memTag = t.fights > 0 ? `<span class="mem-chip">交手 ${t.fights} 次</span>` : "";
+    const memTag = (shouldShowFights() && t.fights > 0) ? `<span class="mem-chip">交手 ${t.fights} 次</span>` : "";
     const lockTag = t.unlocked ? "" : `<span class="lock-chip">🔒 ${mode === "free" && unlockHint ? unlockHint : "未解锁"}</span>`;
     card.innerHTML =
       `<img class="tier-avatar" src="${t.avatar_thumb || t.avatar}" alt="${t.name}">` +
@@ -1350,7 +1352,7 @@ function renderFreeList() {
     tiers.forEach((t) => {
       const card = document.createElement("div");
       card.className = "npc-card" + (t.unlocked ? "" : " locked");
-      const memTag = t.fights ? `<span class="mem-chip">交手 ${t.fights} 次</span>` : "";
+      const memTag = (shouldShowFights() && t.fights > 0) ? `<span class="mem-chip">交手 ${t.fights} 次</span>` : "";
       const lockHint = t.unlocked
         ? ""
         : `<div class="lock-chip">🔒 ${requirePermissionMessage("free_mode", "自由切磋") || "尚未解锁"}</div>`;
@@ -1400,8 +1402,8 @@ async function showStance() {
   const memChip = $("#stance-mem");
   const parts = [];
   if (run.mode === "ladder") parts.push(`第 ${run.game}/3 局`);
-  if (p.npc.fights > 0) parts.push(`交手 ${p.npc.fights} 次`);
-  if (run.mode === "free" && !freeMem) parts.push("记忆关");
+  if (shouldShowFights() && p.npc.fights > 0) parts.push(`交手 ${p.npc.fights} 次`);
+  if (run.mode === "free" && !freeMem && identity?.mode === "account") parts.push("记忆关");
   memChip.textContent = parts.join(" · ");
   hideScreens("stance-screen");
   $("#stance-screen").classList.remove("hidden");
@@ -1433,11 +1435,16 @@ async function newGame(tier, stance, topicId) {
     clearInterval(timerInterval);
     resultLocked = false;
     $("#dialogue").innerHTML = "";
+    const isGuestMode = isGuest();
     const body = { tier: tier || 1, stance, topic_id: topicId, mode: run?.mode || "ladder" };
     if (run && run.npcId) body.npc_id = run.npcId;
-    body.memory_on = (run && run.mode === "ladder") ? true : freeMem;
+    body.memory_on = isGuestMode ? false : (run && run.mode === "ladder") ? true : freeMem;
     const d = await api("/api/new_session", body);
     if (version !== roundVersion) return;
+    if (d.connection_error || d.next?.status === "INVALID_LLM") {
+      alert("连接超时，请F5刷新重试。");
+      return;
+    }
     if (promptEl) promptEl.textContent = promptBackup;
     state.sid = d.sid;
     rememberActiveMatch(d.sid);
@@ -1523,6 +1530,15 @@ async function send() {
   try {
     const d = await api("/api/message", { sid: state.sid, text });
     if (version !== roundVersion || !activeRound) return;
+    if (d.connection_error || d.next?.status === "INVALID_LLM") {
+      clearInterval(timerInterval);
+      activeRound = false;
+      state.sid = null;
+      forgetActiveMatch();
+      applyMatchSettlement(d.account_settlement);
+      alert("连接超时，请F5刷新重试。");
+      return;
+    }
     const jl = d.judge.dimension_label;
     const feedback = d.settlement.direction === "weak"
       ? `⚔️ 命中薄弱点「${jl}」L${d.judge.strength.slice(1)}`

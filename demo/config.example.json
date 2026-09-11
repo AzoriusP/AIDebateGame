@@ -12,6 +12,24 @@
   "port": 8787,
   "judge_timeout_s": 180,
   "npc_timeout_s": 180,
+  "llm_attempt_timeout_s": 20,
+  "llm_total_timeout_s": 60,
+  "llm_endpoints": [
+    {
+      "name": "A",
+      "provider": "openai",
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "hy4-preview",
+      "api_key": "YOUR_TOKENHUB_KEY_HERE"
+    },
+    {
+      "name": "B",
+      "provider": "openai",
+      "base": "https://api.openai.com",
+      "model": "gpt-4o-mini",
+      "api_key": "YOUR_OPENAI_KEY_HERE"
+    }
+  ],
   "tts": {
     "enabled": false,
     "mode": "edge",

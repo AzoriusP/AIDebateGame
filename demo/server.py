@@ -23,6 +23,7 @@ import time
 import uuid
 import urllib.request
 import urllib.error
+import queue
 from http.server import BaseHTTPRequestHandler, ThreadingHTTPServer
 from pathlib import Path
 from urllib.parse import parse_qs, urlparse
@@ -50,6 +51,8 @@ NPC_MODEL = CONFIG.get("npc_model", CONFIG.get("model", "qwen3.5:latest"))
 PORT = int(CONFIG.get("port", 8787))
 JUDGE_TIMEOUT = int(CONFIG.get("judge_timeout_s", 180))
 NPC_TIMEOUT = int(CONFIG.get("npc_timeout_s", 180))
+LLM_ATTEMPT_TIMEOUT = max(1, int(CONFIG.get("llm_attempt_timeout_s", 20)))
+LLM_TOTAL_TIMEOUT = max(1, int(CONFIG.get("llm_total_timeout_s", 60)))
 # 开局是否用 LLM 现场生成开场白：默认 False = 本地模板秒开（0 延迟、可被双击防重）；
 # 置 True 则回到"同步等 LLM 出开场"的旧路径（配合云端 API / 已预热模型时才建议开）。
 LLM_OPENING = bool(CONFIG.get("llm_opening", False))
@@ -62,6 +65,21 @@ TOPICS = _load_json(DATA / "topics.json", [])
 if LLM_MODE == "openai":
     JUDGE_MODEL = OPENAI_MODEL
     NPC_MODEL = OPENAI_MODEL
+
+_configured_llm_endpoints = CONFIG.get("llm_endpoints") or CONFIG.get("llm_fallbacks") or []
+if not _configured_llm_endpoints:
+    _configured_llm_endpoints = [{
+        "name": "default",
+        "provider": LLM_MODE,
+        "base": OPENAI_BASE if LLM_MODE == "openai" else OLLAMA_BASE,
+        "api_key": OPENAI_API_KEY,
+        "model": OPENAI_MODEL if LLM_MODE == "openai" else NPC_MODEL,
+    }]
+LLM_ENDPOINTS = [dict(item) for item in _configured_llm_endpoints if isinstance(item, dict)]
+
+
+class LLMUnavailableError(RuntimeError):
+    """所有候选模型均失败或超过本次回复的总时限。"""
 
 # ---------------------------------------------------------------- TTS 语音合成（可插拔 provider，可整体关闭）
 # 设计：服务端统一出口 GET /api/tts?npc=<npc_id>&text=<台词> → mp3（磁盘缓存，同句不重复请求外网）。
@@ -814,9 +832,10 @@ def _clean_llm_text(text):
     return t.strip()
 
 
-def _ollama_chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None):
+def _ollama_chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None, endpoint=None):
     """本地 Ollama：原生 /api/chat。关 thinking、keep_alive 常驻、限长输出，三管齐下提速。"""
-    url = OLLAMA_BASE.rstrip("/") + "/api/chat"
+    endpoint = endpoint or {}
+    url = str(endpoint.get("base") or OLLAMA_BASE).rstrip("/") + "/api/chat"
     opts = {"temperature": 0.7 if temperature is None else float(temperature)}
     if max_tokens:
         opts["num_predict"] = int(max_tokens)
@@ -835,9 +854,10 @@ def _ollama_chat(messages, model, json_mode=False, timeout=180, max_tokens=None,
     return _clean_llm_text(resp["message"]["content"])
 
 
-def _openai_chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None):
+def _openai_chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None, endpoint=None):
     """云端 API：OpenAI 兼容 /v1/chat/completions（DeepSeek/通义/混元/OpenAI 通用）。"""
-    url = OPENAI_BASE.rstrip("/") + "/v1/chat/completions"
+    endpoint = endpoint or {}
+    url = str(endpoint.get("base") or OPENAI_BASE).rstrip("/") + "/v1/chat/completions"
     body = {"model": model, "messages": messages,
             "temperature": 0.7 if temperature is None else float(temperature), "stream": False}
     if max_tokens:
@@ -845,18 +865,75 @@ def _openai_chat(messages, model, json_mode=False, timeout=180, max_tokens=None,
     if json_mode:
         body["response_format"] = {"type": "json_object"}
     headers = {"Content-Type": "application/json"}
-    if OPENAI_API_KEY:
-        headers["Authorization"] = "Bearer " + OPENAI_API_KEY
+    api_key = str(endpoint.get("api_key") or OPENAI_API_KEY)
+    if api_key:
+        headers["Authorization"] = "Bearer " + api_key
     req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers)
     with urllib.request.urlopen(req, timeout=timeout) as r:
         resp = json.loads(r.read().decode("utf-8"))
     return _clean_llm_text(resp["choices"][0]["message"]["content"])
 
 
+def _chat_once(messages, model, json_mode, timeout, max_tokens, temperature, endpoint):
+    provider = str(endpoint.get("provider") or LLM_MODE).lower()
+    selected_model = str(endpoint.get("model") or model)
+    if provider == "openai":
+        return _openai_chat(messages, selected_model, json_mode, timeout, max_tokens, temperature, endpoint)
+    return _ollama_chat(messages, selected_model, json_mode, timeout, max_tokens, temperature, endpoint)
+
+
 def _chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None):
-    if LLM_MODE == "openai":
-        return _openai_chat(messages, model, json_mode, timeout, max_tokens, temperature)
-    return _ollama_chat(messages, model, json_mode, timeout, max_tokens, temperature)
+    """按候选顺序故障转移；总时限内哪个请求先成功就使用哪个结果。"""
+    if LLM_MODE == "mock":
+        raise LLMUnavailableError("mock mode has no remote model")
+    candidates = LLM_ENDPOINTS or [{"provider": LLM_MODE, "model": model}]
+    events = queue.Queue()
+    stop = threading.Event()
+    started = 0
+    active = 0
+    deadline = time.monotonic() + min(max(1, int(timeout)), LLM_TOTAL_TIMEOUT)
+    next_launch = time.monotonic()
+
+    def launch(index):
+        nonlocal active
+        endpoint = candidates[index]
+        attempt_timeout = max(0.1, min(float(LLM_ATTEMPT_TIMEOUT), deadline - time.monotonic()))
+        active += 1
+
+        def worker():
+            try:
+                if stop.is_set():
+                    return
+                result = _chat_once(messages, model, json_mode, attempt_timeout, max_tokens, temperature, endpoint)
+                if not stop.is_set() and result:
+                    events.put((index, result, None))
+                else:
+                    events.put((index, None, RuntimeError("empty response")))
+            except Exception as exc:
+                events.put((index, None, exc))
+
+        threading.Thread(target=worker, name=f"llm-fallback-{index}", daemon=True).start()
+
+    errors = []
+    launch(0)
+    started = 1
+    while time.monotonic() < deadline:
+        remaining = max(0.01, deadline - time.monotonic())
+        try:
+            index, result, error = events.get(timeout=min(remaining, LLM_ATTEMPT_TIMEOUT))
+            active = max(0, active - 1)
+            if result:
+                stop.set()
+                return result
+            errors.append(f"{index}:{error}")
+        except queue.Empty:
+            # 当前候选超过单次时限，马上启动下一个候选；旧请求由 daemon 线程自行结束。
+            pass
+        if started < len(candidates):
+            launch(started)
+            started += 1
+    stop.set()
+    raise LLMUnavailableError("; ".join(errors[-3:]) or "all candidates timed out")
 
 
 def _extract_json(text):
@@ -942,9 +1019,10 @@ def judge(player_msg, npc, topic, dims):
     ]
     try:
         raw = _chat(messages, JUDGE_MODEL, json_mode=True, timeout=JUDGE_TIMEOUT)
+    except LLMUnavailableError:
+        raise
     except Exception as e:
-        print("[judge] LLM 调用失败，回退 Mock：", e)
-        return _mock_judge(player_msg)
+        raise LLMUnavailableError(str(e)) from e
     obj = _extract_json(raw)
     if not obj:
         return _mock_judge(player_msg)
@@ -1366,9 +1444,10 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
             temp = 0.7 if attempt == 0 else 0.95
             reply = _chat(messages, NPC_MODEL, timeout=NPC_TIMEOUT,
                           max_tokens=NPC_MAX_TOKENS, temperature=temp).strip()
+        except LLMUnavailableError:
+            raise
         except Exception as e:
-            print("[npc] LLM 调用失败，回退 Mock：", e, flush=True)
-            return _mock_npc_reply(npc, topic, beat)
+            raise LLMUnavailableError(str(e)) from e
         if not reply:
             # 空回复：先原地再试（等待时间本来就花着，不增加玩家感知延迟）
             stalls += 1
@@ -1908,9 +1987,13 @@ def new_session(tier=1, stance=None, topic_id=None, npc_id=None, memory_on=True,
         "_last_hit": None,
         "_last_text": "",
     }
-    opening = (_opening_line(npc, topic, npc_stance)
-               if not LLM_OPENING
-               else npc_reply(npc, topic, 100, "OPENING", [], state))
+    try:
+        opening = (_opening_line(npc, topic, npc_stance)
+                   if not LLM_OPENING
+                   else npc_reply(npc, topic, 100, "OPENING", [], state))
+    except LLMUnavailableError as exc:
+        # 开局已预扣，但房间尚未可用：立即按无效局返还全部预扣 token。
+        return _invalidate_match(state, exc)
     state["history"].append({"role": "assistant", "content": opening})
     with _lock:
         sessions[sid] = state
@@ -1967,7 +2050,10 @@ def _process_message(state, text):
     state["_last_text"] = text
 
     dims = _current_dims(state)
-    jr = judge(text, state["npc"], state["topic"], dims)
+    try:
+        jr = judge(text, state["npc"], state["topic"], dims)
+    except LLMUnavailableError as exc:
+        return _invalidate_match(state, exc)
     state["history"].append({"role": "user", "content": text})
 
     jr["_direction"] = _direction(state, jr["dimension"])
@@ -1988,14 +2074,20 @@ def _process_message(state, text):
     final_beat = sched["beat"]
     pending = False
     if state["result"] == "ONGOING":
-        reply = npc_reply(state["npc"], state["topic"], state["confidence"], sched["beat"], state["history"], state)
+        try:
+            reply = npc_reply(state["npc"], state["topic"], state["confidence"], sched["beat"], state["history"], state)
+        except LLMUnavailableError as exc:
+            return _invalidate_match(state, exc)
         # 空回复兜底：返回的是"思考垫话"（dict）—— 先给玩家看，等会儿续拉真回复
         if isinstance(reply, dict) and reply.get("__stall__"):
             pending = True
             reply = reply["text"]
             state["_pending_beat"] = final_beat
     elif state["result"] == "WIN":
-        reply = _concede_line(state)
+        try:
+            reply = _concede_line(state)
+        except LLMUnavailableError as exc:
+            return _invalidate_match(state, exc)
         final_beat = "CONCEDE"  # 前端据此显示"被说服"演出标签
     else:
         reply = _ending_line(state)
@@ -2033,6 +2125,23 @@ def _process_message(state, text):
         "pending": pending,           # true = 上面是思考垫话，前端需调 /api/message_retry 续拉
         "retrospect": retrospect,
         "next": {"status": state["result"]},
+        "account_settlement": state.get("_account_settlement"),
+    }
+
+
+def _invalidate_match(state, error):
+    """LLM 候选全部失败时结束本局，不把模型故障伪装成游戏结果。"""
+    state["result"] = "INVALID_LLM"
+    state["_llm_error"] = str(error)[:300]
+    state["_retrospect"] = "本局连接异常，未计入胜负。"
+    _finalize_match(state)
+    return {
+        "error_code": "llm-unavailable",
+        "connection_error": True,
+        "message": "连接超时，请F5刷新重试。",
+        "next": {"status": "INVALID_LLM"},
+        "token_remaining": state.get("token_remaining", 0),
+        "retrospect": state["_retrospect"],
         "account_settlement": state.get("_account_settlement"),
     }
 
@@ -2116,7 +2225,7 @@ def _finalize_match(state):
             return
         state["_account_settlement"] = _account_settlement(state)
         npc_id = state["npc"].get("npc_id")
-        if not npc_id or not state.get("memory_on", True):
+        if not npc_id or not state.get("memory_on", True) or state["result"] == "INVALID_LLM":
             state["_finalized"] = True
             return
         # 先生成记忆，避免等待 LLM 时锁住其他会话，或失败后留下半次成长。
@@ -2244,9 +2353,10 @@ def _concede_line(state):
 4. 说 1~2 句话（40~90字），只输出你说的话，不要前缀说明。"""
     try:
         return _chat([{"role": "user", "content": prompt}], NPC_MODEL, timeout=NPC_TIMEOUT).strip()
+    except LLMUnavailableError:
+        raise
     except Exception as e:
-        print("[concede] LLM 失败，回退 Mock：", e)
-        return f"（{npc['name']}愣住半晌，声音低了下来）……好吧，你说得对，是我错了。就按你说的，{topic['topic']}这事，我认了。"
+        raise LLMUnavailableError(str(e)) from e
 
 
 def _ending_line(state):
