@@ -12,8 +12,10 @@
   "port": 8787,
   "judge_timeout_s": 180,
   "npc_timeout_s": 180,
-  "llm_attempt_timeout_s": 20,
-  "llm_total_timeout_s": 60,
+  "llm_attempt_timeout_s": 45,
+  "llm_total_timeout_s": 120,
+  "npc_max_tokens": 1200,
+  "judge_max_tokens": 1200,
   "llm_endpoints": [
     {
       "name": "A",
@@ -25,9 +27,18 @@
     {
       "name": "B",
       "provider": "openai",
-      "base": "https://api.openai.com",
-      "model": "gpt-4o-mini",
-      "api_key": "YOUR_OPENAI_KEY_HERE"
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "glm-5.3-flash",
+      "api_key": "YOUR_FAST_MODEL_KEY_HERE"
+    }
+  ],
+  "judge_endpoints": [
+    {
+      "name": "FAST1",
+      "provider": "openai",
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "glm-5.3-flash",
+      "api_key": "YOUR_FAST_MODEL_KEY_HERE"
     }
   ],
   "tts": {

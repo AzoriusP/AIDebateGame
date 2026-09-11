@@ -61,6 +61,7 @@ KEEP_ALIVE = CONFIG.get("keep_alive", "30m")
 
 NPCS = _load_json(DATA / "npcs.json", [])
 TOPICS = _load_json(DATA / "topics.json", [])
+NPC_CORPUS = _load_json(DATA / "npc_corpus.json", {})
 
 if LLM_MODE == "openai":
     JUDGE_MODEL = OPENAI_MODEL
@@ -76,6 +77,11 @@ if not _configured_llm_endpoints:
         "model": OPENAI_MODEL if LLM_MODE == "openai" else NPC_MODEL,
     }]
 LLM_ENDPOINTS = [dict(item) for item in _configured_llm_endpoints if isinstance(item, dict)]
+
+# 判定用的候选模型链（可选）。judge 只是打 6 维分数，不需要最强模型，但对延迟极敏感 ——
+# 思考模型跑判定要 30s+，快模型 7s 出结果。不配 judge_endpoints 则沿用 llm_endpoints。
+_cfg_judge_endpoints = CONFIG.get("judge_endpoints") or []
+JUDGE_ENDPOINTS = [dict(item) for item in _cfg_judge_endpoints if isinstance(item, dict)] or LLM_ENDPOINTS
 
 
 class LLMUnavailableError(RuntimeError):
@@ -224,6 +230,14 @@ NPC_DEDUP_WINDOW = 3           # "三句话之内不要重复" —— 比对窗�
 NPC_DEDUP_THRESHOLD = 0.42     # 字面相似度阈值（3-gram Jaccard），抓原话照搬/换词
 NPC_DEDUP_FP_THRESHOLD = 0.82  # 论据实义字重合阈值（取高位，避免误杀正常内容）
 NPC_DEDUP_RETRY = 1            # 触发重生成的次数上限
+NPC_FOLLOWUP_RETRY = 1         # 追问场景额外允许 1 次重试
+NPC_FOLLOWUP_HARD_LIT = 0.9    # 追问场景下只拦“逐段照搬”
+
+# 双源素材注入（v0.2）：A 源预置素材 + B 源常识新闻护栏
+NPC_CORPUS_BLOCK_MAX = 5               # 候选素材行数上限（未用优先）
+NPC_CORPUS_CHAR_BUDGET = 220           # 候选行字符硬顶
+NPC_CORPUS_LINE_LIMIT = 32             # 单行渲染截断长度
+NPC_PUBLIC_KB_ENABLED = True           # 公共知识引用（B 源）默认开启
 
 # 空回复兜底：模型偶发"只思考不回话"。此时不能让界面空着，也不能立刻降级成 mock 台词，
 # 而是先甩一句"思考垫话"顶住场子（假装在组织语言），后台继续重试拿真回复。
@@ -239,9 +253,13 @@ NPC_STALL_LINES = [
 ]
 NPC_STALL_FOLLOWUP = "哎，那你听我说啊——"   # 续拉前的过渡句（真回复拿到后接在后面）
 
-# NPC 单次回复的输出上限。句式节奏改为"多说两句短句"后，正文需要更多空间，
-# 但也不能放飞（云端模型容易长篇大论）→ 放宽到 420，配合 prompt 的句数约束。
-NPC_MAX_TOKENS = 420
+# 单次回复的输出上限。句式节奏改为"多说两句短句"后，正文需要更多空间，
+# 但也不能放飞（云端模型容易长篇大论）→ 默认放宽到 1200，配合 prompt 的句数约束。
+# ⚠️ 关键：HY4 / glm 这类"思考模型"会先把 token 预算烧在内部推理链（reasoning_content）上，
+# 预算不足时 reasoning 吃满配额 → 正文返回空串 → 判定为失败。实测推理链约 550~900 token，
+# 因此预算必须 ≥ 该量级，否则必定出现"连接超时"。可在 config.json 里用 npc_max_tokens 覆盖。
+NPC_MAX_TOKENS = int(CONFIG.get("npc_max_tokens", 1200))
+JUDGE_MAX_TOKENS = int(CONFIG.get("judge_max_tokens", 1200))
 
 # 整句级重复检测：鼓励"多短句"后，局部整句复读会被整体相似度稀释，
 # 故单独设一道闸——新回复里出现与最近 3 句完全相同的整句即判重。
@@ -289,6 +307,8 @@ def _new_account_record(account_id):
         "player_name": "",
         "skin_id": "skin-default",
         "appearance": {},
+        "progress": {"highest_cleared": 0},
+        "npc_state": {},
     }
 
 
@@ -322,6 +342,7 @@ def _snapshot_account(account_id):
         "skin_id": rec.get("skin_id", "skin-default"),
         "appearance": rec.get("appearance", {}),
         "setup_done": bool(rec.get("setup_done", False)),
+        "progress": rec.get("progress", {"highest_cleared": 0}),
     }
 
 
@@ -341,6 +362,76 @@ def _find_registered_account(identifier):
             if value in {str(alias or "").strip().lower() for alias in aliases}:
                 return rec
     return None
+
+
+def _account_progress(account_id, create=True):
+    rec = _get_account_record(account_id, create=create)
+    if not rec:
+        return None
+    progress = rec.get("progress")
+    if not isinstance(progress, dict):
+        progress = {"highest_cleared": 0}
+        rec["progress"] = progress
+    if "highest_cleared" not in progress or not isinstance(progress.get("highest_cleared"), int):
+        try:
+            progress["highest_cleared"] = int(progress.get("highest_cleared", 0))
+        except Exception:
+            progress["highest_cleared"] = 0
+    return progress
+
+
+def _account_npc_state(account_id, create=True):
+    rec = _get_account_record(account_id, create=create)
+    if not rec:
+        return None
+    state = rec.get("npc_state")
+    if not isinstance(state, dict):
+        state = {}
+        rec["npc_state"] = state
+    return state
+
+
+def _normalize_npc_entry(raw):
+    if not isinstance(raw, dict):
+        return {"adj": {k: 0.0 for k in DIMENSIONS}, "memories": [], "fights": 0}
+    adj = raw.get("adj")
+    if not isinstance(adj, dict):
+        adj = {}
+    norm_adj = {k: float(adj.get(k, 0.0) or 0.0) for k in DIMENSIONS}
+    memories = raw.get("memories")
+    if not isinstance(memories, list):
+        memories = []
+    return {
+        "adj": norm_adj,
+        "memories": [x for x in memories if isinstance(x, dict)],
+        "fights": int(raw.get("fights", 0) or 0),
+    }
+
+
+def _npc_entry_for_ctx(npc_id, player_ctx=None, create=True):
+    npc_id = str(npc_id or "").strip()
+    if not npc_id:
+        return {"adj": {k: 0.0 for k in DIMENSIONS}, "memories": [], "fights": 0}
+    ctx = _player_ctx(player_ctx)
+    if _is_guest_ctx(ctx):
+        return _npc_entry(npc_id) if not create else _npc_entry(npc_id)
+    npc_map = _account_npc_state(ctx.get("account_id"), create=create)
+    if npc_map is None:
+        return {"adj": {k: 0.0 for k in DIMENSIONS}, "memories": [], "fights": 0}
+    entry = npc_map.get(npc_id)
+    if entry is None:
+        if not create:
+            return {"adj": {k: 0.0 for k in DIMENSIONS}, "memories": [], "fights": 0}
+        entry = _normalize_npc_entry({})
+        npc_map[npc_id] = entry
+        return entry
+    if not isinstance(entry, dict):
+        entry = _normalize_npc_entry({})
+        npc_map[npc_id] = entry
+    else:
+        entry = _normalize_npc_entry(entry)
+        npc_map[npc_id] = entry
+    return entry
 
 
 def _auth_send_code(body):
@@ -432,7 +523,12 @@ def _get_account_record(account_id, create=True):
         return None
     with _lock:
         if account_id in _ACCOUNT_STATE:
-            return _ACCOUNT_STATE[account_id]
+            rec = _ACCOUNT_STATE[account_id]
+            if "progress" not in rec or not isinstance(rec.get("progress"), dict):
+                rec["progress"] = {"highest_cleared": 0}
+            if "npc_state" not in rec or not isinstance(rec.get("npc_state"), dict):
+                rec["npc_state"] = {}
+            return rec
         if not create:
             return None
         _ACCOUNT_STATE[account_id] = _new_account_record(account_id)
@@ -882,11 +978,11 @@ def _chat_once(messages, model, json_mode, timeout, max_tokens, temperature, end
     return _ollama_chat(messages, selected_model, json_mode, timeout, max_tokens, temperature, endpoint)
 
 
-def _chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None):
+def _chat(messages, model, json_mode=False, timeout=180, max_tokens=None, temperature=None, endpoints=None):
     """按候选顺序故障转移；总时限内哪个请求先成功就使用哪个结果。"""
     if LLM_MODE == "mock":
         raise LLMUnavailableError("mock mode has no remote model")
-    candidates = LLM_ENDPOINTS or [{"provider": LLM_MODE, "model": model}]
+    candidates = endpoints or LLM_ENDPOINTS or [{"provider": LLM_MODE, "model": model}]
     events = queue.Queue()
     stop = threading.Event()
     started = 0
@@ -1018,7 +1114,8 @@ def judge(player_msg, npc, topic, dims):
         {"role": "user", "content": "【待判定的玩家原话】\n\"" + player_msg + "\""},
     ]
     try:
-        raw = _chat(messages, JUDGE_MODEL, json_mode=True, timeout=JUDGE_TIMEOUT)
+        raw = _chat(messages, JUDGE_MODEL, json_mode=True, timeout=JUDGE_TIMEOUT,
+                    max_tokens=JUDGE_MAX_TOKENS, endpoints=JUDGE_ENDPOINTS)
     except LLMUnavailableError:
         raise
     except Exception as e:
@@ -1228,13 +1325,262 @@ _KIN_PAT = re.compile(
 
 # 平台/品牌词：实例（淘宝买鞋还是拼多多买的）漂移同样是玩家一眼看穿的穿帮
 _BRAND_PAT = re.compile(r"淘宝|拼多多|京东|抖音|快手|闲鱼|拼夕夕|唯品会|得物|天猫")
+_REFER_PAT = re.compile(r"你说的|你刚说|你刚提|你那个|刚才那个")
+_DENY_PAT = re.compile(r"我没说过|哪有这个人|你记错了|这哪有|哪有这回事")
 
 
-def _extract_self_facts(history, max_facts=6):
-    """实体记忆：从 NPC 自己的全部发言里抽"人物/品牌 + 所在句"，
-    供 system prompt 注入，保证 NPC 编过的人、说过的事跨回合可追问。
-    抽取范围是全 history（不只是近 6 条窗口），专治"第 7 回合就忘了开头"。
-    返回去重后的短句列表，时间倒序（最近的在前）。"""
+def _corpus_private_keys(gist):
+    keys = set(_nominals(gist))
+    keys.update(_BRAND_PAT.findall(gist))
+    keys.update(re.findall(r"\d+(?:\.\d+)?(?:万|千|百|十|块|元|%)?", gist))
+    if not keys:
+        compact = re.sub(r"[\s，。！？、,.!?;；:：\"'「」『』（）()\-—…]+", "", gist)
+        if compact:
+            keys.add(compact[:8])
+    return set(filter(None, (k.strip() for k in keys)))
+
+
+def _extract_corpus(npc):
+    payload = NPC_CORPUS.get(npc.get("npc_id") or "") if isinstance(NPC_CORPUS, dict) else None
+    if isinstance(payload, dict):
+        payload = payload.get("entries", [])
+    elif not isinstance(payload, list):
+        return []
+    out = []
+    for item in payload:
+        if not isinstance(item, dict):
+            continue
+        gist = (item.get("gist") or "").strip()
+        if not gist:
+            continue
+        out.append({
+            "id": str(item.get("id") or f"{npc.get('npc_id', 'npc')}-C{len(out)+1:02d}"),
+            "gist": gist,
+            "details": item.get("details") if isinstance(item.get("details"), list) else [],
+            "dim": item.get("dim", "IDENTITY"),
+            "stance": item.get("stance", "both"),
+            "beats": item.get("beats") if isinstance(item.get("beats"), list) else [],
+            "deep": bool(item.get("deep", True)),
+            "source": item.get("source", "firsthand"),
+            "entity": item.get("entity", ""),
+            "private_keys": _corpus_private_keys(gist),
+        })
+    return out
+
+
+def _private_entity_whitelist(npc, corpus, dynamic_entities=None):
+    wl = set()
+    if npc.get("name"):
+        wl.add(npc.get("name"))
+    if npc.get("persona"):
+        wl.add(npc.get("persona"))
+    for item in corpus:
+        entity = (item.get("entity") or "").strip()
+        if entity:
+            wl.add(entity)
+        wl.update(item.get("private_keys", set()))
+    if dynamic_entities:
+        wl.update(dynamic_entities)
+    return set(wl)
+
+
+def _followup_scope(player_text, private_whitelist, self_facts, used_nominals):
+    """追问分流：private（认账）/public（公共见闻）/None（未追问）。"""
+    t = (player_text or "").strip()
+    if not t:
+        return None
+    wl = set(private_whitelist or set())
+    if _DENY_PAT.search(t):
+        return None
+    # private: 明确人名/关系/品牌命中 private 白名单
+    if _nominals(t) & wl:
+        return "private"
+    if _BRAND_PAT.search(t) and set(_BRAND_PAT.findall(t)) & wl:
+        return "private"
+    if _nominals(t) & set(used_nominals or []):
+        return "private"
+    # public: 明确指代语
+    if _REFER_PAT.search(t):
+        return "public" if not (self_facts and (_nominals(t) & wl)) else "private"
+    return None
+
+
+def _entity_from_text(player_text, private_whitelist):
+    wl = set(private_whitelist or set())
+    for n in _nominals(player_text or ""):
+        if n in wl:
+            return n
+    return None
+
+
+def _entity_unused_details(corpus, entity):
+    if not entity:
+        return []
+    for item in corpus:
+        if item.get("deep") and entity in item.get("private_keys", set()):
+            details = item.get("details") or []
+            return [x for x in details if isinstance(x, str) and x.strip()]
+    return []
+
+
+def _select_corpus_for_prompt(corpus, used_ids, topic_stance, beat, state_dims, char_budget=NPC_CORPUS_CHAR_BUDGET):
+    if not corpus:
+        return [], []
+    used_set = set(used_ids or [])
+
+    def stance_ok(item):
+        st = item.get("stance", "both")
+        if st == "pro":
+            return topic_stance == "支持"
+        if st == "anti":
+            return topic_stance == "反对"
+        return True
+
+    beat_map = {
+        "OPENING": {"open", "argue"},
+        "TALK": {"argue", "rebut"},
+        "YIELD": {"patch", "rebut"},
+        "REBUTTAL": {"argue", "rebut"},
+        "OBJECTION": {"argue", "rebut"},
+        "HOOK": {"hook"},
+        "DISMISS": {"argue", "hook"},
+        "BRUSH_OFF": {"emote"},
+        "CONCEDE": {"argue"},
+    }
+    beat_targets = beat_map.get(beat, set())
+
+    weak_dims = set([d for d, _ in sorted(state_dims.items(), key=lambda kv: kv[1])[:2]]) if state_dims else set()
+    unused = []
+    used = []
+    for item in corpus:
+        if not stance_ok(item):
+            continue
+        is_used = item.get("id") in used_set
+        score = 0
+        if item.get("dim") in weak_dims:
+            score -= 2
+        if set(item.get("beats", [])) & beat_targets:
+            score -= 2
+        # used 放最后，未用优先
+        score += 100 if is_used else 0
+        if is_used:
+            used.append((score, item))
+        else:
+            unused.append((score, item))
+    unused.sort(key=lambda x: x[0])
+    used.sort(key=lambda x: x[0])
+
+    shown_unused = []
+    shown_used = []
+    budget = char_budget
+
+    def push(bucket, target):
+        nonlocal budget
+        line = _truncate_corpus_gist(target)
+        need = len(line) + 3
+        if len(shown_unused) + len(shown_used) >= NPC_CORPUS_BLOCK_MAX and not bucket:
+            return False
+        if need > budget:
+            return False
+        bucket.append(target)
+        budget -= need
+        return True
+
+    for _, item in unused:
+        if len(shown_unused) >= NPC_CORPUS_BLOCK_MAX:
+            break
+        if not push(shown_unused, item):
+            break
+
+    if not shown_unused:
+        for _, item in used:
+            if len(shown_used) >= 2:
+                break
+            push(shown_used, item)
+    return shown_unused, shown_used
+
+
+def _truncate_corpus_gist(item):
+    text = (item or {}).get("gist", "")
+    text = (text or "").strip()
+    if len(text) <= NPC_CORPUS_LINE_LIMIT:
+        return text
+    return text[: max(6, NPC_CORPUS_LINE_LIMIT - 1)] + "…"
+
+
+def _render_corpus_block(available, blocked):
+    lines = []
+    for item in available:
+        lines.append(f"  ✓ {_truncate_corpus_gist(item)}")
+    for item in blocked:
+        lines.append(f"  ✗ {_truncate_corpus_gist(item)}（本局不再复用）")
+    if not lines:
+        return ""
+    return "\n\n【你可以用的素材（本轮优先未用）】\n" + "\n".join(lines)
+
+
+def _render_public_kb_block(npc):
+    if not NPC_PUBLIC_KB_ENABLED:
+        return ""
+    identity = f"你是{npc.get('persona', '这个人')}"
+    return f"""
+
+【可以引用公共见闻（选做，非必需）】
+你可以偶尔拿新闻上看到的、网上听说的、大家都这么说的公共见闻当佐证，让话更有时事感。
+这类内容只做趋势表达，不做精确举证：你可以说\"我看法就是这样\"、\"前阵子不是有个事嘛\"，不要讲具体日期、精确数字、机构名、人名和可核查细节。
+你始终坚持同域（消费/职场/生活/科技/养生/教育/家庭）讨论。
+拿不准就别说，退回你的真实见闻；你是{identity}，说法要像你自己的口吻。
+
+用公共见闻时，一句带过即可，再立刻回到你自己的立场和道理上。"""
+
+
+def _render_public_kb_followup_block():
+    return """
+
+【本回合模式：玩家追问你刚提的公共见闻】
+这是追问公共观点，不是你做过的固定经历。你只需说你记得的大概方向，不要编细节；也不要说"我没说过"。\n"""
+
+
+def _mark_corpus_used(reply, corpus, used_ids):
+    current = set(used_ids or [])
+    added = []
+    text = (reply or "").strip()
+    if not text:
+        return added
+    for item in corpus:
+        if item.get("id") in current:
+            continue
+        gist = item.get("gist", "")
+        keys = item.get("private_keys", set())
+        if keys and any(k and k in text for k in keys):
+            current.add(item.get("id"))
+            added.append(item.get("id"))
+            continue
+        if gist and gist[:10] and gist[:10] in text:
+            current.add(item.get("id"))
+            added.append(item.get("id"))
+    return added
+
+
+def _fallback_npc_line(npc, beat):
+    lines = {
+        "OPENING": "我先说一句：这件事我先按这个方向聊，你听着就知道我想法。",
+        "TALK": "你这问题我先接住，我给你讲个更直接的点——先说我这边的真实逻辑。",
+        "YIELD": "你这点我不否认，但这不够，我要说我这边的底线在哪。",
+        "REBUTTAL": "你这回合问得不错，我还是按这条路继续反击，不换主线。",
+        "OBJECTION": "你这招我听懂了，先说一句：这和现实里要区分开看。",
+        "HOOK": "你再往下说一层，我这边先把核心补上。",
+        "BRUSH_OFF": "你说你说的，我先不理会那句，立场不变。",
+        "DISMISS": "别兜圈，我把问题先抓紧一次就说完。",
+        "CONCEDE": "你这回先把节奏带一下，我再换个说法。",
+    }
+    return lines.get(beat, "这件事我先说一句核心：按我的经验来判断，不绕弯。")
+
+
+def _extract_self_facts(history, max_facts=6, private_whitelist=None):
+    """实体记忆：优先保留 NPC 的“私人实体”发言，避免公共趋势进 private 记忆。"""
+    whitelist = set(private_whitelist or [])
+    private_mode = bool(whitelist)
     facts = []
     seen = set()
     for h in reversed(history):
@@ -1247,6 +1593,11 @@ def _extract_self_facts(history, max_facts=6):
                 continue
             if not (_KIN_PAT.search(s) or _BRAND_PAT.search(s)):
                 continue
+            if private_mode:
+                names = _nominals(s)
+                brands = set(_BRAND_PAT.findall(s))
+                if not (names & whitelist or brands & whitelist):
+                    continue
             key = re.sub(r"[^\u4e00-\u9fa5]", "", s)
             if not key or key in seen:
                 continue
@@ -1258,27 +1609,23 @@ def _extract_self_facts(history, max_facts=6):
 
 
 def _is_entity_followup(player_text, self_facts, used_nominals):
-    """判断玩家是否在追问 NPC 说过的人/事：
-    玩家这句话里出现亲戚称呼、NPC 用过的具体人名、或 NPC 例子里的平台/品牌词。
-    追问场景下 NPC 接着讲同一个人是合法的，防重复要让位于一致性。"""
-    t = (player_text or "").strip()
-    if not t:
-        return False
-    if _KIN_PAT.search(t):          # 玩家提到任何亲戚称呼（表弟/二舅…）
-        return True
-    if _nominals(t) & used_nominals:  # 玩家复述 NPC 说过的人名（李大爷…）
-        return True
-    if self_facts and _BRAND_PAT.search(t):
-        brand_here = set(_BRAND_PAT.findall(t))
-        for f in self_facts:
-            if brand_here & set(_BRAND_PAT.findall(f)):
-                return True
-    return False
+    # legacy 兼容：仅保留 bool 返回值，实际分流请用 _followup_scope
+    return _followup_scope(player_text, set(), self_facts, used_nominals) == "private"
 
 
 def _npc_system_prompt(npc, topic, confidence, beat, memories=None, last_player_text="",
                        recent_self_lines=None, repeat_strict=False, self_facts=None,
-                       followup=False):
+                       followup_scope=None, followup=False, corpus_block="",
+                       public_kb_block="", followup_details=None):
+    scope = followup_scope
+    if scope is None and followup:
+        scope = "private"
+    if scope is None:
+        scope = "none"
+    followup_details = followup_details or []
+    corpus_block = corpus_block or ""
+    public_kb_block = public_kb_block or ""
+
     mem_block = ""
     if memories:
         mstr = "\n".join("· " + m for m in memories)
@@ -1297,16 +1644,19 @@ def _npc_system_prompt(npc, topic, confidence, beat, memories=None, last_player_
     habits_block = f"\n你偶尔会冒出这样的口头语（整个对话最多带一两次，别句句挂嘴上）：{habits}" if habits else ""
 
     dup_block = ""
-    if followup:
-        # 追问模式：玩家在问 NPC 说过的人/事 → 一致性优先，撤掉"换人换事"压力
-        dup_block = """
+    if scope == "private":
+        # 追问私人素材：一致性优先，但保留“可承接细节补充”
+        detail_lines = "\n".join(f"  · {x}" for x in followup_details[:2]) if followup_details else ""
+        details_block = f"\n\n【追问补充细节】\n{detail_lines}" if detail_lines else ""
+        dup_block = f"""
 
-【本回合模式：玩家在追问你说过的人/事】
-玩家刚才那句话是在问你之前提过的某个人或某件事。这一回合你**必须接着讲同一个**：
-1. 就是那个人、那件事——称呼一个字都别换（说过的"表弟"就是表弟，绝不能变成表妹/二舅/邻居）。
-2. 之前给你的细节（在哪个平台买的、买的什么、出了什么事）全部保持，往这个基础上补充新的细节接着讲。
-3. 绝不许说"我没说过""哪有这个人""你记错了"——你是记性正常的真人，自己编的人自己认。
-4. 这不算重复说话，别因为怕重复就换新人。"""
+【你在追问自己说过的私人见闻】（这是你在本场对话里说过、带人名/细节的内容）
+玩家刚才问的是你刚刚提到的私人见闻。该回合你要紧扣它说话，称呼、细节不能乱换。
+1. 仍需保持同一个人物或事：称呼一个字都别乱（“表弟”不可变成“表姐”“二舅”“邻居”）。
+2. 可以补充新细节，但要把已出现的人名/场景/金额线索接着讲。
+3. 绝不许说"我没说过""你记错了""哪有这个人"——你是会认账的真人，不要赖账。\n{details_block}"""
+    elif scope == "public":
+        dup_block = _render_public_kb_followup_block()
     elif recent_self_lines:
         lines = "\n".join(f"  {i+1}. 「{x}」" for i, x in enumerate(recent_self_lines))
         strict_note = (
@@ -1344,7 +1694,7 @@ def _npc_system_prompt(npc, topic, confidence, beat, memories=None, last_player_
 【你的身份】（性格底色，不是台词清单）
 {npc['background']}{habits_block}
 你是地道的中国人，在中国土生土长、一直生活在中国，母语是中文。你身边的人、你举的例子、你的生活常识都必须是中国背景（中国的地名、单位、节气、物价、社会习惯）。不要把自己说成外国人、华侨或海归，也不要冒出英文词、外国生活场景或外国式的价值观表达——你就是个中国老百姓在跟人抬杠。
-{mem_block}{facts_block}
+{mem_block}{corpus_block}{public_kb_block}{facts_block}
 【自然度铁律】（与立场铁律同级，违反 = 像在演戏，这是评审最在意的点）
 1. 你是一个有血有肉的普通人在跟人抬杠，不是在"扮演这一类人的样板戏"。你说话就像你认识的那种真人，先有"人"，再有职业/身份，别让标签盖过你说话的样子。
 2. 严禁"AI 样板腔"：别把职业行话、身份标签、网络热词当口头禅每句都甩（偶尔带一两次是味道，句句挂嘴上就是出戏）；开口别先给玩家扣"你这是典型的XX"的帽子再训人；别把话说得像金句排比、公众号宣言。你怎么跟熟人拌嘴，就怎么说话。
@@ -1396,9 +1746,22 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
         return _mock_npc_reply(npc, topic, beat)
     memories = None
     if state and state.get("memory_on", True):
-        m = NPC_STATE.get(npc.get("npc_id"), {}).get("memories", [])
+        m = _npc_entry_for_ctx(npc.get("npc_id"), state.get("player_ctx"), create=False).get("memories", [])
         if m:
             memories = [x.get("summary", "") for x in m]
+
+    state_dims = {}
+    corpus_used = []
+    private_entities = []
+    if state:
+        state_dims = _current_dims(state)
+        corpus_used = state.get("corpus_used", [])
+        private_entities = state.get("private_entities", [])
+        if not corpus_used:
+            state["corpus_used"] = corpus_used
+        if not private_entities:
+            state["private_entities"] = private_entities
+
     # 取玩家最近一句真实发言（role=user 的最后一条），用于 prompt 正面回应
     last_player_text = ""
     for h in reversed(history):
@@ -1408,27 +1771,51 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
 
     # 防重复：抽出 NPC 自己最近 3 句，注入 prompt 并做生成后多重校验
     recent_self = _extract_recent_npc_lines(history, n=NPC_DEDUP_WINDOW)
+    corpus = _extract_corpus(npc)
+    private_whitelist = _private_entity_whitelist(npc, corpus, private_entities)
     # NPC 自己的名字/自称不算"重复指称"，需排除
     npc_self_names = {npc.get("name", ""), npc.get("persona", "")}
     npc_self_names = {x for x in npc_self_names if x}
     # 近窗口内已用过的具体指称（人名），复读这些 = 同一例子重放
     used_nominals = set()
     for prev in recent_self:
-        used_nominals |= _nominals(prev, exclude=npc_self_names)
+        used_nominals |= {x for x in _nominals(prev, exclude=npc_self_names) if x in private_whitelist}
     # 实体记忆：全 history 抽"NPC 编过的人/说过的事"，保证跨回合可追问、不漂移
-    self_facts = _extract_self_facts(history)
-    followup = _is_entity_followup(last_player_text, self_facts, used_nominals)
-    if followup:
-        print("[npc] 追问模式：玩家在追问 NPC 说过的人/事，一致性优先于换新", flush=True)
+    self_facts = _extract_self_facts(history, private_whitelist=private_whitelist)
+    followup = _followup_scope(last_player_text, private_whitelist, self_facts, used_nominals)
+    followup_details = []
+    if followup == "private":
+        print("[npc] 追问模式：玩家在追问 NPC 说过的私人见闻，走一致性优先分支", flush=True)
+        entity = _entity_from_text(last_player_text, private_whitelist) or (next(iter(used_nominals), ""))
+        followup_details = _entity_unused_details(corpus, entity)
+        if entity:
+            private_entities = state.get("private_entities", []) if state else []
+            if entity and entity not in private_entities and state:
+                private_entities.append(entity)
+                state["private_entities"] = private_entities
+        if not followup_details:
+            print("[npc] 本回合无可复用细节，允许补充新角度，但不能换人物/主事件", flush=True)
+    elif followup == "public":
+        print("[npc] 追问公共信息：公共见闻可追问，但不绑定为同一人物", flush=True)
+
+    available_corpus, blocked_corpus = _select_corpus_for_prompt(
+        corpus, corpus_used, topic["npc_stance"], beat, state_dims, NPC_CORPUS_CHAR_BUDGET
+    )
+    corpus_block = _render_corpus_block(available_corpus, blocked_corpus)
+    public_kb_block = _render_public_kb_block(npc)
     strict = False
     reply = ""
     banned = []          # 已判定重复的历史输出，重试时显式禁止
     best_reply, best_score = "", None   # best-of：保留重复度最低的一条
+    final_hard_dup = False
     stalls = 0           # 空回复重试计数（不算重复重试）
-    for attempt in range(NPC_DEDUP_RETRY + NPC_STALL_MAX_RETRY + 1):
+    dup_retry = NPC_DEDUP_RETRY + (NPC_FOLLOWUP_RETRY if followup == "private" else 0)
+    for attempt in range(dup_retry + NPC_STALL_MAX_RETRY + 1):
         sys_prompt = _npc_system_prompt(npc, topic, confidence, beat, memories,
                                         last_player_text, recent_self, repeat_strict=strict,
-                                        self_facts=self_facts, followup=followup)
+                                        self_facts=self_facts, followup_scope=followup,
+                                        corpus_block=corpus_block, public_kb_block=public_kb_block,
+                                        followup_details=followup_details)
         if banned:
             banned_block = "\n".join(f"  ✗ 「{b}」" for b in banned)
             sys_prompt += f"""
@@ -1465,11 +1852,16 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
             worst_fp = max(worst_fp, fp)
         reused = used_nominals & _nominals(reply, exclude=npc_self_names)
         reused_sents = _reused_sentences(reply, recent_self)
-        if followup:
-            # 追问模式：玩家在问 NPC 说过的某人某事，复述/展开同一件事是合法的。
-            # 只拦"整段原话照搬"（字面），整句判重与论据判重全部豁免——
-            # 否则一致性会被"换人换事"压力冲掉，重新出现表弟→表妹漂移。
-            hard_dup = worst_lit >= 0.62
+        if followup == "private":
+            # 私人追问：只拦逐段照搬，保留追问一致性；整句复读也会触发兜底
+            hard_dup = (worst_lit >= NPC_FOLLOWUP_HARD_LIT) or bool(reused_sents)
+        elif followup == "public":
+            # 公共追问：走非追问全量重复规则，避免新闻观点被无端固化
+            hard_dup = (worst_lit >= NPC_DEDUP_THRESHOLD
+                        or worst_fp >= NPC_DEDUP_FP_THRESHOLD
+                        or bool(reused_sents))
+            if _DENY_PAT.search(reply):
+                hard_dup = True
         else:
             # 硬重复（字面/论据/整句复读）→ 触发重生成；指称复用作为软信号记入得分
             hard_dup = (worst_lit >= NPC_DEDUP_THRESHOLD
@@ -1478,16 +1870,19 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
         score = worst_lit + worst_fp + (0.3 if reused else 0.0) + 0.5 * len(reused_sents)
         if best_score is None or score < best_score:
             best_score, best_reply = score, reply
-        if hard_dup and banned.__len__() < NPC_DEDUP_RETRY:
-            if followup:
-                why = f"追问模式下整段照搬（字面 {worst_lit:.2f}）"
+        final_hard_dup = hard_dup
+        if hard_dup and banned.__len__() < dup_retry:
+            if followup == "private":
+                why = f"私人追问模式下疑似照搬（字面 {worst_lit:.2f}）"
+            elif followup == "public":
+                why = f"公共追问模式重复（字面 {worst_lit:.2f}/论据 {worst_fp:.2f}/整句{len(reused_sents)}）"
             else:
                 why = (f"字面 {worst_lit:.2f}" if worst_lit >= NPC_DEDUP_THRESHOLD
                        else f"论据 {worst_fp:.2f}" if worst_fp >= NPC_DEDUP_FP_THRESHOLD
                        else f"整句复读「{reused_sents[0][:12]}」")
             print(f"[npc] 检测到重复（{why}），重生成：{reply[:30]}...", flush=True)
             banned.append(reply)
-            strict = not followup   # 追问模式下禁止"换人换事"加压
+            strict = (followup is None)  # 追问保留“换同一件事”机会，非追问才加紧禁重
             continue
         if hard_dup:
             print(f"[npc] 重试后仍重复（字面 {worst_lit:.2f}/论据 {worst_fp:.2f}/整句{len(reused_sents)}），取较低重复度版本", flush=True)
@@ -1496,6 +1891,16 @@ def npc_reply(npc, topic, confidence, beat, history, state=None):
     if not out:
         print("[npc] 重试后仍为空回复，返回思考垫话", flush=True)
         return _stall_reply(npc)
+    if final_hard_dup:
+        out = _fallback_npc_line(npc, beat)
+    if state:
+        if followup == "private" and state.get("private_entities"):
+            state["private_entities"] = list(dict.fromkeys(state["private_entities"]))
+        if isinstance(corpus_used, list):
+            used_ids = _mark_corpus_used(out, corpus, corpus_used)
+            if used_ids:
+                state["corpus_used"] = corpus_used
+                print(f"[npc] 本回合新增素材消耗：{used_ids}", flush=True)
     return out
 
 
@@ -1619,7 +2024,7 @@ def _current_dims(state):
     base = state["npc"]["dimensions"]
     adj = {}
     if state.get("memory_on", True):
-        adj = NPC_STATE.get(state["npc"].get("npc_id"), {}).get("adj", {})
+        adj = _npc_entry_for_ctx(state["npc"].get("npc_id"), state.get("player_ctx"), create=False).get("adj", {})
     return {k: round(base.get(k, 5) + state["drift"].get(k, 0) + adj.get(k, 0.0), 2) for k in DIMENSIONS}
 
 
@@ -1778,11 +2183,20 @@ def progress_update(tier=None, reset=False, player_ctx=None):
             return _guest_permission_payload("progress_reset", "进度重置（NPC记忆与成长）")
         if not _can_use_account_feature(ctx, "progress_reset"):
             return _account_permission_payload("progress_reset", "进度重置（NPC记忆与成长）", ctx)
-        PROGRESS["highest_cleared"] = 0
-    elif tier is not None and not _is_guest_ctx(ctx):
-        PROGRESS["highest_cleared"] = max(int(PROGRESS.get("highest_cleared", 0)), int(tier))
-    _save_progress()
-    payload = {"highest_cleared": PROGRESS["highest_cleared"]}
+        progress = _account_progress(ctx.get("account_id"), create=True)
+        progress["highest_cleared"] = 0
+        _save_account_state()
+        payload_highest = progress["highest_cleared"]
+    elif not _is_guest_ctx(ctx):
+        progress = _account_progress(ctx.get("account_id"), create=True)
+        if tier is not None:
+            progress["highest_cleared"] = max(int(progress.get("highest_cleared", 0)), int(tier))
+            _save_account_state()
+        payload_highest = progress["highest_cleared"]
+    else:
+        _save_progress()
+        payload_highest = int(PROGRESS.get("highest_cleared", 0))
+    payload = {"highest_cleared": payload_highest}
     if not _is_guest_ctx(ctx):
         payload["account"] = _snapshot_account(ctx["account_id"])
     return payload
@@ -1812,11 +2226,14 @@ def npc_reset(npc_id=None, player_ctx=None):
         return _guest_permission_payload("progress_reset", "进度重置（NPC记忆与成长）")
     if not _can_use_account_feature(ctx, "progress_reset"):
         return _account_permission_payload("progress_reset", "进度重置（NPC记忆与成长）", ctx)
+    npc_state = _account_npc_state(ctx.get("account_id"), create=True)
+    if npc_state is None:
+        return _account_permission_payload("progress_reset", "进度重置（NPC记忆与成长）", ctx)
     if npc_id:
-        NPC_STATE.pop(npc_id, None)
+        npc_state.pop(npc_id, None)
     else:
-        NPC_STATE.clear()
-    _save_npc_state()
+        npc_state.clear()
+    _save_account_state()
     payload = {"ok": True, "reset": npc_id or "all", "account": _snapshot_account(ctx["account_id"])}
     return payload
 
@@ -1843,9 +2260,9 @@ def tier_list(player_ctx=None, mode="ladder"):
             "npc_id": n.get("npc_id"),
             "persona": n["persona"],
             "token_quota": n["token_quota"],
-            "fights": NPC_STATE.get(n.get("npc_id"), {}).get("fights", 0),
+            "fights": _npc_entry_for_ctx(n.get("npc_id"), ctx, create=False).get("fights", 0),
             "unlocked": (mode != "free")
-                        and ((not _is_guest_ctx(ctx)) and t <= int(PROGRESS.get("highest_cleared", 0)) + 1
+                        and ((not _is_guest_ctx(ctx)) and t <= int(_account_progress(ctx.get("account_id")).get("highest_cleared", 0)) + 1
                         or (t <= 1)
                         )
                         or (mode == "free" and can_access_free_mode),
@@ -1890,7 +2307,7 @@ def preview_topic(tier=1, npc_id=None, player_ctx=None, mode="ladder"):
     npc = locked[0] if locked else random.choice(_npcs_by_tier(tier))
     topic = dict(random.choice(_topics_by_tier(tier)))
     npc_stance, player_stance = _resolve_stances(npc, topic)
-    entry = NPC_STATE.get(npc.get("npc_id"), {})
+    entry = _npc_entry_for_ctx(npc.get("npc_id"), ctx, create=False)
     return {
         "npc": {"name": npc["name"], "persona": npc["persona"], "tier": npc["tier"],
                 "npc_id": npc.get("npc_id"),
@@ -1986,6 +2403,8 @@ def new_session(tier=1, stance=None, topic_id=None, npc_id=None, memory_on=True,
         "hit_stats": {},
         "_last_hit": None,
         "_last_text": "",
+        "corpus_used": [],
+        "private_entities": [],
     }
     try:
         opening = (_opening_line(npc, topic, npc_stance)
@@ -1997,7 +2416,7 @@ def new_session(tier=1, stance=None, topic_id=None, npc_id=None, memory_on=True,
     state["history"].append({"role": "assistant", "content": opening})
     with _lock:
         sessions[sid] = state
-    entry = NPC_STATE.get(npc.get("npc_id"), {})
+    entry = _npc_entry_for_ctx(npc.get("npc_id"), ctx, create=False)
     return {
         "sid": sid,
         "npc": {"name": npc["name"], "persona": npc["persona"], "tier": npc["tier"],
@@ -2083,6 +2502,10 @@ def _process_message(state, text):
             pending = True
             reply = reply["text"]
             state["_pending_beat"] = final_beat
+            state["_pending_stall"] = True
+        else:
+            state["_pending_beat"] = None
+            state["_pending_stall"] = False
     elif state["result"] == "WIN":
         try:
             reply = _concede_line(state)
@@ -2165,8 +2588,11 @@ def retry_pending_reply(sid):
         if isinstance(reply, dict) and reply.get("__stall__"):
             # 还是空的：再给一句垫话，让前端可以继续续拉（最多由前端限次）
             return {"npc_reply": reply["text"], "pending": True, "beat": beat}
+        if state.get("_pending_stall"):
+            reply = f"{NPC_STALL_FOLLOWUP}{reply}"
         state["history"].append({"role": "assistant", "content": reply})
         state["_pending_beat"] = None
+        state["_pending_stall"] = False
         return {"npc_reply": reply, "pending": False, "beat": beat}
 
 
@@ -2231,7 +2657,7 @@ def _finalize_match(state):
         # 先生成记忆，避免等待 LLM 时锁住其他会话，或失败后留下半次成长。
         summary = _gen_memory(state)
         with _lock:
-            entry = _npc_entry(npc_id)
+            entry = _npc_entry_for_ctx(npc_id, state.get("player_ctx"))
             entry["fights"] = entry.get("fights", 0) + 1
             hits = state.get("hit_stats", {})
             if hits:
@@ -2249,7 +2675,10 @@ def _finalize_match(state):
                 if len(mem) > 3:
                     del mem[:-3]
             state["_finalized"] = True
-        _save_npc_state()
+        if _is_guest_ctx(state.get("player_ctx")):
+            _save_npc_state()
+        else:
+            _save_account_state()
 
 
 def _gen_memory(state):
