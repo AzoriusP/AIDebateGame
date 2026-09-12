@@ -623,3 +623,156 @@ html.ui-booting::after {
   #lobby-history,
   #lobby-settings { transition: none; }
 }
+
+/* ================================================================
+   玩家反馈 / 报 BUG（feedback.js）
+   ------------------------------------------------------------- */
+/* 主界面常驻入口：被 feedback.js 从隐藏的 #mode-bottom 挪到可见的 #lobby-icon-stack */
+#mode-feedback {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  height: 52px;
+  padding: 0 20px;
+  border: 2px solid #2b80a1;
+  border-radius: 26px;
+  background: radial-gradient(circle at 30% 24%, #ffffff, #b6e6f6 58%, #46a7ce);
+  color: #0b3d50;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  white-space: nowrap;
+  cursor: pointer;
+  box-shadow: 0 4px 8px rgba(30, 91, 116, 0.28), inset 0 0 0 3px rgba(255, 255, 255, 0.62);
+  transition: filter 140ms ease, transform 140ms ease;
+}
+#mode-feedback:hover,
+#mode-feedback:focus-visible {
+  filter: brightness(1.06);
+  transform: translateY(-1px);
+  outline: 2px solid rgba(255, 255, 255, 0.92);
+  outline-offset: 2px;
+}
+#mode-feedback.feedback-entry-floating,
+#mode-feedback-fallback {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 60;
+}
+
+/* 弹窗：与 #lobby-dialog 同一套视觉语言 */
+#feedback-dialog {
+  position: relative;
+  max-width: 560px;
+  width: calc(100% - 32px);
+  max-height: 86dvh;
+  overflow: auto;
+  padding: 30px;
+  color: var(--lobby-ink);
+  border: 2px solid #4c707e;
+  border-radius: 8px;
+  background:
+    repeating-linear-gradient(135deg, transparent 0 10px, rgba(71, 158, 188, 0.035) 10px 11px),
+    rgba(250, 251, 247, 0.99);
+  box-shadow: 0 18px 50px rgba(17, 48, 61, 0.36), inset 0 0 0 3px rgba(255, 255, 255, 0.9);
+}
+#feedback-dialog::backdrop {
+  background: rgba(19, 49, 61, 0.55);
+  backdrop-filter: blur(4px);
+}
+#feedback-dialog h2 {
+  margin: 0 42px 18px 0;
+  color: #29434e;
+  font-family: var(--serif);
+  font-size: 27px;
+  letter-spacing: 0.12em;
+}
+#feedback-dialog h2::after {
+  content: "FEEDBACK CHANNEL";
+  display: block;
+  margin-top: 5px;
+  color: var(--lobby-blue-deep);
+  font: 700 8px/1 var(--sans);
+  letter-spacing: 0.5em;
+}
+#feedback-dialog-close {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  width: 36px;
+  height: 36px;
+  border: 1px solid #6d8a95;
+  border-radius: 50%;
+  background: linear-gradient(#fff, #d9edf3);
+  color: #426775;
+  font-size: 24px;
+  cursor: pointer;
+}
+#feedback-dialog-content { color: #41545c; line-height: 1.7; }
+
+.fb-field { display: flex; flex-direction: column; gap: 6px; margin-bottom: 14px; }
+.fb-field > label {
+  color: #2f4a56;
+  font-weight: 700;
+  font-size: 14px;
+  letter-spacing: 0.04em;
+}
+.fb-req { color: #cf4d4d; }
+.fb-field input[type="text"],
+.fb-field select,
+.fb-field textarea {
+  width: 100%;
+  box-sizing: border-box;
+  padding: 10px 12px;
+  border: 1px solid #8ba4ae;
+  border-radius: 6px;
+  background: #ffffff;
+  color: #24333d;
+  font-family: inherit;
+  font-size: 15px;
+  line-height: 1.5;
+}
+.fb-field textarea { resize: vertical; min-height: 96px; }
+.fb-field input[type="text"]:focus,
+.fb-field select:focus,
+.fb-field textarea:focus {
+  border-color: var(--lobby-blue-deep);
+  outline: 2px solid rgba(8, 127, 172, 0.35);
+  outline-offset: 1px;
+}
+.fb-counter { align-self: flex-end; color: #7d919b; font-size: 12px; }
+
+.fb-status { min-height: 20px; margin: 4px 0 10px; font-size: 14px; font-weight: 700; }
+.fb-status.fb-ok { color: #1c7a4a; }
+.fb-status.fb-error { color: #c0392b; }
+.fb-status.fb-pending { color: #7d919b; }
+
+.fb-actions { display: flex; justify-content: flex-end; gap: 12px; }
+.fb-actions button {
+  min-width: 108px;
+  padding: 10px 20px;
+  border-radius: 6px;
+  font-family: var(--serif);
+  font-size: 16px;
+  font-weight: 800;
+  letter-spacing: 0.06em;
+  cursor: pointer;
+}
+#fb-cancel { border: 1px solid #8ba4ae; background: #eef5f8; color: #4a6470; }
+#fb-submit {
+  border: 1px solid #1c6f92;
+  background: linear-gradient(#57c3ea, #1f8cb6);
+  color: #fff;
+  text-shadow: 0 1px 2px rgba(12, 60, 80, 0.5);
+}
+#fb-submit:hover { filter: brightness(1.06); }
+#fb-submit:disabled { opacity: 0.6; cursor: default; filter: none; }
+
+@media (max-width: 620px) {
+  #mode-feedback { height: 46px; padding: 0 14px; font-size: 14px; }
+  #feedback-dialog { padding: 22px; }
+  #feedback-dialog h2 { font-size: 22px; }
+}
+

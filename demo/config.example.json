@@ -54,5 +54,24 @@
       "L4_A": "zh-CN-YunjianNeural",
       "L5_A": "zh-CN-YunyangNeural"
     }
+  },
+  "feedback": {
+    "rate_per_min": 3,
+    "rate_per_day": 50,
+    "max_message_len": 2000,
+    "max_contact_len": 120,
+    "max_id_len": 64,
+    "mail": {
+      "enabled": false,
+      "smtp_host": "smtp.qq.com",
+      "smtp_port": 465,
+      "smtp_user": "YOUR_SENDER_QQ_MAIL@qq.com",
+      "smtp_pass": "YOUR_SMTP_AUTH_CODE",
+      "mail_from": "",
+      "mail_to": "wdy0wb@agent.qq.com",
+      "use_ssl": true,
+      "timeout_s": 10,
+      "min_interval_s": 5
+    }
   }
 }

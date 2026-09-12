@@ -3,6 +3,8 @@ demo/config.json
 demo/data/accounts.json
 demo/data/npc_state.json
 demo/data/progress.json
+# 玩家反馈含玩家 IP / UA 等可识别信息，禁止入库
+demo/data/feedback.jsonl
 demo/tools/token_probe_out.json
 .env
 .env.*

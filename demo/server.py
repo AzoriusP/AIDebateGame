@@ -64,6 +64,16 @@ LLM_OPENING = bool(CONFIG.get("llm_opening", False))
 # Ollama 模型常驻时长：避免每局反复把模型 load 进显存（冷加载是开局卡顿的主因）。
 KEEP_ALIVE = CONFIG.get("keep_alive", "30m")
 
+# 玩家反馈 / 报 BUG（POST /api/feedback）：限流 + 字段长度上限配置，
+# 全部有代码内默认值，config.json 缺失也能跑；落盘到 demo/data/feedback.jsonl（append-only）。
+_FB_CFG = CONFIG.get("feedback", {}) or {}
+FB_TYPES = ("bug", "suggestion", "experience", "other")
+FB_MAX_MESSAGE = int(_FB_CFG.get("max_message_len", 2000))
+FB_MAX_CONTACT = int(_FB_CFG.get("max_contact_len", 120))
+FB_MAX_ID = int(_FB_CFG.get("max_id_len", 64))
+FB_RATE_PER_MIN = int(_FB_CFG.get("rate_per_min", 3))    # 单 IP 每分钟上限
+FB_RATE_PER_DAY = int(_FB_CFG.get("rate_per_day", 50))   # 单 IP 每天上限
+
 NPCS = _load_json(DATA / "npcs.json", [])
 TOPICS = _load_json(DATA / "topics.json", [])
 NPC_CORPUS = _load_json(DATA / "npc_corpus.json", {})
@@ -194,6 +204,294 @@ def tts_synthesize(npc_id, text):
 
 def tts_status():
     return {"enabled": TTS_ENABLED, "ready": tts_ready(), "mode": TTS_MODE, "reason": _tts_reason()}
+
+
+# ---------------------------------------------------------------- 反馈邮件通知（可插拔，默认关闭）
+# 设计：玩家反馈落盘成功（feedback.jsonl 才是 source of truth）后，把该条记录投入**进程内队列**，
+# 由**单个后台 daemon 线程**顺序发一封格式统一的通知邮件 —— 落盘成功即返回 200，发信纯属尽力而为。
+# kill switch：config.feedback.mail.enabled=false（或 host/recipient 未配 / 依赖缺失）→ /api/status
+# 上报 feedback_mail.ready:false，入队处静默跳过并只 warn 一次；对落盘与 HTTP 响应零影响。
+# 与 TTS 模块保持同一套 readiness / 降级原因 / 状态上报范式。全程 Python 标准库，零第三方依赖。
+try:
+    import smtplib
+    from email.mime.text import MIMEText
+    from email.header import Header
+    _HAS_SMTP = True
+except Exception:                              # 标准库理论上恒在；仍做防御性降级，对齐 TTS 范式
+    smtplib = None
+    _HAS_SMTP = False
+
+_FB_MAIL_CFG = (_FB_CFG.get("mail", {}) or {}) if isinstance(_FB_CFG, dict) else {}
+
+# 环境变量名映射（FEEDBACK-003）：config.json 里对应字段留空时用环境变量兜底。
+# 目的：云端部署时 tar 包内 config.json 可保持空白、不含任何凭据，凭据只在服务器上单独注入。
+# 优先级严格为：config.json 非空值 ＞ 环境变量 ＞ 代码内默认值；所有字符串取值均 strip()，去除空白/换行脏值。
+_FB_MAIL_ENV = {
+    "smtp_host": "AIDEBATE_FB_MAIL_HOST",
+    "smtp_user": "AIDEBATE_FB_MAIL_USER",
+    "smtp_pass": "AIDEBATE_FB_MAIL_PASS",
+    "mail_from": "AIDEBATE_FB_MAIL_FROM",
+    "mail_to":   "AIDEBATE_FB_MAIL_TO",
+}
+_FB_MAIL_ENV_PORT = "AIDEBATE_FB_MAIL_PORT"
+
+
+def _fb_mail_str_src(key, default=""):
+    """按优先级取字符串配置值并回报来源：返回 (值, 来源)，来源 ∈ {"config","env","default"}。
+    语义 = config.json 非空值 ＞ 环境变量非空值 ＞ 默认值；空字符串自然回落。"""
+    v = str(_FB_MAIL_CFG.get(key, "") or "").strip()
+    if v:
+        return v, "config"
+    env_name = _FB_MAIL_ENV.get(key)
+    if env_name:
+        v = str(os.environ.get(env_name, "") or "").strip()
+        if v:
+            return v, "env"
+    return default, "default"
+
+
+def _fb_mail_str(key, default=""):
+    return _fb_mail_str_src(key, default)[0]
+
+
+def _fb_mail_parse_int(v):
+    """健壮解析整数：非数字/为空一律返回 None，绝不抛异常（避免进程启动即崩溃）。"""
+    try:
+        s = str(v).strip()
+        return int(s) if s else None
+    except Exception:
+        return None
+
+
+def _fb_mail_int(key, env_name, default):
+    """int 型配置取值：config 非空可解析 ＞ 环境变量可解析 ＞ 默认值；任一级非法值自动降级，绝不抛异常。"""
+    p = _fb_mail_parse_int(_FB_MAIL_CFG.get(key, ""))
+    if p is not None:
+        return p
+    if env_name:
+        p = _fb_mail_parse_int(os.environ.get(env_name, ""))
+        if p is not None:
+            return p
+    return default
+
+
+FB_MAIL_ENABLED = bool(_FB_MAIL_CFG.get("enabled", False))     # 总开关，默认关闭
+FB_MAIL_HOST = _fb_mail_str("smtp_host", "smtp.qq.com")
+FB_MAIL_PORT = _fb_mail_int("smtp_port", _FB_MAIL_ENV_PORT, 465)
+FB_MAIL_USER, _FB_MAIL_USER_SRC = _fb_mail_str_src("smtp_user", "")
+FB_MAIL_PASS, _FB_MAIL_PASS_SRC = _fb_mail_str_src("smtp_pass", "")    # 授权码，不是登录密码
+FB_MAIL_FROM = _fb_mail_str("mail_from", "") or FB_MAIL_USER           # 留空 → 环境变量 → 兜底为账号本身
+FB_MAIL_TO = _fb_mail_str("mail_to", "wdy0wb@agent.qq.com")
+FB_MAIL_USE_SSL = bool(_FB_MAIL_CFG.get("use_ssl", True))      # 465→SSL；587→STARTTLS
+FB_MAIL_TIMEOUT = int(_FB_MAIL_CFG.get("timeout_s", 10))
+FB_MAIL_MIN_INTERVAL = float(_FB_MAIL_CFG.get("min_interval_s", 5))   # 队列内两封邮件最小间隔，防刷爆收件箱
+
+FB_MAIL_TYPE_ENUM = {"bug": "BUG", "suggestion": "SUGGESTION", "experience": "EXPERIENCE", "other": "OTHER"}
+FB_MAIL_TYPE_LABEL = {"bug": "BUG", "suggestion": "建议", "experience": "体验问题", "other": "其他"}
+
+_FB_MAIL_Q = queue.Queue()                     # 进程内队列：服务器重启丢队列可接受（jsonl 为准）
+_FB_MAIL_LOCK = threading.Lock()
+_FB_MAIL_STATS = {"sent": 0, "failed": 0}
+_FB_MAIL_LAST_SEND = [0.0]                     # 上次发送时间，用于强制最小间隔
+_FB_MAIL_WORKER = [None]                       # 唯一后台 worker 线程引用
+_FB_MAIL_WARNED = [False]                      # 未就绪时只 warn 一次，避免刷屏
+
+
+def _fb_mail_reason():
+    if not FB_MAIL_ENABLED:
+        return "disabled-by-config"
+    if not _HAS_SMTP:
+        return "smtplib-unavailable"
+    if not FB_MAIL_HOST or not FB_MAIL_PORT:
+        return "smtp-not-configured"
+    if not FB_MAIL_TO:
+        return "recipient-not-configured"
+    return "ok"
+
+
+def fb_mail_ready():
+    return FB_MAIL_ENABLED and _fb_mail_reason() == "ok"
+
+
+def _fb_mail_subject(rec):
+    """主题：`[抬杠模拟器][BUG] L2_A · ladder · 2026-09-12 15:41`；无 NPC/模式时省略对应段。"""
+    ftype = FB_MAIL_TYPE_ENUM.get(str(rec.get("type", "")).lower(), "OTHER")
+    head = "[抬杠模拟器][%s]" % ftype
+    seg = []
+    npc = str(rec.get("npc_id", "") or "").strip()
+    mode = str(rec.get("mode", "") or "").strip()
+    ts = str(rec.get("ts_iso", "") or "").strip().replace("T", " ")[:16]
+    if npc:
+        seg.append(npc)
+    if mode:
+        seg.append(mode)
+    if ts:
+        seg.append(ts)
+    return head + ((" " + " · ".join(seg)) if seg else "")
+
+
+def _fb_mail_identity(rec):
+    if str(rec.get("player_mode", "guest")) == "account":
+        who = str(rec.get("player_name", "") or "").strip() or str(rec.get("account_id", "") or "").strip()
+        return "账号:" + who if who else "账号"
+    return "游客"
+
+
+def _fb_mail_body(rec):
+    """正文纯文本固定模板，机器可解析、人可读。"""
+    ftype_label = FB_MAIL_TYPE_LABEL.get(str(rec.get("type", "")).lower(), "其他")
+    npc = str(rec.get("npc_id", "") or "").strip() or "未指定"
+    mode = str(rec.get("mode", "") or "").strip() or "未指定"
+    contact = str(rec.get("contact", "") or "").strip() or "未留"
+    return (
+        "—— 反馈详情 ——\n"
+        "编号：%s\n"
+        "时间：%s\n"
+        "类型：%s\n"
+        "涉及 NPC：%s\n"
+        "模式 / 关卡：%s\n"
+        "联系方式：%s\n"
+        "\n"
+        "内容：\n"
+        "%s\n"
+        "\n"
+        "—— 元信息 ——\n"
+        "来源 IP：%s\n"
+        "身份：%s\n"
+        "User-Agent：%s"
+    ) % (
+        str(rec.get("id", "") or ""),
+        str(rec.get("ts_iso", "") or ""),
+        ftype_label,
+        npc,
+        mode,
+        contact,
+        str(rec.get("message", "") or ""),
+        str(rec.get("client_ip", "") or ""),
+        _fb_mail_identity(rec),
+        str(rec.get("user_agent", "") or ""),
+    )
+
+
+def _fb_mail_send(rec):
+    """同步发一封通知邮件；失败抛异常由 worker 记录。中文主题走 RFC2047 编码。"""
+    if not _HAS_SMTP:
+        raise RuntimeError("smtplib unavailable")
+    subject = _fb_mail_subject(rec)
+    body = _fb_mail_body(rec)
+    sender = FB_MAIL_FROM or FB_MAIL_TO
+    msg = MIMEText(body, "plain", "utf-8")
+    msg["Subject"] = Header(subject, "utf-8")     # 中文主题必须 RFC2047 编码，否则部分客户端乱码
+    msg["From"] = sender
+    msg["To"] = FB_MAIL_TO
+    if FB_MAIL_USE_SSL:
+        smtp = smtplib.SMTP_SSL(FB_MAIL_HOST, FB_MAIL_PORT, timeout=FB_MAIL_TIMEOUT)
+    else:
+        smtp = smtplib.SMTP(FB_MAIL_HOST, FB_MAIL_PORT, timeout=FB_MAIL_TIMEOUT)
+    try:
+        if not FB_MAIL_USE_SSL:
+            smtp.ehlo()
+            try:                                   # 587 期望 STARTTLS；服务器不支持则退明文继续
+                smtp.starttls()
+                smtp.ehlo()
+            except smtplib.SMTPException:
+                pass
+        if FB_MAIL_USER and FB_MAIL_PASS:
+            smtp.login(FB_MAIL_USER, FB_MAIL_PASS)
+        smtp.sendmail(sender, [FB_MAIL_TO], msg.as_string())
+    finally:
+        try:
+            smtp.quit()
+        except Exception:
+            try:
+                smtp.close()
+            except Exception:
+                pass
+
+
+def _fb_mail_worker():
+    """唯一后台线程：从队列顺序取记录发送，遵守最小间隔。daemon 随进程退出。"""
+    while True:
+        rec = _FB_MAIL_Q.get()
+        try:
+            wait = FB_MAIL_MIN_INTERVAL - (time.time() - _FB_MAIL_LAST_SEND[0])
+            if wait > 0:
+                time.sleep(wait)
+            _FB_MAIL_LAST_SEND[0] = time.time()
+            _fb_mail_send(rec)
+            with _FB_MAIL_LOCK:
+                _FB_MAIL_STATS["sent"] += 1
+        except Exception as e:                     # 发信失败只记录，绝不影响落盘与 HTTP 响应
+            with _FB_MAIL_LOCK:
+                _FB_MAIL_STATS["failed"] += 1
+            print("[fb_mail] 发送失败：%s" % e)
+        finally:
+            try:
+                _FB_MAIL_Q.task_done()
+            except Exception:
+                pass
+
+
+def _ensure_fb_mail_worker():
+    t = _FB_MAIL_WORKER[0]
+    if t is not None and t.is_alive():
+        return
+    with _FB_MAIL_LOCK:
+        t = _FB_MAIL_WORKER[0]
+        if t is not None and t.is_alive():
+            return
+        t = threading.Thread(target=_fb_mail_worker, name="fb-mail-worker", daemon=True)
+        _FB_MAIL_WORKER[0] = t
+        t.start()
+
+
+def _fb_mail_enqueue(rec):
+    """落盘成功后调用：把记录投入后台发送队列（非阻塞）。永不抛异常，绝不影响 HTTP 响应。"""
+    try:
+        if not fb_mail_ready():
+            if not _FB_MAIL_WARNED[0]:
+                _FB_MAIL_WARNED[0] = True
+                print("[fb_mail] 跳过邮件通知（reason=%s）；反馈已正常落盘，不影响接口" % _fb_mail_reason())
+            return
+        _ensure_fb_mail_worker()
+        _FB_MAIL_Q.put(rec)
+    except Exception as e:
+        print("[fb_mail] 入队失败：%s" % e)
+
+
+def _fb_mail_secret_source():
+    """回报发信凭据（smtp_user/smtp_pass）的来源标签，用于确认环境变量是否生效。
+    **只输出标签，绝不输出账号 / 授权码或任何片段**。取值 ∈ {config, env, mixed, none}：
+      config —— user+pass 均来自 config.json
+      env    —— user+pass 均来自环境变量（config 里为空、env 提供）
+      mixed  —— 一个来自 config、另一个来自 env
+      none   —— 两者都没拿到非空值
+    """
+    srcs = []
+    if FB_MAIL_USER:
+        srcs.append(_FB_MAIL_USER_SRC)
+    if FB_MAIL_PASS:
+        srcs.append(_FB_MAIL_PASS_SRC)
+    if not srcs:
+        return "none"
+    if all(s == "config" for s in srcs):
+        return "config"
+    if all(s == "env" for s in srcs):
+        return "env"
+    return "mixed"
+
+
+def fb_mail_status():
+    with _FB_MAIL_LOCK:
+        sent = _FB_MAIL_STATS["sent"]
+        failed = _FB_MAIL_STATS["failed"]
+    try:
+        queued = _FB_MAIL_Q.qsize()
+    except Exception:
+        queued = 0
+    return {"enabled": FB_MAIL_ENABLED, "ready": fb_mail_ready(), "reason": _fb_mail_reason(),
+            "sent": sent, "failed": failed, "queued": queued,
+            "secret_source": _fb_mail_secret_source()}
 
 
 # ---------------------------------------------------------------- 常量
@@ -2541,6 +2839,11 @@ NPC_STATE = _load_json(NPC_STATE_PATH, {})
 PROGRESS_PATH = DATA / "progress.json"
 PROGRESS = _load_json(PROGRESS_PATH, {"highest_cleared": 0})
 
+# 玩家反馈落盘：append-only JSONL（一行一条 JSON），绝不覆盖/清空已有数据。
+FEEDBACK_PATH = DATA / "feedback.jsonl"
+_FEEDBACK_HITS = {}          # ip -> [epoch, ...]（进程内滑动窗口，仅用于限流）
+_FEEDBACK_HITS_SWEEP = [0.0]  # 上次清理陈旧 IP 记录的时间，防字典无限膨胀
+
 def _player_ctx(body):
     if not isinstance(body, dict):
         body = {}
@@ -3362,6 +3665,99 @@ def _mock_hint(state):
     return f"{name}的软肋是「{weak}」。试着用数据、案例或反问，围绕这些薄弱点追问 TA。"
 
 
+def _client_ip(handler):
+    """取 TCP 来源地址。部署形态是 直连 公网IP:8787（无反向代理），
+    故不信任 X-Forwarded-For，避免伪造该头绕过限流。"""
+    try:
+        return handler.client_address[0]
+    except Exception:
+        return "unknown"
+
+
+def _feedback_rate_ok(ip):
+    """按来源 IP 的滑动窗口限流：单 IP 每分钟 ≤FB_RATE_PER_MIN、每天 ≤FB_RATE_PER_DAY。
+    返回 (ok, retry_after_seconds)。进程内内存计数，重启即清零（demo 规模足够）。"""
+    now = time.time()
+    day_ago = now - 86400
+    with _lock:
+        hits = [t for t in _FEEDBACK_HITS.get(ip, []) if t >= day_ago]
+        recent = [t for t in hits if t >= now - 60]
+        if len(recent) >= FB_RATE_PER_MIN:
+            _FEEDBACK_HITS[ip] = hits
+            return False, max(1, int(60 - (now - min(recent))) + 1)
+        if len(hits) >= FB_RATE_PER_DAY:
+            _FEEDBACK_HITS[ip] = hits
+            return False, max(1, int(86400 - (now - min(hits))) + 1)
+        hits.append(now)
+        _FEEDBACK_HITS[ip] = hits
+        # 偶发清理陈旧 IP 记录（每小时一次），避免字典无限膨胀
+        if now - _FEEDBACK_HITS_SWEEP[0] > 3600:
+            _FEEDBACK_HITS_SWEEP[0] = now
+            for k in list(_FEEDBACK_HITS):
+                if k == ip:
+                    continue
+                v = _FEEDBACK_HITS[k]
+                if not v or v[-1] < day_ago:
+                    _FEEDBACK_HITS.pop(k, None)
+    return True, 0
+
+
+def submit_feedback(body, ip, headers=None):
+    """校验 + 限流 + append 落盘到 feedback.jsonl。返回 (http_status, payload)。"""
+    if not isinstance(body, dict):
+        body = {}
+    # type：白名单归一化；未知值回落到 other（不硬拒，避免玩家因前端异常提交失败）
+    ftype = str(body.get("type", "bug") or "bug").strip().lower()
+    if ftype not in FB_TYPES:
+        ftype = "other"
+    message = str(body.get("message", "") or "").strip()
+    if not message:
+        return 400, {"ok": False, "error": "请填写反馈内容", "message": "请填写反馈内容"}
+    if len(message) > FB_MAX_MESSAGE:
+        return 400, {"ok": False,
+                     "error": "反馈内容超长（上限 %d 字）" % FB_MAX_MESSAGE,
+                     "message": "反馈内容超长（上限 %d 字）" % FB_MAX_MESSAGE}
+    npc_id = str(body.get("npc_id", "") or "").strip()[:FB_MAX_ID]
+    mode = str(body.get("mode", "") or "").strip()[:FB_MAX_ID]
+    contact = str(body.get("contact", "") or "").strip()[:FB_MAX_CONTACT]
+    ok, retry = _feedback_rate_ok(ip)
+    if not ok:
+        return 429, {"ok": False,
+                     "error": "提交太频繁，请 %d 秒后再试" % retry,
+                     "message": "提交太频繁，请稍后再试",
+                     "retry_after": retry}
+    # 只在账号模式下记录身份字段（游客不留任何可识别信息）
+    is_account = str(body.get("player_mode", "guest")) == "account" and bool(str(body.get("account_id", "") or "").strip())
+    now = time.time()
+    rec = {
+        "id": uuid.uuid4().hex,
+        "ts": round(now, 3),
+        "ts_iso": time.strftime("%Y-%m-%dT%H:%M:%S", time.localtime(now)),
+        "type": ftype,
+        "npc_id": npc_id,
+        "mode": mode,
+        "message": message,
+        "contact": contact,
+        "client_ip": ip,
+        "player_mode": "account" if is_account else "guest",
+        "account_id": str(body.get("account_id", "") or "").strip()[:64] if is_account else "",
+        "player_name": str(body.get("player_name", "") or "").strip()[:64] if is_account else "",
+        "user_agent": (str(headers.get("User-Agent", ""))[:200] if headers else ""),
+        "source": "web",
+    }
+    try:
+        line = json.dumps(rec, ensure_ascii=False)
+        with _lock:
+            with open(FEEDBACK_PATH, "a", encoding="utf-8") as f:
+                f.write(line + "\n")
+    except Exception as e:
+        return 500, {"ok": False, "error": "保存反馈失败，请稍后再试",
+                     "message": "保存反馈失败，请稍后再试", "detail": str(e)[:120]}
+    # 落盘成功即视为成功：邮件通知是尽力而为的异步增强，失败不影响本响应（见 _fb_mail_enqueue）。
+    _fb_mail_enqueue(rec)
+    return 200, {"ok": True, "id": rec["id"], "message": "已收到，感谢反馈！"}
+
+
 # ---------------------------------------------------------------- HTTP
 class Handler(BaseHTTPRequestHandler):
     def _send(self, code, body, ctype="application/json; charset=utf-8"):
@@ -3401,7 +3797,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._serve_file(BASE / rel, None)
         elif path == "/api/status":
-            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
+            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
         elif path == "/api/tts":
             self._serve_tts()
         else:
@@ -3497,8 +3893,12 @@ class Handler(BaseHTTPRequestHandler):
             self._send(200, _account_token_callback(body))
         elif path == "/api/hint":
             self._send(200, hint_session(body.get("sid")))
+        elif path == "/api/feedback":
+            # 玩家反馈 / 报 BUG：校验 + 限流 + append 到 data/feedback.jsonl
+            _code, _payload = submit_feedback(body, _client_ip(self), self.headers)
+            self._send(_code, _payload)
         elif path == "/api/status":
-            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
+            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
         else:
             self._send(404, {"error": "not found"})
 
