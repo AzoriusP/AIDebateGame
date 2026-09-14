@@ -14,7 +14,7 @@
   "npc_timeout_s": 180,
   "llm_attempt_timeout_s": 45,
   "llm_total_timeout_s": 120,
-  "npc_max_tokens": 1200,
+  "npc_max_tokens": 2400,
   "judge_max_tokens": 1200,
   "llm_endpoints": [
     {
