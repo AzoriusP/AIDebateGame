@@ -91,12 +91,66 @@ if not _configured_llm_endpoints:
         "api_key": OPENAI_API_KEY,
         "model": OPENAI_MODEL if LLM_MODE == "openai" else NPC_MODEL,
     }]
-LLM_ENDPOINTS = [dict(item) for item in _configured_llm_endpoints if isinstance(item, dict)]
+
+
+def _resolve_endpoint_key(ep):
+    """解析单个端点的密钥，返回 (key, source)。四级优先级：
+      1. endpoint["api_key"] 非空         → source "config"
+      2. endpoint["api_key_env"] 指定变量 → source "env:<VAR>"
+      3. 按端点名推导 AIDEBATE_LLM_KEY_<NAME> → source "env:<VAR>"
+      4. 全局 OPENAI_API_KEY              → source "global"
+    设计目的：云端 config.json 可以完全不写密钥，密钥只在服务器上以环境变量注入，
+    配置被备份/打包/误传时都不含任何凭据。source 只回标签、绝不回显密钥本身，
+    供 /api/status 自检"密钥到底从哪来"。"""
+    k = str(ep.get("api_key") or "").strip()
+    if k:
+        return k, "config"
+    env_name = str(ep.get("api_key_env") or "").strip()
+    if env_name:
+        v = str(os.environ.get(env_name, "") or "").strip()
+        if v:
+            return v, "env:" + env_name
+    name = str(ep.get("name") or "").strip()
+    if name:
+        auto = "AIDEBATE_LLM_KEY_" + re.sub(r"[^A-Za-z0-9]+", "_", name).upper()
+        v = str(os.environ.get(auto, "") or "").strip()
+        if v:
+            return v, "env:" + auto
+    g = str(os.environ.get("OPENAI_API_KEY", "") or "").strip()
+    if g:
+        return g, "global"
+    return "", "none"
+
+
+def _prepare_endpoints(items):
+    """复制端点列表并把解析出的密钥放进私有字段 _key（**不回写 api_key**，
+    避免密钥被任何序列化/日志路径带出去），同时记录来源标签。"""
+    out = []
+    for item in items:
+        ep = dict(item)
+        key, src = _resolve_endpoint_key(ep)
+        ep["_key"] = key
+        ep["_key_source"] = src
+        out.append(ep)
+    return out
+
+
+def llm_key_sources():
+    """自检用：回报每个端点的密钥来源标签（绝不含密钥本身）。"""
+    def brief(items):
+        return [{"name": e.get("name"), "model": e.get("model"),
+                 "key_source": e.get("_key_source"), "has_key": bool(e.get("_key"))}
+                for e in items]
+    return {"endpoints": brief(LLM_ENDPOINTS), "judge_endpoints": brief(JUDGE_ENDPOINTS)}
+
+
+LLM_ENDPOINTS = _prepare_endpoints(_configured_llm_endpoints)
 
 # 判定用的候选模型链（可选）。judge 只是打 6 维分数，不需要最强模型，但对延迟极敏感 ——
 # 思考模型跑判定要 30s+，快模型 7s 出结果。不配 judge_endpoints 则沿用 llm_endpoints。
 _cfg_judge_endpoints = CONFIG.get("judge_endpoints") or []
-JUDGE_ENDPOINTS = [dict(item) for item in _cfg_judge_endpoints if isinstance(item, dict)] or LLM_ENDPOINTS
+_judge_items = [item for item in _cfg_judge_endpoints if isinstance(item, dict)]
+JUDGE_ENDPOINTS = _prepare_endpoints(_judge_items) if _judge_items else LLM_ENDPOINTS
 
 
 class LLMUnavailableError(RuntimeError):
@@ -1386,7 +1440,9 @@ def _openai_chat(messages, model, json_mode=False, timeout=180, max_tokens=None,
     if extra_body:
         body.update(extra_body)
     headers = {"Content-Type": "application/json"}
-    api_key = str(endpoint.get("api_key") or OPENAI_API_KEY)
+    # _key 是启动时解析好的端点密钥（可能来自环境变量）；api_key 是 config 里的明文；
+    # 最后才回落到全局 OPENAI_API_KEY。见 _resolve_endpoint_key 的四级优先级。
+    api_key = str(endpoint.get("_key") or endpoint.get("api_key") or OPENAI_API_KEY)
     if api_key:
         headers["Authorization"] = "Bearer " + api_key
     req = urllib.request.Request(url, data=json.dumps(body).encode("utf-8"), headers=headers)
@@ -3797,7 +3853,7 @@ class Handler(BaseHTTPRequestHandler):
             else:
                 self._serve_file(BASE / rel, None)
         elif path == "/api/status":
-            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
+            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "llm_keys": llm_key_sources(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
         elif path == "/api/tts":
             self._serve_tts()
         else:
@@ -3898,7 +3954,7 @@ class Handler(BaseHTTPRequestHandler):
             _code, _payload = submit_feedback(body, _client_ip(self), self.headers)
             self._send(_code, _payload)
         elif path == "/api/status":
-            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
+            self._send(200, {"llm_mode": LLM_MODE, "model": NPC_MODEL, "ok": True, "tts": tts_status(), "feedback_mail": fb_mail_status(), "llm_keys": llm_key_sources(), "usage": dict(_USAGE_TOTAL), "thinking": {"mode": THINK_MODE_DEFAULT, "style": THINK_STYLE, "tasks": dict(THINK_TASKS)}})
         else:
             self._send(404, {"error": "not found"})
 

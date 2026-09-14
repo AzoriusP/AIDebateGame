@@ -7,7 +7,7 @@
   "judge_model": "qwen3.5:latest",
   "npc_model": "qwen3.5:latest",
   "openai_base": "https://tokenhub.tencentmaas.com",
-  "openai_api_key": "YOUR_TOKENHUB_KEY_HERE",
+  "openai_api_key": "",
   "openai_model": "hy4-preview",
   "port": 8787,
   "judge_timeout_s": 180,
@@ -22,23 +22,50 @@
       "provider": "openai",
       "base": "https://tokenhub.tencentmaas.com",
       "model": "hy4-preview",
-      "api_key": "YOUR_TOKENHUB_KEY_HERE"
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_A"
     },
     {
       "name": "B",
       "provider": "openai",
       "base": "https://tokenhub.tencentmaas.com",
       "model": "glm-5.3-flash",
-      "api_key": "YOUR_FAST_MODEL_KEY_HERE"
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_B"
+    },
+    {
+      "name": "C",
+      "provider": "openai",
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "glm-5.3-flash",
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_C"
     }
   ],
   "judge_endpoints": [
     {
-      "name": "FAST1",
+      "name": "J1",
       "provider": "openai",
       "base": "https://tokenhub.tencentmaas.com",
       "model": "glm-5.3-flash",
-      "api_key": "YOUR_FAST_MODEL_KEY_HERE"
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_B"
+    },
+    {
+      "name": "J2",
+      "provider": "openai",
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "glm-5.3-flash",
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_C"
+    },
+    {
+      "name": "J3",
+      "provider": "openai",
+      "base": "https://tokenhub.tencentmaas.com",
+      "model": "hy4-preview",
+      "api_key": "",
+      "api_key_env": "AIDEBATE_LLM_KEY_A"
     }
   ],
   "tts": {
@@ -65,8 +92,8 @@
       "enabled": false,
       "smtp_host": "smtp.qq.com",
       "smtp_port": 465,
-      "smtp_user": "YOUR_SENDER_QQ_MAIL@qq.com",
-      "smtp_pass": "YOUR_SMTP_AUTH_CODE",
+      "smtp_user": "",
+      "smtp_pass": "",
       "mail_from": "",
       "mail_to": "wdy0wb@agent.qq.com",
       "use_ssl": true,
