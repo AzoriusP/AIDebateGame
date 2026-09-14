@@ -7,6 +7,7 @@
 用法： python bench_thinking_cloud.py
 """
 import json
+import os
 import sys
 import time
 import urllib.request
@@ -14,7 +15,11 @@ import urllib.request
 sys.stdout.reconfigure(encoding="utf-8")
 
 BASE = "https://tokenhub.tencentmaas.com/v1/chat/completions"
-KEY = "sk-itZfFmYA3Vyj2uPdX4CVDgpzaRkXlXlkBfh7SDia7ZeR7FpF"
+# ⚠️ 密钥只从环境变量读，绝不硬编码（本文件曾因硬编码 key 泄露过一次，见 git 历史 b0b0cd9）。
+# 用法： export AIDEBATE_BENCH_KEY=sk-xxxx  再运行
+KEY = os.environ.get("AIDEBATE_BENCH_KEY", "").strip()
+if not KEY:
+    sys.exit("未设置环境变量 AIDEBATE_BENCH_KEY，已退出（避免用占位值打出 401）。")
 
 NPC_PROMPT = (
     "你是王阿姨，市井热心的退休大妈，在和玩家辩论「年轻人就该早点结婚生孩子」。\n"
