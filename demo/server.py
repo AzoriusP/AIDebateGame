@@ -1296,7 +1296,11 @@ def _thinking_payload(mode, provider="", model="", style=None):
         return payload
     if style == "glm":
         if mode == "off":
-            return {"thinking": {"type": "disabled"}}
+            # ⚠️ GLM-5.3 系列是"始终思考"模型，不接受 {"thinking":{"type":"disabled"}} ——
+            # 发出去会被 TokenHub 直接拒绝：400 invalid_request_error
+            # "该模型始终思考，不支持关闭思考；请使用 low、high 或 max。"
+            # 既然关不掉，就不要发这个字段（保持请求合法），输出长度仍由 max_tokens 约束。
+            return {}
         # GLM-5.3 系列只能 enabled，深度靠 reasoning_effort；budget 字段不适用，勿加
         return {"thinking": {"type": "enabled"},
                 "reasoning_effort": "low" if mode == "low" else "high"}
